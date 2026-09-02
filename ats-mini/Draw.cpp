@@ -7,7 +7,7 @@
 #include "Draw.h"
 
 extern uint8_t currentDCVIdx;
-extern uint8_t bandIdx;
+extern int bandIdx;
 
 //
 // Draw preferences write indicator
