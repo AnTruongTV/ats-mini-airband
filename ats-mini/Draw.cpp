@@ -283,6 +283,13 @@ void drawFrequency(uint32_t freq, int x, int y, int ux, int uy, uint8_t hl)
 //
 void drawScale(uint32_t freq)
 {
+  // 1. Tính toán Offset DCV cho tần số Scale nếu ở Airband
+  if (bandIdx == 2)
+  {
+    if (currentDCVIdx == 1)      freq += 100000; // +100 MHz
+    else if (currentDCVIdx == 2) freq += 110000; // +110 MHz
+  }
+
   // Scale pointer
   spr.fillTriangle(156, 120, 160, 130, 164, 120, TH.scale_pointer);
   spr.drawLine(160, 130, 160, 169, TH.scale_pointer);
@@ -291,7 +298,6 @@ void drawScale(uint32_t freq)
   spr.setTextColor(TH.scale_text);
 
   // Extra frequencies to draw outside the screen boundaries
-  // (ensures frequency numbers don't disappear at the edges)
   int16_t slack = 3;
 
   // Scale offset
@@ -300,15 +306,26 @@ void drawScale(uint32_t freq)
   // Start drawing frequencies from the left
   freq = freq / 10 - 20 - slack;
 
-  // Get band edges
+  // Get band edges (Lưu ý: Giới hạn min/max freq gốc cũng cần giữ nguyên để vẽ vạch)
   const Band *band = getCurrentBand();
   uint32_t minFreq = band->minimumFreq / 10;
   uint32_t maxFreq = band->maximumFreq / 10;
 
+  // Tính khoảng lệch offset để kiểm tra điều kiện giới hạn minFreq / maxFreq chuẩn
+  uint32_t dcvOffsetUnits = 0;
+  if (bandIdx == 2) {
+    if (currentDCVIdx == 1)      dcvOffsetUnits = 10000; // 100,000 kHz / 10
+    else if (currentDCVIdx == 2) dcvOffsetUnits = 11000; // 110,000 kHz / 10
+  }
+
   for(int i=0 ; i<(slack + 41 + slack) ; i++, freq++)
   {
     int16_t x = i * 8 - offset;
-    if(freq >= minFreq && freq <= maxFreq)
+    
+    // So sánh giới hạn bằng tần số gốc (chưa cộng DCV offset)
+    uint32_t rawFreq = freq - dcvOffsetUnits;
+
+    if(rawFreq >= minFreq && rawFreq <= maxFreq)
     {
       uint16_t lineColor = (i==20) && (!offset || (!(freq%5) && offset==1))?
         TH.scale_pointer : TH.scale_line;
@@ -317,12 +334,25 @@ void drawScale(uint32_t freq)
       {
         spr.drawLine(x, 169, x, 150, lineColor);
         spr.drawLine(x + 1, 169, x + 1, 150, lineColor);
-        if(currentMode == FM)
+
+        // 2. Định dạng nhãn số bên dưới vạch chia
+        if(bandIdx == 2)
+        {
+          // Airband: In dạng 118.0, 118.1 (In MHz với 1 chữ số thập phân)
+          spr.drawFloat(freq / 100.0, 1, x, 140, 2);
+        }
+        else if(currentMode == FM)
+        {
           spr.drawFloat(freq / 10.0, 1, x, 140, 2);
+        }
         else if(freq >= 100)
+        {
           spr.drawFloat(freq / 100.0, 3, x, 140, 2);
+        }
         else
+        {
           spr.drawNumber(freq * 10, x, 140, 2);
+        }
       }
       else if((freq % 5) == 0 && (freq % 10) != 0)
       {
@@ -336,7 +366,6 @@ void drawScale(uint32_t freq)
     }
   }
 }
-
 //
 // Draw S-meter
 //
