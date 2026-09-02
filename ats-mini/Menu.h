@@ -122,6 +122,7 @@ int getCurrentUTCOffset();
 int getTotalUTCOffsets();
 int getTotalFmRegions();
 int getTotalBleModes();
+int getTotalDCV();
 
 void doSoftMute(int16_t enc);
 void doAgc(int16_t enc);
@@ -134,5 +135,6 @@ void doCal(int16_t enc);
 void doStep(int16_t enc);
 void doMode(int16_t enc);
 void doBand(int16_t enc);
+void doDCV(int16_t enc);
 
 #endif // MENU_H
