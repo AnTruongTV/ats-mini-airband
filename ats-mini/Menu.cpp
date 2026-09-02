@@ -1334,22 +1334,41 @@ static void drawDCV(int x, int y, int sx)
   }
 }
 
+static int getValidBandIdx(int baseIdx, int offset) 
+{
+  int count = ITEM_COUNT(bands);
+  int step = (offset > 0) ? 1 : -1;
+  int stepsToTake = abs(offset);
+  int curr = baseIdx;
+
+  for (int s = 0; s < stepsToTake; s++) 
+  {
+    do {
+      curr = (curr + count + step) % count;
+    } while (currentDCVIdx == 0 && curr == 2); // Bỏ qua index 2 nếu DCV OFF
+  }
+
+  return curr;
+}
+
 static void drawBand(int x, int y, int sx)
 {
   drawCommon(menu[MENU_BAND], x, y, sx, true);
 
-  int count = ITEM_COUNT(bands);
-  for(int i=-2 ; i<3 ; i++)
+  for(int i = -2 ; i < 3 ; i++)
   {
-    if(i==0) {
-      drawZoomedMenu(bands[abs((bandIdx+count+i)%count)].bandName);
+    // Lấy index band hợp lệ dựa trên trạng thái DCV
+    int idx = (i == 0) ? bandIdx : getValidBandIdx(bandIdx, i);
+
+    if(i == 0) {
+      drawZoomedMenu(bands[idx].bandName);
       spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
     } else {
       spr.setTextColor(TH.menu_item);
     }
 
     spr.setTextDatum(MC_DATUM);
-    spr.drawString(bands[abs((bandIdx+count+i)%count)].bandName, 40+x+(sx/2), 64+y+(i*16), 2);
+    spr.drawString(bands[idx].bandName, 40 + x + (sx / 2), 64 + y + (i * 16), 2);
   }
 }
 
