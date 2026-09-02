@@ -252,7 +252,7 @@ void setup()
 
   if (bandIdx == 2 && currentDCVIdx == 0) {
     bandIdx = 0;
-  
+  }
   // Audio Amplifier Enable. G8PTN: Added
   // After the SI4732 has been setup, enable the audio amplifier
   if(PIN_AMP_EN >= 0) digitalWrite(PIN_AMP_EN, HIGH);
