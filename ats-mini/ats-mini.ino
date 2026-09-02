@@ -252,11 +252,6 @@ void setup()
 
   if (bandIdx == 2 && currentDCVIdx == 0) {
     bandIdx = 0;
-  if (bands[0].lastFrequency > 0) {
-      currentFrequency = bands[0].lastFrequency;
-    }
-    prefsRequestSave(SAVE_SETTINGS);
-  }
   
   // Audio Amplifier Enable. G8PTN: Added
   // After the SI4732 has been setup, enable the audio amplifier
