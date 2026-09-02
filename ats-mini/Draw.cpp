@@ -183,6 +183,20 @@ void drawFrequency(uint32_t freq, int x, int y, int ux, int uy, uint8_t hl)
     { x - 30 - 32 * 3 - 16, y + 28, 27 + 16 }, //  5000.000
     { x - 30 - 32 * 4 -  0, y + 28, 27 }, //      10000.000
   };
+  
+  int x_air = x + 15; 
+
+  const Line hlDigitsAIR[] =
+  {
+    { x_air - 16 * 1 + 1, y + 28, 14 }, // Position 1: .xx5
+    { x_air - 16 * 1 - 7, y + 28, 21 }, // Position 2: .x05/x25
+    { x_air - 16 * 2 + 1, y + 28, 14 }, // Position 3: .x00
+    { x_air - 16 * 2 - 7, y + 28, 21 }, // Position 4: .050
+    { x_air - 16 * 3 + 1, y + 28, 14 }, // Position 5: .100
+    { x_air - 16 * 4 - 7, y + 28, 14 }, // Position 6: 1.xxx
+    { x_air - 16 * 5 - 7, y + 28, 14 }, // Position 7: 10.xxx
+    { x_air - 16 * 6 - 7, y + 28, 14 }, // Position 8: 100.xxx
+  };
 
   // Top bit specifies if the digit selector is on
   bool selectOn = hl & 0x80;
@@ -204,6 +218,16 @@ void drawFrequency(uint32_t freq, int x, int y, int ux, int uy, uint8_t hl)
     spr.setTextDatum(ML_DATUM);
     spr.setTextColor(TH.funit_text);
     spr.drawString("MHz", ux, uy);
+  }
+    else if(currentMode == AIR)
+  {
+    int x_air = x + 15;
+    li = hl < ITEM_COUNT(hlDigitsAIR) ? &hlDigitsAIR[hl] : 0;
+    uint32_t airFreq = getAirDisplayFreq(freq);
+    char text[12];
+    sprintf(text, "%3lu.%03lu", airFreq / 1000, airFreq % 1000);
+    spr.setTextDatum(MR_DATUM);
+    spr.drawString(text, x_air, y, 7);
   }
   else
   {
