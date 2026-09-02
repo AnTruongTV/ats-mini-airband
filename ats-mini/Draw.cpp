@@ -221,11 +221,9 @@ void drawFrequency(uint32_t freq, int x, int y, int ux, int uy, uint8_t hl)
   }
     else if(currentMode == AIR)
   {
-    int x_air = x + 15;
     li = hl < ITEM_COUNT(hlDigitsAIR) ? &hlDigitsAIR[hl] : 0;
-    uint32_t airFreq = getAirDisplayFreq(freq);
     char text[12];
-    sprintf(text, "%3lu.%03lu", airFreq / 1000, airFreq % 1000);
+    sprintf(text, "%3lu.%03lu", freq / 1000, freq % 1000);
     spr.setTextDatum(MR_DATUM);
     spr.drawString(text, x_air, y, 7);
   }
