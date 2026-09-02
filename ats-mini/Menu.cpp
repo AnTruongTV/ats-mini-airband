@@ -160,9 +160,14 @@ int getTotalDCV() {
 }
 
 uint16_t getAirbandMaxFreq() {
-  if (bandIdx == 2) {
-    if (currentDCVIdx == 1) return 30000; // Mode 100M: Giới hạn 30 MHz gốc (Hiển thị 130.00 MHz)
-    if (currentDCVIdx == 2) return 27000; // Mode 110M: Giới hạn 27 MHz gốc (Hiển thị 137.00 MHz)
+  if (bandIdx == 2) { // Airband Mode
+    switch (currentDCVIdx) {
+      case 1: 
+        return 30000; // Offset 100M: Max 30MHz
+      case 2: 
+      default: 
+        return 27000; // Offset 110M: Max 27MHz
+    }
   }
   return getCurrentBand()->maximumFreq;
 }
