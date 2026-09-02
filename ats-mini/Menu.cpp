@@ -31,7 +31,7 @@ Band bands[] =
   {"VHF",  FM_BAND_TYPE, FM,   6400, 10800, 10390, 1, 0, 0, 0},
   // All band. LW, MW and SW (from 150kHz to 30MHz)
   {"ALL",  SW_BAND_TYPE, AM,    150, 30000, 15000, 1, 4, 0, 0},
-  {"AIR",  SW_BAND_TYPE, AM,   8000, 27990,  8000, 4, 4, 0, 0},
+  {"AIR",  SW_BAND_TYPE, AM,   8000, 27990,  8000, 3, 4, 0, 0},
   {"NDB",  SW_BAND_TYPE, AM,    190,  1800,   200, 0, 4, 0, 0},
 };
 
@@ -600,13 +600,18 @@ static void clickDateTime(bool shortPress)
 void doDCV(int16_t enc) {
   if (enc == 0) return;
 
+  int count = getTotalDCV();
+  
   if (enc > 0) {
-    currentDCVIdx = (currentDCVIdx + 1) % getTotalDCV();
+    if (currentDCVIdx < count - 1) {
+      currentDCVIdx++;
+    }
   } else {
-    currentDCVIdx = (currentDCVIdx - 1 + getTotalDCV()) % getTotalDCV();
+    if (currentDCVIdx > 0) {
+      currentDCVIdx--;
+    }
   }
 }
-
 void doSelectDigit(int16_t enc)
 {
   freqInputPos = clamp_range(freqInputPos, -enc, getMinFreqInputPos(), getMaxFreqInputPos());
@@ -1080,6 +1085,7 @@ bool doSideBar(uint16_t cmd, int16_t enc, int16_t enca)
     case CMD_DATETIME:   doDateTime(enc);break;
     case CMD_SQUELCH:    doSquelch(enca);break;
     case CMD_ABOUT:      doAbout(enc);break;
+    case CMD_DCV:        doDCV(enc);break;
     default:             return(false);
   }
 
@@ -1309,20 +1315,22 @@ static void drawDCV(int x, int y, int sx)
   drawCommon(settings[MENU_DCV], x, y, sx, true);
 
   int count = getTotalDCV();
-
-  for(int i = -2; i < 3; i++)
+  for(int i=-2 ; i<3 ; i++)
   {
-    int idx = abs((currentDCVIdx + count + i) % count);
+    // Chặn lặp lại cho các menu ngắn (ít hơn 5 item)
+    if (count < 5 && ((currentDCVIdx + i) < 0 || (currentDCVIdx + i) >= count)) {
+      continue;
+    }
 
-    if(i == 0) {
-      drawZoomedMenu(dcvDesc[idx]);
+    if(i==0) {
+      drawZoomedMenu(dcvDesc[abs((currentDCVIdx + count + i) % count)]);
       spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
     } else {
       spr.setTextColor(TH.menu_item);
     }
 
     spr.setTextDatum(MC_DATUM);
-    spr.drawString(dcvDesc[idx], 40 + x + (sx / 2), 64 + y + (i * 16), 2);
+    spr.drawString(dcvDesc[abs((currentDCVIdx + count + i) % count)], 40 + x + (sx / 2), 64 + y + (i * 16), 2);
   }
 }
 
