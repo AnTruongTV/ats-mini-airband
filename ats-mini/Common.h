@@ -190,6 +190,7 @@ extern uint8_t bleModeIdx;
 extern uint8_t wifiModeIdx;
 extern uint8_t FmRegionIdx;
 
+
 extern int8_t agcIdx;
 extern int8_t agcNdx;
 extern int8_t softMuteMaxAttIdx;
@@ -222,6 +223,7 @@ const char *getRadioText();
 const char *getProgramInfo();
 const char *getRdsTime();
 uint16_t getRdsPiCode();
+uint32_t getAirDisplayFreq(uint32_t freq);
 void clearStationInfo();
 bool checkRds();
 bool identifyFrequency(uint16_t freq, bool periodic = false);
