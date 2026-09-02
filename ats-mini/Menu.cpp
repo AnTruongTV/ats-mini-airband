@@ -611,7 +611,19 @@ void doDCV(int16_t enc) {
       currentDCVIdx--;
     }
   }
+
+  // Khi tắt DCV về 0 mà máy đang ở Airband (index 2) -> Đưa thẳng về VHF (index 0)
+  if (currentDCVIdx == 0 && bandIdx == 2) {
+    // Lưu lại cấu hình Airband trước khi thoát
+    bands[bandIdx].currentFreq = currentFrequency + currentBFO / 1000;
+    bands[bandIdx].bandMode = currentMode;
+
+    bandIdx = 0; // Index của dải VHF/FM
+    selectBand(bandIdx);
+  }
 }
+
+
 void doSelectDigit(int16_t enc)
 {
   freqInputPos = clamp_range(freqInputPos, -enc, getMinFreqInputPos(), getMaxFreqInputPos());
@@ -933,8 +945,8 @@ void doBand(int16_t enc)
   bands[bandIdx].currentFreq = currentFrequency + currentBFO / 1000;
   bands[bandIdx].bandMode = currentMode;
 
-  // Change band
-  bandIdx = wrap_range(bandIdx, enc, 0, LAST_ITEM(bands));
+  // Change band: Tự động bỏ qua Airband nếu DCV OFF
+  bandIdx = getValidBandIdx(bandIdx, enc);
 
   // Enable the new band
   selectBand(bandIdx);
