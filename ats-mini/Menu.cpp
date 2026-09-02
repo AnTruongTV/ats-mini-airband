@@ -91,11 +91,12 @@ static const char *menu[] =
 #define MENU_SCROLL       9
 #define MENU_SLEEP        10
 #define MENU_SLEEPMODE    11
-#define MENU_LOADEIBI     12
-#define MENU_USBMODE      13
-#define MENU_BLEMODE      14
-#define MENU_WIFIMODE     15
-#define MENU_ABOUT        16
+#define MENU_DCV          12
+#define MENU_LOADEIBI     13
+#define MENU_USBMODE      14
+#define MENU_BLEMODE      15
+#define MENU_WIFIMODE     16
+#define MENU_ABOUT        17
 
 
 int8_t settingsIdx = MENU_BRIGHTNESS;
@@ -114,6 +115,7 @@ static const char *settings[] =
   "Scroll Dir.",
   "Sleep",
   "Sleep Mode",
+  "DCV",
   "Load EiBi",
   "USB Port",
   "Bluetooth",
@@ -140,6 +142,21 @@ int getTotalFmRegions() { return(ITEM_COUNT(fmRegions)); }
 const char *bandModeDesc[] = { "FM", "LSB", "USB", "AM" };
 
 int getTotalModes() { return(ITEM_COUNT(bandModeDesc)); }
+
+//
+// Down Converter Menu
+//
+const char *dcvDesc[] = {
+  "OFF",
+  "100MHz",
+  "110MHz"
+};
+
+static uint8_t currentDCVIdx = 0;
+
+int getTotalDCV() {
+  return ITEM_COUNT(dcvDesc);
+}
 
 //
 // Memory Menu
@@ -580,6 +597,16 @@ static void clickDateTime(bool shortPress)
 // Encoder input handlers
 //
 
+void doDCV(int16_t enc) {
+  if (enc == 0) return;
+
+  if (enc > 0) {
+    currentDCVIdx = (currentDCVIdx + 1) % getTotalDCV();
+  } else {
+    currentDCVIdx = (currentDCVIdx - 1 + getTotalDCV()) % getTotalDCV();
+  }
+}
+
 void doSelectDigit(int16_t enc)
 {
   freqInputPos = clamp_range(freqInputPos, -enc, getMinFreqInputPos(), getMaxFreqInputPos());
@@ -1013,6 +1040,7 @@ static void clickSettings(int cmd, bool shortPress)
     case MENU_LOADEIBI:
       eibiLoadSchedule();
       break;
+    case MENU_DCV:        currentCmd = CMD_DCV;       break;
   }
 }
 
@@ -1274,6 +1302,28 @@ static void drawScan(int x, int y, int sx)
   spr.drawLine(40+x+(sx/2)-4, 66+y+5, 40+x+(sx/2), 66+y-16+5, TH.menu_param);
   spr.drawLine(40+x+(sx/2), 66+y-16+5, 40+x+(sx/2)+4, 66+y+5, TH.menu_param);
   spr.drawLine(40+x+(sx/2)+4, 66+y+5, 40+x+(sx/2)+17, 66+y+5, TH.menu_param);
+}
+
+static void drawDCV(int x, int y, int sx)
+{
+  drawCommon(settings[MENU_DCV], x, y, sx, true);
+
+  int count = getTotalDCV();
+
+  for(int i = -2; i < 3; i++)
+  {
+    int idx = abs((currentDCVIdx + count + i) % count);
+
+    if(i == 0) {
+      drawZoomedMenu(dcvDesc[idx]);
+      spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
+    } else {
+      spr.setTextColor(TH.menu_item);
+    }
+
+    spr.setTextDatum(MC_DATUM);
+    spr.drawString(dcvDesc[idx], 40 + x + (sx / 2), 64 + y + (i * 16), 2);
+  }
 }
 
 static void drawBand(int x, int y, int sx)
@@ -1870,6 +1920,7 @@ void drawSideBar(uint16_t cmd, int x, int y, int sx)
     case CMD_UTCOFFSET:  drawUTCOffset(x, y, sx);  break;
     case CMD_DATETIME:   drawDateTime(x, y, sx);   break;
     case CMD_SQUELCH:    drawSquelch(x, y, sx);    break;
+    case CMD_DCV:        drawDCV(x, y, sx);        break;
     default:             drawInfo(x, y, sx);       break;
   }
 }
