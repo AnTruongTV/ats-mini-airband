@@ -28,7 +28,7 @@ int bandIdx = 0;
 // Do not forget to update the bands table in the manual.md
 Band bands[] =
 {
-  {"VHF",  FM_BAND_TYPE, FM,   6400, 10800, 10390, 1, 0, 0, 0},
+  {"VHF",  FM_BAND_TYPE, FM,   6400, 10800, 10650, 1, 0, 0, 0},
   // All band. LW, MW and SW (from 150kHz to 30MHz)
   {"ALL",  SW_BAND_TYPE, AM,    150, 30000, 15000, 1, 4, 0, 0},
   {"AIR",  SW_BAND_TYPE, AM,   8000, 27990,  8000, 3, 4, 0, 0},
@@ -152,7 +152,7 @@ const char *dcvDesc[] = {
   "110MHz"
 };
 
-static uint8_t currentDCVIdx = 0;
+uint8_t currentDCVIdx = 0;
 
 int getTotalDCV() {
   return ITEM_COUNT(dcvDesc);
