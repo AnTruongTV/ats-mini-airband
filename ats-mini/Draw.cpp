@@ -7,6 +7,7 @@
 #include "Draw.h"
 
 extern uint8_t currentDCVIdx;
+extern uint8_t bandIdx;
 
 //
 // Draw preferences write indicator
@@ -221,7 +222,7 @@ void drawFrequency(uint32_t freq, int x, int y, int ux, int uy, uint8_t hl)
     spr.setTextColor(TH.funit_text);
     spr.drawString("MHz", ux, uy);
   }
-  else if (getCurrentBand() == &bandTable[2])
+  else if (bandIdx == 2)
   {
     li = hl < ITEM_COUNT(hlDigitsAIR) ? &hlDigitsAIR[hl] : 0;
     uint32_t displayFreq = freq;
