@@ -187,7 +187,7 @@ void drawFrequency(uint32_t freq, int x, int y, int ux, int uy, uint8_t hl)
     { x - 30 - 32 * 4 -  0, y + 28, 27 }, //      10000.000
   };
 
-  int x_air = x - 20;
+  int x_air = x + 40;
 
   const Line hlDigitsAIR[] =
   {
