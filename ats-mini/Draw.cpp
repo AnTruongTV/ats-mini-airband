@@ -6,6 +6,8 @@
 #include "BleMode.h"
 #include "Draw.h"
 
+extern uint8_t currentDCVIdx;
+
 //
 // Draw preferences write indicator
 //
@@ -219,12 +221,12 @@ void drawFrequency(uint32_t freq, int x, int y, int ux, int uy, uint8_t hl)
     spr.setTextColor(TH.funit_text);
     spr.drawString("MHz", ux, uy);
   }
-  else if (currentBand == 2) // AIR Band
+  else if (getCurrentBand() == &bandTable[2])
   {
     li = hl < ITEM_COUNT(hlDigitsAIR) ? &hlDigitsAIR[hl] : 0;
     uint32_t displayFreq = freq;
-    if (currentDCVIdx == 1)      displayFreq += 100000; // +100MHz
-    else if (currentDCVIdx == 2) displayFreq += 110000; // +110MHz
+    if (currentDCVIdx == 1)      displayFreq += 100000;
+    else if (currentDCVIdx == 2) displayFreq += 110000;
     char text[12];
     sprintf(text, "%3lu.%03lu", displayFreq / 1000, displayFreq % 1000);
     spr.setTextDatum(MR_DATUM);
