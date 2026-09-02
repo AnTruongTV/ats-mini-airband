@@ -123,11 +123,43 @@ void drawBandAndMode(const char *band, const char *mode, int x, int y)
   spr.setTextColor(TH.band_text);
   uint16_t band_width = spr.drawString(band, x, y);
 
+  // 1. Vẽ Mode (AM / FM / USB / LSB...)
   spr.setTextDatum(TL_DATUM);
   spr.setTextColor(TH.mode_text);
-  uint16_t mode_width = spr.drawString(mode, x + band_width / 2 + 12, y + 8, 2);
+  
+  int mode_text_x = x + band_width / 2 + 12;
+  int mode_text_y = y + 8;
+  uint16_t mode_width = spr.drawString(mode, mode_text_x, mode_text_y, 2);
 
-  spr.drawSmoothRoundRect(x + band_width / 2 + 7, y + 7, 4, 4, mode_width + 8, 17, TH.mode_border, TH.bg);
+  int mode_box_x = x + band_width / 2 + 7;
+  int mode_box_y = y + 7;
+  int mode_box_w = mode_width + 8;
+  int mode_box_h = 17;
+
+  // Vẽ khung Mode
+  spr.drawSmoothRoundRect(mode_box_x, mode_box_y, 4, 4, mode_box_w, mode_box_h, TH.mode_border, TH.bg);
+
+  // 2. Vẽ Badge Offset (100 / 110)
+  if (bandIdx == 2 && currentDCVIdx > 0)
+  {
+    const char *dcvText = (currentDCVIdx == 1) ? "100" : "110";
+
+    // Khung DCV bắt đầu NGAY SAU mép phải của khung Mode + khoảng cách 6px
+    int dcv_box_x = mode_box_x + mode_box_w + 6; 
+    int dcv_box_y = mode_box_y;
+
+    // Đo độ rộng chữ "100"/"110"
+    // Dùng tạm datum tạm để đo width chính xác
+    uint16_t dcv_text_width = spr.textWidth(dcvText, 2);
+    int dcv_box_w = dcv_text_width + 8; // Khung ôm vừa khít chữ + 8px padding
+
+    // Chữ DCV nằm chính giữa trong khung DCV
+    int dcv_text_x = dcv_box_x + 4; 
+
+    // In chữ & Vẽ khung
+    spr.drawString(dcvText, dcv_text_x, mode_text_y, 2);
+    spr.drawSmoothRoundRect(dcv_box_x, dcv_box_y, 4, 4, dcv_box_w, mode_box_h, TH.mode_border, TH.bg);
+  }
 }
 
 //
