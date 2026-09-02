@@ -13,6 +13,7 @@
 #include "patch_init.h"
 
 extern ButtonTracker pb1;
+extern uint16_t getAirbandMaxFreq();
 
 // Current sleep status, returned by sleepOn()
 static bool sleep_on = false;
@@ -374,7 +375,9 @@ bool clockSetEpoch(uint32_t epoch)
 //
 bool isFreqInBand(const Band *band, uint16_t freq)
 {
-  return((freq>=band->minimumFreq) && (freq<=band->maximumFreq));
+  uint16_t maxFreq = (bandIdx == 2) ? getAirbandMaxFreq() : band->maximumFreq;
+
+  return ((freq >= band->minimumFreq) && (freq <= maxFreq));
 }
 
 //
