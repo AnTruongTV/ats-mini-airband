@@ -51,24 +51,61 @@ static void drawSmallScale(uint32_t freq, int y)
   const uint16_t scaleStart = 51;
   const uint16_t scaleEnd = 269;
 
+  // 1. Tính toán Offset DCV cho Airband (đơn vị kHz)
+  uint32_t dcvOffset = 0;
+  if (bandIdx == 2)
+  {
+    if (currentDCVIdx == 1)      dcvOffset = 100000; // +100 MHz
+    else if (currentDCVIdx == 2) dcvOffset = 110000; // +110 MHz
+  }
+
+  // Tần số giới hạn thực tế sau khi cộng offset
+  uint32_t minFreq = band->minimumFreq + dcvOffset;
+  uint32_t maxFreq = band->maximumFreq + dcvOffset;
+
+  // 2. Vẽ thanh scale và con trỏ S-Meter
   for(int i=scaleStart+3; i<=scaleEnd-3; i+=2) spr.drawPixel(i, y, TH.scale_line);
   spr.drawCircle(scaleStart, y, 3, TH.scale_line);
   spr.drawCircle(scaleEnd, y, 3, TH.scale_line);
+
+  // Vị trí con trỏ dùng freq gốc để giữ tỉ lệ phần trăm chính xác
   spr.fillCircle(scaleStart + (scaleEnd-scaleStart) * (freq - band->minimumFreq) / (band->maximumFreq - band->minimumFreq), y, 3, TH.scale_pointer);
 
-  char lim[8];
+  // 3. In nhãn giới hạn TẦN SỐ ĐẦU (Min)
+  char lim[10];
   spr.setTextColor(TH.scale_text);
   spr.setTextDatum(MC_DATUM);
-  if(band->bandType==FM_BAND_TYPE)
-    sprintf(lim, "%0.2f", band->minimumFreq/100.00);
+
+  if (bandIdx == 2)
+  {
+    // Airband: In dạng MHz gọn gàng (ví dụ: 118.00)
+    sprintf(lim, "%.2f", minFreq / 1000.0);
+  }
+  else if (band->bandType == FM_BAND_TYPE)
+  {
+    sprintf(lim, "%0.2f", band->minimumFreq / 100.00);
+  }
   else
+  {
     sprintf(lim, "%u", band->minimumFreq);
-  spr.drawString(lim, scaleStart-27, y, 2);
-  if(band->bandType==FM_BAND_TYPE)
-    sprintf(lim, "%0.2f", band->maximumFreq/100.00);
+  }
+  spr.drawString(lim, scaleStart - 27, y, 2);
+
+  // 4. In nhãn giới hạn TẦN SỐ CUỐI (Max)
+  if (bandIdx == 2)
+  {
+    // Airband: In dạng MHz gọn gàng (ví dụ: 138.00)
+    sprintf(lim, "%.2f", maxFreq / 1000.0);
+  }
+  else if (band->bandType == FM_BAND_TYPE)
+  {
+    sprintf(lim, "%0.2f", band->maximumFreq / 100.00);
+  }
   else
+  {
     sprintf(lim, "%u", band->maximumFreq);
-  spr.drawString(lim, scaleEnd+27, y, 2);
+  }
+  spr.drawString(lim, scaleEnd + 27, y, 2);
 }
 
 //

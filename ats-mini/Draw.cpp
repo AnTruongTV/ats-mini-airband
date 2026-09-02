@@ -6,6 +6,9 @@
 #include "BleMode.h"
 #include "Draw.h"
 
+extern uint8_t currentDCVIdx;
+extern int bandIdx;
+
 //
 // Draw preferences write indicator
 //
@@ -120,11 +123,43 @@ void drawBandAndMode(const char *band, const char *mode, int x, int y)
   spr.setTextColor(TH.band_text);
   uint16_t band_width = spr.drawString(band, x, y);
 
+  // 1. Vẽ Mode (AM / FM / USB / LSB...)
   spr.setTextDatum(TL_DATUM);
   spr.setTextColor(TH.mode_text);
-  uint16_t mode_width = spr.drawString(mode, x + band_width / 2 + 12, y + 8, 2);
+  
+  int mode_text_x = x + band_width / 2 + 12;
+  int mode_text_y = y + 8;
+  uint16_t mode_width = spr.drawString(mode, mode_text_x, mode_text_y, 2);
 
-  spr.drawSmoothRoundRect(x + band_width / 2 + 7, y + 7, 4, 4, mode_width + 8, 17, TH.mode_border, TH.bg);
+  int mode_box_x = x + band_width / 2 + 7;
+  int mode_box_y = y + 7;
+  int mode_box_w = mode_width + 8;
+  int mode_box_h = 17;
+
+  // Vẽ khung Mode
+  spr.drawSmoothRoundRect(mode_box_x, mode_box_y, 4, 4, mode_box_w, mode_box_h, TH.mode_border, TH.bg);
+
+  // 2. Vẽ Badge Offset (100 / 110)
+  if (bandIdx == 2 && currentDCVIdx > 0)
+  {
+    const char *dcvText = (currentDCVIdx == 1) ? "100" : "110";
+
+    // Khung DCV bắt đầu NGAY SAU mép phải của khung Mode + khoảng cách 6px
+    int dcv_box_x = mode_box_x + mode_box_w + 6; 
+    int dcv_box_y = mode_box_y;
+
+    // Đo độ rộng chữ "100"/"110"
+    // Dùng tạm datum tạm để đo width chính xác
+    uint16_t dcv_text_width = spr.textWidth(dcvText, 2);
+    int dcv_box_w = dcv_text_width + 8; // Khung ôm vừa khít chữ + 8px padding
+
+    // Chữ DCV nằm chính giữa trong khung DCV
+    int dcv_text_x = dcv_box_x + 4; 
+
+    // In chữ & Vẽ khung
+    spr.drawString(dcvText, dcv_text_x, mode_text_y, 2);
+    spr.drawSmoothRoundRect(dcv_box_x, dcv_box_y, 4, 4, dcv_box_w, mode_box_h, TH.mode_border, TH.bg);
+  }
 }
 
 //
@@ -184,6 +219,20 @@ void drawFrequency(uint32_t freq, int x, int y, int ux, int uy, uint8_t hl)
     { x - 30 - 32 * 4 -  0, y + 28, 27 }, //      10000.000
   };
 
+  int x_air = x + 50;
+
+  const Line hlDigitsAIR[] =
+  {
+    { x_air - 16 * 1 + 1, y + 28, 14 }, // Position 0: .xx5
+    { x_air - 16 * 1 - 7, y + 28, 21 }, // Position 1: .x05/x25
+    { x_air - 16 * 2 + 1, y + 28, 14 }, // Position 2: .x00
+    { x_air - 16 * 2 - 7, y + 28, 21 }, // Position 3: .050
+    { x_air - 16 * 3 + 1, y + 28, 14 }, // Position 4: .100
+    { x_air - 16 * 4 - 7, y + 28, 14 }, // Position 5: 1.xxx
+    { x_air - 16 * 5 - 7, y + 28, 14 }, // Position 6: 10.xxx
+    { x_air - 16 * 6 - 7, y + 28, 14 }, // Position 7: 100.xxx
+  };
+
   // Top bit specifies if the digit selector is on
   bool selectOn = hl & 0x80;
   const struct Line *li;
@@ -204,6 +253,17 @@ void drawFrequency(uint32_t freq, int x, int y, int ux, int uy, uint8_t hl)
     spr.setTextDatum(ML_DATUM);
     spr.setTextColor(TH.funit_text);
     spr.drawString("MHz", ux, uy);
+  }
+  else if (bandIdx == 2)
+  {
+    li = hl < ITEM_COUNT(hlDigitsAIR) ? &hlDigitsAIR[hl] : 0;
+    uint32_t displayFreq = freq;
+    if (currentDCVIdx == 1)      displayFreq += 100000;
+    else if (currentDCVIdx == 2) displayFreq += 110000;
+    char text[12];
+    sprintf(text, "%3lu.%03lu", displayFreq / 1000, displayFreq % 1000);
+    spr.setTextDatum(MR_DATUM);
+    spr.drawString(text, x_air, y, 7);
   }
   else
   {
@@ -255,6 +315,13 @@ void drawFrequency(uint32_t freq, int x, int y, int ux, int uy, uint8_t hl)
 //
 void drawScale(uint32_t freq)
 {
+  // 1. Tính toán Offset DCV cho tần số Scale nếu ở Airband
+  if (bandIdx == 2)
+  {
+    if (currentDCVIdx == 1)      freq += 100000; // +100 MHz
+    else if (currentDCVIdx == 2) freq += 110000; // +110 MHz
+  }
+
   // Scale pointer
   spr.fillTriangle(156, 120, 160, 130, 164, 120, TH.scale_pointer);
   spr.drawLine(160, 130, 160, 169, TH.scale_pointer);
@@ -263,7 +330,6 @@ void drawScale(uint32_t freq)
   spr.setTextColor(TH.scale_text);
 
   // Extra frequencies to draw outside the screen boundaries
-  // (ensures frequency numbers don't disappear at the edges)
   int16_t slack = 3;
 
   // Scale offset
@@ -272,15 +338,26 @@ void drawScale(uint32_t freq)
   // Start drawing frequencies from the left
   freq = freq / 10 - 20 - slack;
 
-  // Get band edges
+  // Get band edges (Lưu ý: Giới hạn min/max freq gốc cũng cần giữ nguyên để vẽ vạch)
   const Band *band = getCurrentBand();
   uint32_t minFreq = band->minimumFreq / 10;
   uint32_t maxFreq = band->maximumFreq / 10;
 
+  // Tính khoảng lệch offset để kiểm tra điều kiện giới hạn minFreq / maxFreq chuẩn
+  uint32_t dcvOffsetUnits = 0;
+  if (bandIdx == 2) {
+    if (currentDCVIdx == 1)      dcvOffsetUnits = 10000; // 100,000 kHz / 10
+    else if (currentDCVIdx == 2) dcvOffsetUnits = 11000; // 110,000 kHz / 10
+  }
+
   for(int i=0 ; i<(slack + 41 + slack) ; i++, freq++)
   {
     int16_t x = i * 8 - offset;
-    if(freq >= minFreq && freq <= maxFreq)
+    
+    // So sánh giới hạn bằng tần số gốc (chưa cộng DCV offset)
+    uint32_t rawFreq = freq - dcvOffsetUnits;
+
+    if(rawFreq >= minFreq && rawFreq <= maxFreq)
     {
       uint16_t lineColor = (i==20) && (!offset || (!(freq%5) && offset==1))?
         TH.scale_pointer : TH.scale_line;
@@ -289,12 +366,25 @@ void drawScale(uint32_t freq)
       {
         spr.drawLine(x, 169, x, 150, lineColor);
         spr.drawLine(x + 1, 169, x + 1, 150, lineColor);
-        if(currentMode == FM)
+
+        // 2. Định dạng nhãn số bên dưới vạch chia
+        if(bandIdx == 2)
+        {
+          // Airband: In dạng 118.0, 118.1 (In MHz với 1 chữ số thập phân)
+          spr.drawFloat(freq / 100.0, 1, x, 140, 2);
+        }
+        else if(currentMode == FM)
+        {
           spr.drawFloat(freq / 10.0, 1, x, 140, 2);
+        }
         else if(freq >= 100)
+        {
           spr.drawFloat(freq / 100.0, 3, x, 140, 2);
+        }
         else
+        {
           spr.drawNumber(freq * 10, x, 140, 2);
+        }
       }
       else if((freq % 5) == 0 && (freq % 10) != 0)
       {
@@ -308,7 +398,6 @@ void drawScale(uint32_t freq)
     }
   }
 }
-
 //
 // Draw S-meter
 //
