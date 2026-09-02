@@ -23,6 +23,7 @@
 //
 
 int bandIdx = 0;
+static int getValidBandIdx(int baseIdx, int offset);
 
 // Band limits are expanded to align with the nearest tuning scale mark
 // Do not forget to update the bands table in the manual.md
