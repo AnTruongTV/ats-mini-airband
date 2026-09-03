@@ -552,6 +552,11 @@ static void setBandwidth()
   }
 }
 
+void applyBandwidth()
+{
+  setBandwidth();
+}
+
 // Seek mode. Pass true to toggle, false to return the current one
 uint8_t seekMode(bool toggle)
 {
