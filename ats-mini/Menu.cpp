@@ -2023,7 +2023,7 @@ static void drawInfo(int x, int y, int sx)
   spr.setTextColor(TH.box_text);
   spr.fillSmoothRoundRect(1+x, 1+y, 76+sx, 110, 4, TH.box_border);
   spr.fillSmoothRoundRect(2+x, 2+y, 74+sx, 108, 4, TH.box_bg);
-
+  spr.drawString("Step:", 6+x, 64+y+(-3*16), 2);
   if (bandIdx == 2)
     spr.drawString(airStepDesc[currentAirSpacing], 48+x, 64+y+(-3*16), 2);
   else
