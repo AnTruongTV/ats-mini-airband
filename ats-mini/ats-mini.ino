@@ -656,6 +656,11 @@ uint16_t getNextAir833Freq(uint16_t freq, int16_t enc)
   return baseFreq + newOffset;
 }
 
+bool isAir25Channel(uint16_t freq)
+{
+  return (freq % 25) == 0;
+}
+
 //
 // Handle tuning
 //
@@ -689,6 +694,13 @@ bool doTune(int16_t enc)
     ))
   {
   updateFrequency(getNextAir833Freq(currentFrequency, enc), true);
+   
+  if (isAir25Channel(currentFrequency))
+    bands[bandIdx].bandwidthIdx = 6; // 6.0k
+  else
+    bands[bandIdx].bandwidthIdx = 5; // 4.0k
+
+setBandwidth();
 
   clearStationInfo();
   identifyFrequency(currentFrequency);
