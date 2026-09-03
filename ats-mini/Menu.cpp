@@ -1311,6 +1311,17 @@ static void drawSettings(int x, int y, int sx)
 
 static void drawMode(int x, int y, int sx)
 {
+    if (bandIdx == 2)
+  {
+    drawCommon(menu[MENU_MODE], x, y, sx, true);
+    drawZoomedMenu("AM");
+
+    spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
+    spr.setTextDatum(MC_DATUM);
+    spr.drawString("AM", 40+x+(sx/2), 64+y, 2);
+    return;
+  }
+
   drawCommon(menu[MENU_MODE], x, y, sx, true);
 
   int count = ITEM_COUNT(bandModeDesc);
@@ -1331,6 +1342,17 @@ static void drawMode(int x, int y, int sx)
 
 static void drawStep(int x, int y, int sx)
 {
+  if (bandIdx == 2)
+  {
+  drawCommon(menu[MENU_STEP], x, y, sx, true);
+  drawZoomedMenu("25k");
+
+  spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
+  spr.setTextDatum(MC_DATUM);
+  spr.drawString("25k", 40+x+(sx/2), 64+y, 2);
+  return;
+  }
+  
   int count = getLastStep(currentMode) + 1;
   int idx   = bands[bandIdx].currentStepIdx + count;
 
@@ -1450,6 +1472,17 @@ static void drawBand(int x, int y, int sx)
 
 static void drawBandwidth(int x, int y, int sx)
 {
+  if (bandIdx == 2)
+  {
+  drawCommon(menu[MENU_BW], x, y, sx, true);
+  drawZoomedMenu("6.0k");
+
+  spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
+  spr.setTextDatum(MC_DATUM);
+  spr.drawString("6.0k", 40+x+(sx/2), 64+y, 2);
+  return;
+  }
+  
   int count = getLastBandwidth(currentMode) + 1;
   int idx   = bands[bandIdx].bandwidthIdx + count;
 
