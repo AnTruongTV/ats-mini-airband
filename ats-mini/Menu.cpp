@@ -877,9 +877,10 @@ static void clickMemory(uint8_t idx, bool shortPress)
 }
 
 void doStep(int16_t enc)
+{
   if (bandIdx == 2)
   return;
-{
+  
   uint8_t idx = bands[bandIdx].currentStepIdx;
 
   idx = wrap_range(idx, enc, 0, getLastStep(currentMode));
