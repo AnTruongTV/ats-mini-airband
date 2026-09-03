@@ -923,12 +923,21 @@ void doStep(int16_t enc)
 {
   if (bandIdx == 2)
   {
-  if (enc > 0)
-    currentAirSpacing = AIR_833;
-  else if (enc < 0)
-    currentAirSpacing = AIR_25K;
+    if (enc > 0 && currentAirSpacing < AIR_833)
+      currentAirSpacing++;
 
-  return;
+    if (enc < 0 && currentAirSpacing > AIR_25K)
+      currentAirSpacing--;
+
+    // Auto bandwidth to AIR spacing
+    if (currentAirSpacing == AIR_833)
+      bands[bandIdx].bandwidthIdx = 5; // 4.0k
+    else
+      bands[bandIdx].bandwidthIdx = 6; // 6.0k
+
+    setBandwidth();
+
+    return;
   }
   
   uint8_t idx = bands[bandIdx].currentStepIdx;
@@ -1031,9 +1040,12 @@ void doBandwidth(int16_t enc)
 {
   if (bandIdx == 2)
   {
-    bands[bandIdx].bandwidthIdx = 6;
-    setBandwidth();
-    return;
+  if (currentAirSpacing == AIR_833)
+    bands[bandIdx].bandwidthIdx = 5; // 4.0 kHz
+  else
+    bands[bandIdx].bandwidthIdx = 6; // 6.0 kHz
+  setBandwidth();
+  return;
   }
 
   uint8_t idx = bands[bandIdx].bandwidthIdx;
