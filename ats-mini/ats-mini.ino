@@ -622,6 +622,42 @@ bool doSeek(int16_t enc, int16_t enca)
 }
 
 //
+// Handle 8.33khz
+//
+uint16_t getNextAir833Freq(uint16_t freq, int16_t enc)
+{
+  // Raw frequency tương ứng 118.000 MHz
+  uint16_t baseFreq;
+
+  if (currentDCVIdx == 1)       // DCV 100 MHz
+    baseFreq = 18000;
+  else if (currentDCVIdx == 2)  // DCV 110 MHz
+    baseFreq = 8000;
+  else
+    return freq;
+
+  // Không xử lý vùng dưới 118 MHz
+  if (freq < baseFreq)
+    return freq;
+
+  uint32_t offset = freq - baseFreq;
+
+  // Tìm channel 8.33 gần nhất
+  int32_t channel = (offset * 3 + 12) / 25;
+
+  // Đi channel kế tiếp / trước
+  if (enc > 0)
+    channel++;
+  else if (enc < 0 && channel > 0)
+    channel--;
+
+  // 8.333... kHz = 25 / 3 kHz
+  uint32_t newOffset = (channel * 25 + 1) / 3;
+
+  return baseFreq + newOffset;
+}
+
+//
 // Handle tuning
 //
 bool doTune(int16_t enc)
