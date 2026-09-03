@@ -730,12 +730,12 @@ bool doTune(int16_t enc)
   
   updateFrequency(getNextAir833Freq(currentFrequency, enc), true);
    
-  if (isAir25Channel(currentFrequency))
+  if ((currentAirChannel % 25) == 0)
     bands[bandIdx].bandwidthIdx = 6; // 6.0k
   else
     bands[bandIdx].bandwidthIdx = 5; // 4.0k
 
-applyBandwidth();
+  applyBandwidth();
 
   clearStationInfo();
   identifyFrequency(currentFrequency);
