@@ -1358,19 +1358,27 @@ static void drawStep(int x, int y, int sx)
 {
   if (bandIdx == 2)
   {
-    drawCommon(menu[MENU_STEP], x, y, sx, true);
-    drawZoomedMenu(airStepDesc[currentAirSpacing]);
+  drawCommon(menu[MENU_STEP], x, y, sx, true);
 
+  spr.setTextDatum(MC_DATUM);
+
+  if (currentAirSpacing == AIR_833)
     spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
-    spr.setTextDatum(MC_DATUM);
-    spr.drawString(
-      airStepDesc[currentAirSpacing],
-      40+x+(sx/2),
-      64+y,
-      2
-    );
+  else
+    spr.setTextColor(TH.menu_item);
 
-    return;
+  spr.drawString("8.33k", 40 + x + (sx / 2), 56 + y, 2);
+
+  if (currentAirSpacing == AIR_25K)
+    spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
+  else
+    spr.setTextColor(TH.menu_item);
+
+  spr.drawString("25k", 40 + x + (sx / 2), 72 + y, 2);
+
+  drawZoomedMenu(airStepDesc[currentAirSpacing]);
+
+  return;
   }
 
   int count = getLastStep(currentMode) + 1;
