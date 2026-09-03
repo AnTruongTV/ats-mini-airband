@@ -685,7 +685,17 @@ uint32_t getNextAir833Channel(uint32_t channel, int16_t enc)
 
   static const uint8_t offsets[] = { 0, 5, 10, 15 };
 
-  return block + offsets[pos];
+  uint32_t result = block + offsets[pos];
+
+  if (result < 118000)
+    result = 118000;
+
+  if (currentDCVIdx == 1 && result > 130000)
+    result = 130000;
+  else if (currentDCVIdx == 2 && result > 137000)
+    result = 137000;
+
+  return result;
 }
 
 uint16_t airChannelToCarrier(uint32_t channel)
