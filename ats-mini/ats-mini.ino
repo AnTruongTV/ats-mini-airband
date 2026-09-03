@@ -745,8 +745,10 @@ bool doTune(int16_t enc)
     (
       currentDCVIdx == 2 ||
       (currentDCVIdx == 1 &&
-       (currentAirChannel > 118000 ||
-        (currentAirChannel == 118000 && enc > 0)))
+        (currentFrequency > 18000 ||
+          (currentFrequency == 18000 &&
+            (currentAirChannel > 118000 ||
+              (currentAirChannel == 118000 && enc > 0)))))
     ))
   {
 
@@ -754,6 +756,16 @@ bool doTune(int16_t enc)
 
   uint16_t newFreq = airChannelToCarrier(currentAirChannel);
   updateFrequency(newFreq, true);
+
+  if (bandIdx == 2 &&
+    currentDCVIdx == 1 &&
+    currentAirSpacing == AIR_833 &&
+    currentFrequency == 18000)
+  {
+  currentAirChannel = 118000;
+  bands[bandIdx].bandwidthIdx = 6; // 118.000 = 25k channel -> 6k
+  applyBandwidth();
+  }
    
   if ((currentAirChannel % 25) == 0)
     bands[bandIdx].bandwidthIdx = 6; // 6.0k
