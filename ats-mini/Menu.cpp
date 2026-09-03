@@ -923,8 +923,12 @@ void doStep(int16_t enc)
 {
   if (bandIdx == 2)
   {
-    currentAirSpacing = wrap_range(currentAirSpacing, enc, AIR_25K, AIR_833);
-    return;
+  if (enc > 0)
+    currentAirSpacing = AIR_833;
+  else if (enc < 0)
+    currentAirSpacing = AIR_25K;
+
+  return;
   }
   
   uint8_t idx = bands[bandIdx].currentStepIdx;
