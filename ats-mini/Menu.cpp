@@ -625,6 +625,11 @@ void doDCV(int16_t enc) {
     }
   }
 
+    if (bandIdx == 2 && currentDCVIdx != 0)
+  {
+    updateFrequency(getCurrentBand()->minimumFreq, false);
+  }
+
   // Khi tắt DCV về 0 mà máy đang ở Airband (index 2) -> Đưa thẳng về VHF (index 0)
   if (currentDCVIdx == 0 && bandIdx == 2) {
     // Lưu lại cấu hình Airband trước khi thoát
