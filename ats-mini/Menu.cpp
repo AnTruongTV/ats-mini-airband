@@ -192,6 +192,7 @@ static const char *airStepDesc[] = {
 };
 
 uint8_t currentAirSpacing = AIR_25K;
+uint32_t currentAirChannel = 118000;
 
 int getTotalDCV() {
   return ITEM_COUNT(dcvDesc);
