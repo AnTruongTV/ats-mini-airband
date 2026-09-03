@@ -965,9 +965,16 @@ void doStep(int16_t enc)
 
     // Auto bandwidth to AIR spacing
     if (currentAirSpacing == AIR_833)
-      bands[bandIdx].bandwidthIdx = 5; // 4.0k
+    {
+      if ((currentAirChannel % 25) == 0)
+        bands[bandIdx].bandwidthIdx = 6; // 6.0k
+      else
+        bands[bandIdx].bandwidthIdx = 5; // 4.0k
+    }
     else
-      bands[bandIdx].bandwidthIdx = 6; // 6.0k
+    {
+      bands[bandIdx].bandwidthIdx = 6; // 25k mode
+    }
 
     setBandwidth();
 
