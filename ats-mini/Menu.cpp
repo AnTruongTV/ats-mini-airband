@@ -923,10 +923,12 @@ void doStep(int16_t enc)
 {
   if (bandIdx == 2)
   {
-    if (enc > 0 && currentAirSpacing < AIR_833)
+    int16_t dir = enc * scrollDirection;
+    
+    if (dir > 0 && currentAirSpacing < AIR_833)
       currentAirSpacing++;
 
-    if (enc < 0 && currentAirSpacing > AIR_25K)
+    if (dir < 0 && currentAirSpacing > AIR_25K)
       currentAirSpacing--;
 
     // Auto bandwidth to AIR spacing
