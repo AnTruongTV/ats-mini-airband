@@ -950,6 +950,19 @@ void doStep(int16_t enc)
     if (dir > 0 && currentAirSpacing > AIR_25K)
       currentAirSpacing--;
 
+    // Sync channel display khi vào 8.33
+    if (currentAirSpacing == AIR_833)
+    {
+      uint32_t rfFreq = currentFrequency;
+
+      if (currentDCVIdx == 1)
+        rfFreq += 100000;
+      else if (currentDCVIdx == 2)
+        rfFreq += 110000;
+
+      currentAirChannel = rfFreq;
+    }
+
     // Auto bandwidth to AIR spacing
     if (currentAirSpacing == AIR_833)
       bands[bandIdx].bandwidthIdx = 5; // 4.0k
