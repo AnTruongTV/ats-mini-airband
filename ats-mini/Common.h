@@ -176,6 +176,7 @@ extern bool zoomMenu;
 extern int8_t scrollDirection;
 extern uint8_t utcOffsetIdx;
 extern uint8_t uiLayoutIdx;
+extern uint32_t currentAirChannel;
 
 extern int8_t FmAgcIdx;
 extern int8_t AmAgcIdx;
