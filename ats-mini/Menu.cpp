@@ -186,11 +186,6 @@ const char *dcvDesc[] = {
 
 uint8_t currentDCVIdx = 0;
 
-enum AirSpacing {
-  AIR_25K = 0,
-  AIR_833 = 1
-};
-
 static const char *airStepDesc[] = {
   "25k",
   "8.33k"
