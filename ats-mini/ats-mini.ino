@@ -745,8 +745,8 @@ bool doTune(int16_t enc)
     (
       currentDCVIdx == 2 ||
       (currentDCVIdx == 1 &&
-       (currentFrequency > 18000 ||
-        (currentFrequency == 18000 && enc > 0)))
+       (currentAirChannel > 118000 ||
+        (currentAirChannel == 118000 && enc > 0)))
     ))
   {
 
