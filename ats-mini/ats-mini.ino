@@ -762,6 +762,54 @@ bool doTune(int16_t enc)
     ))
   {
 
+  // AIR 8.33 band-edge wrapping
+if (currentDCVIdx == 1 &&
+    currentAirChannel == 130000 &&
+    enc > 0)
+{
+  // DCV100: 130.000 -> 108.000
+  currentAirChannel = 118000;
+  updateFrequency(8000, false);
+
+  bands[bandIdx].bandwidthIdx = 6;
+  applyBandwidth();
+
+  clearStationInfo();
+  identifyFrequency(currentFrequency);
+  return true;
+}
+
+if (currentDCVIdx == 2 &&
+    currentAirChannel == 118000 &&
+    enc < 0)
+{
+  // DCV110: 118.000 -> 137.000
+  currentAirChannel = 137000;
+  updateFrequency(27000, false);
+
+  bands[bandIdx].bandwidthIdx = 6;
+  applyBandwidth();
+
+  clearStationInfo();
+  identifyFrequency(currentFrequency);
+  return true;
+}
+
+  if (currentDCVIdx == 2 &&
+    currentAirChannel == 137000 &&
+    enc > 0)
+{
+  currentAirChannel = 118000;
+  updateFrequency(8000, false);
+
+  bands[bandIdx].bandwidthIdx = 6;
+  applyBandwidth();
+
+  clearStationInfo();
+  identifyFrequency(currentFrequency);
+  return true;
+}
+
   currentAirChannel = getNextAir833Channel(currentAirChannel, enc);
 
   uint16_t newFreq = airChannelToCarrier(currentAirChannel);
@@ -803,7 +851,17 @@ bool doTune(int16_t enc)
         : stepAdjust;
 
     // Tune to a new frequency
-    updateFrequency(currentFrequency + step * enc, bandIdx != 2);
+    updateFrequency(currentFrequency + step * enc, true);
+    // Sync AIR channel state after DCV100 band wrap
+    if (bandIdx == 2 &&
+      currentDCVIdx == 1 &&
+      currentAirSpacing == AIR_833 &&
+      currentFrequency == 30000)
+    {
+      currentAirChannel = 130000;
+      bands[bandIdx].bandwidthIdx = 6;
+      applyBandwidth();
+    }
     if (bandIdx == 2 &&
       currentDCVIdx == 1 &&
       currentAirSpacing == AIR_833 &&
