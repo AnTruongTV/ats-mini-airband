@@ -877,6 +877,8 @@ static void clickMemory(uint8_t idx, bool shortPress)
 }
 
 void doStep(int16_t enc)
+  if (bandIdx == 2)
+  return;
 {
   uint8_t idx = bands[bandIdx].currentStepIdx;
 
@@ -972,6 +974,13 @@ void doBand(int16_t enc)
 
 void doBandwidth(int16_t enc)
 {
+  if (bandIdx == 2)
+  {
+    bands[bandIdx].bandwidthIdx = 6;
+    setBandwidth();
+    return;
+  }
+
   uint8_t idx = bands[bandIdx].bandwidthIdx;
 
   idx = wrap_range(idx, enc, 0, getLastBandwidth(currentMode));
