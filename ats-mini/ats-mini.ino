@@ -700,7 +700,7 @@ bool doTune(int16_t enc)
   else
     bands[bandIdx].bandwidthIdx = 5; // 4.0k
 
-setBandwidth();
+applyBandwidth();
 
   clearStationInfo();
   identifyFrequency(currentFrequency);
