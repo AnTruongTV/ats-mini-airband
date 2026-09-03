@@ -680,7 +680,21 @@ bool doTune(int16_t enc)
   else
   {
     uint16_t step = getCurrentStep()->step;
+    if (bandIdx == 2 &&
+    currentAirSpacing == AIR_833 &&
+    (
+      currentDCVIdx == 2 ||
+      (currentDCVIdx == 1 &&
+       (currentFrequency > 18000 ||
+        (currentFrequency == 18000 && enc > 0)))
+    ))
+  {
+  updateFrequency(getNextAir833Freq(currentFrequency, enc), true);
 
+  clearStationInfo();
+  identifyFrequency(currentFrequency);
+  return true;
+  }
     // AIR + DCV 100 MHz:
     // 108.000 - 117.950 MHz dùng 50 kHz
     // tại 118.000, tune xuống cũng dùng 50 kHz
