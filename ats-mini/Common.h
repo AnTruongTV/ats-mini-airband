@@ -197,6 +197,10 @@ extern uint8_t disableAgc;
 
 extern const int CALMax;
 
+enum AirSpacing { AIR_25K = 0, AIR_833 = 1};
+
+extern uint8_t currentAirSpacing;
+
 static inline bool isSSB() { return(currentMode>FM && currentMode<AM); }
 
 void useBand(const Band *band);
