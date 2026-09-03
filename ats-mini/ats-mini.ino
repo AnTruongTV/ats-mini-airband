@@ -688,6 +688,30 @@ uint32_t getNextAir833Channel(uint32_t channel, int16_t enc)
   return block + offsets[pos];
 }
 
+uint16_t airChannelToCarrier(uint32_t channel)
+{
+  // Lấy phần 25 kHz block
+  uint32_t block = (channel / 25) * 25;
+  uint32_t rem   = channel % 25;
+
+  uint32_t carrier = block;
+
+  if (rem == 0 || rem == 5)
+    carrier = block;        // .000 / .005 -> carrier .000
+  else if (rem == 10)
+    carrier = block + 8;    // .010 -> carrier .0083 ≈ .008
+  else if (rem == 15)
+    carrier = block + 17;   // .015 -> carrier .0167 ≈ .017
+
+  // Đổi RF display về raw tuner frequency
+  if (currentDCVIdx == 1)
+    carrier -= 100000;
+  else if (currentDCVIdx == 2)
+    carrier -= 110000;
+
+  return (uint16_t)carrier;
+}
+
 bool isAir25Channel(uint16_t freq)
 {
   return (freq % 25) == 0;
