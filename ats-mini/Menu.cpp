@@ -690,6 +690,7 @@ void doDCV(int16_t enc) {
     if (bandIdx == 2 && currentDCVIdx != 0)
   {
     updateFrequency(getCurrentBand()->minimumFreq, false);
+    currentAirChannel = 118000;
   }
 
   // Khi tắt DCV về 0 mà máy đang ở Airband (index 2) -> Đưa thẳng về VHF (index 0)
