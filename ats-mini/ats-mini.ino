@@ -803,7 +803,7 @@ bool doTune(int16_t enc)
         : stepAdjust;
 
     // Tune to a new frequency
-    updateFrequency(currentFrequency + step * enc, true);
+    updateFrequency(currentFrequency + step * enc, bandIdx != 2);
     if (bandIdx == 2 &&
       currentDCVIdx == 1 &&
       currentAirSpacing == AIR_833 &&
