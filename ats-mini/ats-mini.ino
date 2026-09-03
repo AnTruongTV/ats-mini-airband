@@ -516,9 +516,10 @@ bool updateFrequency(int newFreq, bool wrap)
   if (bandIdx == 2 && currentDCVIdx == 2)
       maxFreq = 27000;
   // Do not let new frequency exceed band limits
-  if(newFreq < band->minimumFreq)
+    if(newFreq < band->minimumFreq)
   {
-    if(!wrap) return false; else newFreq = band->maximumFreq;
+    if(!wrap) return false;
+    else newFreq = maxFreq;
   }
   else if(newFreq > maxFreq)
   {
