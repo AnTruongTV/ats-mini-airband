@@ -261,9 +261,13 @@ void drawFrequency(uint32_t freq, int x, int y, int ux, int uy, uint8_t hl)
   uint32_t displayFreq;
 
   // Nếu đang dùng 8.33 kHz thì hiển thị channel designator
-  if (currentAirSpacing == AIR_833)
+  if (currentAirSpacing == AIR_833 &&
+    (
+      currentDCVIdx == 2 ||
+      (currentDCVIdx == 1 && freq >= 18000)
+    ))
   {
-    displayFreq = currentAirChannel;
+  displayFreq = currentAirChannel;
   }
   else
   {
