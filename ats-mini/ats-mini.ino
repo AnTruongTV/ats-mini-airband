@@ -656,6 +656,38 @@ uint16_t getNextAir833Freq(uint16_t freq, int16_t enc)
   return baseFreq + newOffset;
 }
 
+uint32_t getNextAir833Channel(uint32_t channel, int16_t enc)
+{
+  uint32_t block = (channel / 25) * 25;
+  uint32_t rem   = channel % 25;
+
+  int pos;
+
+  if (rem == 0)       pos = 0;
+  else if (rem == 5)  pos = 1;
+  else if (rem == 10) pos = 2;
+  else if (rem == 15) pos = 3;
+  else                pos = 0;
+
+  pos += enc;
+
+  while (pos < 0)
+  {
+    block -= 25;
+    pos += 4;
+  }
+
+  while (pos > 3)
+  {
+    block += 25;
+    pos -= 4;
+  }
+
+  static const uint8_t offsets[] = { 0, 5, 10, 15 };
+
+  return block + offsets[pos];
+}
+
 bool isAir25Channel(uint16_t freq)
 {
   return (freq % 25) == 0;
@@ -693,6 +725,9 @@ bool doTune(int16_t enc)
         (currentFrequency == 18000 && enc > 0)))
     ))
   {
+
+  currentAirChannel = getNextAir833Channel(currentAirChannel, enc);
+  
   updateFrequency(getNextAir833Freq(currentFrequency, enc), true);
    
   if (isAir25Channel(currentFrequency))
