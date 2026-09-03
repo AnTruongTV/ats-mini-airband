@@ -214,6 +214,24 @@ uint16_t getAirbandMaxFreq() {
   }
   return getCurrentBand()->maximumFreq;
 }
+
+//
+// Check instrument band or Comm band
+//
+bool isAirCommBand()
+{
+  if (bandIdx != 2)
+    return false;
+
+  if (currentDCVIdx == 2) // 110 MHz DCV: bắt đầu từ 118 MHz
+    return true;
+
+  if (currentDCVIdx == 1) // 100 MHz DCV
+    return currentFrequency >= 18000; // 100 + 18 = 118 MHz
+
+  return false;
+}
+
 //
 // Memory Menu
 //
@@ -925,10 +943,10 @@ void doStep(int16_t enc)
   {
     int16_t dir = enc * scrollDirection;
     
-    if (dir > 0 && currentAirSpacing < AIR_833)
+    if (dir < 0 && currentAirSpacing < AIR_833)
       currentAirSpacing++;
 
-    if (dir < 0 && currentAirSpacing > AIR_25K)
+    if (dir > 0 && currentAirSpacing > AIR_25K)
       currentAirSpacing--;
 
     // Auto bandwidth to AIR spacing
@@ -2006,8 +2024,10 @@ static void drawInfo(int x, int y, int sx)
   spr.fillSmoothRoundRect(1+x, 1+y, 76+sx, 110, 4, TH.box_border);
   spr.fillSmoothRoundRect(2+x, 2+y, 74+sx, 108, 4, TH.box_bg);
 
-  spr.drawString("Step:", 6+x, 64+y+(-3*16), 2);
-  spr.drawString(getCurrentStep()->desc, 48+x, 64+y+(-3*16), 2);
+  if (bandIdx == 2)
+    spr.drawString(airStepDesc[currentAirSpacing], 48+x, 64+y+(-3*16), 2);
+  else
+    spr.drawString(getCurrentStep()->desc, 48+x, 64+y+(-3*16), 2);
 
   spr.drawString("BW:", 6+x, 64+y+(-2*16), 2);
   spr.drawString(getCurrentBandwidth()->desc, 48+x, 64+y+(-2*16), 2);
