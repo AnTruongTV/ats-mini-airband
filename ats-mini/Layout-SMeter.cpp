@@ -60,8 +60,13 @@ static void drawSmallScale(uint32_t freq, int y)
   }
 
   // Tần số giới hạn thực tế sau khi cộng offset
+  uint32_t rawMaxFreq = band->maximumFreq;
+
+  if (bandIdx == 2 && currentDCVIdx == 2)
+    rawMaxFreq = 27000;
+
   uint32_t minFreq = band->minimumFreq + dcvOffset;
-  uint32_t maxFreq = band->maximumFreq + dcvOffset;
+  uint32_t maxFreq = rawMaxFreq + dcvOffset;
 
   // 2. Vẽ thanh scale và con trỏ S-Meter
   for(int i=scaleStart+3; i<=scaleEnd-3; i+=2) spr.drawPixel(i, y, TH.scale_line);
@@ -69,7 +74,7 @@ static void drawSmallScale(uint32_t freq, int y)
   spr.drawCircle(scaleEnd, y, 3, TH.scale_line);
 
   // Vị trí con trỏ dùng freq gốc để giữ tỉ lệ phần trăm chính xác
-  spr.fillCircle(scaleStart + (scaleEnd-scaleStart) * (freq - band->minimumFreq) / (band->maximumFreq - band->minimumFreq), y, 3, TH.scale_pointer);
+  spr.fillCircle(scaleStart + (scaleEnd-scaleStart) * (freq - band->minimumFreq) / (rawMaxFreq - band->minimumFreq), y, 3, TH.scale_pointer);
 
   // 3. In nhãn giới hạn TẦN SỐ ĐẦU (Min)
   char lim[10];
