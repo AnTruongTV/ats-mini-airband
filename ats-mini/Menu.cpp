@@ -186,6 +186,18 @@ const char *dcvDesc[] = {
 
 uint8_t currentDCVIdx = 0;
 
+enum AirSpacing {
+  AIR_25K = 0,
+  AIR_833 = 1
+};
+
+static const char *airStepDesc[] = {
+  "25k",
+  "8.33k"
+};
+
+uint8_t currentAirSpacing = AIR_25K;
+
 int getTotalDCV() {
   return ITEM_COUNT(dcvDesc);
 }
@@ -910,7 +922,10 @@ static void clickMemory(uint8_t idx, bool shortPress)
 void doStep(int16_t enc)
 {
   if (bandIdx == 2)
-  return;
+  {
+    currentAirSpacing = wrap_range(currentAirSpacing, enc, AIR_25K, AIR_833);
+    return;
+  }
   
   uint8_t idx = bands[bandIdx].currentStepIdx;
 
@@ -919,7 +934,6 @@ void doStep(int16_t enc)
 
   rx.setFrequencyStep(steps[currentMode][idx].step);
 
-  // Set seek spacing
   if(currentMode==FM)
     rx.setSeekFmSpacing(steps[currentMode][idx].spacing);
   else
@@ -1344,15 +1358,21 @@ static void drawStep(int x, int y, int sx)
 {
   if (bandIdx == 2)
   {
-  drawCommon(menu[MENU_STEP], x, y, sx, true);
-  drawZoomedMenu("25k");
+    drawCommon(menu[MENU_STEP], x, y, sx, true);
+    drawZoomedMenu(airStepDesc[currentAirSpacing]);
 
-  spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
-  spr.setTextDatum(MC_DATUM);
-  spr.drawString("25k", 40+x+(sx/2), 64+y, 2);
-  return;
+    spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
+    spr.setTextDatum(MC_DATUM);
+    spr.drawString(
+      airStepDesc[currentAirSpacing],
+      40+x+(sx/2),
+      64+y,
+      2
+    );
+
+    return;
   }
-  
+
   int count = getLastStep(currentMode) + 1;
   int idx   = bands[bandIdx].currentStepIdx + count;
 
@@ -1368,9 +1388,15 @@ static void drawStep(int x, int y, int sx)
     }
 
     spr.setTextDatum(MC_DATUM);
-    spr.drawString(steps[currentMode][abs((idx+i)%count)].desc, 40+x+(sx/2), 64+y+(i*16), 2);
+    spr.drawString(
+      steps[currentMode][abs((idx+i)%count)].desc,
+      40+x+(sx/2),
+      64+y+(i*16),
+      2
+    );
   }
 }
+
 
 static void drawSeek(int x, int y, int sx)
 {
