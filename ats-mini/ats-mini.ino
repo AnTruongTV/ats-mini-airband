@@ -751,8 +751,9 @@ bool doTune(int16_t enc)
   {
 
   currentAirChannel = getNextAir833Channel(currentAirChannel, enc);
-  
-  updateFrequency(getNextAir833Freq(currentFrequency, enc), true);
+
+  uint16_t newFreq = airChannelToCarrier(currentAirChannel);
+  updateFrequency(newFreq, true);
    
   if ((currentAirChannel % 25) == 0)
     bands[bandIdx].bandwidthIdx = 6; // 6.0k
