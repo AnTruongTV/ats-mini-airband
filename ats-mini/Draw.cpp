@@ -343,6 +343,9 @@ void drawScale(uint32_t freq)
   uint32_t minFreq = band->minimumFreq / 10;
   uint32_t maxFreq = band->maximumFreq / 10;
 
+  if (bandIdx == 2 && currentDCVIdx == 2)
+    maxFreq = 2700;
+
   // Tính khoảng lệch offset để kiểm tra điều kiện giới hạn minFreq / maxFreq chuẩn
   uint32_t dcvOffsetUnits = 0;
   if (bandIdx == 2) {
