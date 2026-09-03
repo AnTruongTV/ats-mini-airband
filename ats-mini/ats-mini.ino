@@ -250,6 +250,9 @@ void setup()
   // If loading bands fails, save default bands
   if(!prefsLoad(SAVE_BANDS|SAVE_VERIFY)) prefsSave(SAVE_BANDS);
 
+  if (bandIdx == 2 && currentDCVIdx == 0) {
+    bandIdx = 0;
+  }
   // Audio Amplifier Enable. G8PTN: Added
   // After the SI4732 has been setup, enable the audio amplifier
   if(PIN_AMP_EN >= 0) digitalWrite(PIN_AMP_EN, HIGH);
@@ -508,14 +511,20 @@ bool updateFrequency(int newFreq, bool wrap)
 {
   Band *band = getCurrentBand();
 
+  uint16_t maxFreq = band->maximumFreq;
+
+  if (bandIdx == 2 && currentDCVIdx == 2)
+      maxFreq = 27000;
   // Do not let new frequency exceed band limits
-  if(newFreq < band->minimumFreq)
+    if(newFreq < band->minimumFreq)
   {
-    if(!wrap) return false; else newFreq = band->maximumFreq;
+    if(!wrap) return false;
+    else newFreq = maxFreq;
   }
-  else if(newFreq > band->maximumFreq)
+  else if(newFreq > maxFreq)
   {
-    if(!wrap) return false; else newFreq = band->minimumFreq;
+    if(!wrap) return false;
+    else newFreq = band->minimumFreq;
   }
 
   // Set new frequency
