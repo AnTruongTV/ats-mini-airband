@@ -1360,23 +1360,34 @@ static void drawStep(int x, int y, int sx)
   {
   drawCommon(menu[MENU_STEP], x, y, sx, true);
 
+  int centerY = 64 + y;
+
   spr.setTextDatum(MC_DATUM);
 
   if (currentAirSpacing == AIR_833)
+    {
+    // 8.33k nằm giữa
+    drawZoomedMenu("8.33k");
+
     spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
-  else
+    spr.drawString("8.33k", 40 + x + (sx / 2), centerY, 2);
+
+    // 25k nằm dưới
     spr.setTextColor(TH.menu_item);
+    spr.drawString("25k", 40 + x + (sx / 2), centerY + 16, 2);
+    }
+  else
+    {
+    // 8.33k nằm trên
+    spr.setTextColor(TH.menu_item);
+    spr.drawString("8.33k", 40 + x + (sx / 2), centerY - 16, 2);
 
-  spr.drawString("8.33k", 40 + x + (sx / 2), 56 + y, 2);
+    // 25k nằm giữa
+    drawZoomedMenu("25k");
 
-  if (currentAirSpacing == AIR_25K)
     spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
-  else
-    spr.setTextColor(TH.menu_item);
-
-  spr.drawString("25k", 40 + x + (sx / 2), 72 + y, 2);
-
-  drawZoomedMenu(airStepDesc[currentAirSpacing]);
+    spr.drawString("25k", 40 + x + (sx / 2), centerY, 2);
+    }
 
   return;
   }
