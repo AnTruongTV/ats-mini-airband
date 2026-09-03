@@ -919,6 +919,11 @@ void doAgc(int16_t enc)
 
 void doMode(int16_t enc)
 {
+  if (bandIdx == 2)
+  {
+    currentMode = AM;
+    return;
+  }
   // This is our current mode for the current band
   currentMode = bands[bandIdx].bandMode;
 
