@@ -255,16 +255,33 @@ void drawFrequency(uint32_t freq, int x, int y, int ux, int uy, uint8_t hl)
     spr.drawString("MHz", ux, uy);
   }
   else if (bandIdx == 2)
+{
+  li = hl < ITEM_COUNT(hlDigitsAIR) ? &hlDigitsAIR[hl] : 0;
+
+  uint32_t displayFreq;
+
+  // Nếu đang dùng 8.33 kHz thì hiển thị channel designator
+  if (currentAirSpacing == AIR_833)
   {
-    li = hl < ITEM_COUNT(hlDigitsAIR) ? &hlDigitsAIR[hl] : 0;
-    uint32_t displayFreq = freq;
-    if (currentDCVIdx == 1)      displayFreq += 100000;
-    else if (currentDCVIdx == 2) displayFreq += 110000;
-    char text[12];
-    sprintf(text, "%3lu.%03lu", displayFreq / 1000, displayFreq % 1000);
-    spr.setTextDatum(MR_DATUM);
-    spr.drawString(text, x_air, y, 7);
+    displayFreq = currentAirChannel;
   }
+  else
+  {
+    // 25 kHz / instrument band vẫn hiển thị kiểu cũ
+    displayFreq = freq;
+
+    if (currentDCVIdx == 1)
+      displayFreq += 100000;
+    else if (currentDCVIdx == 2)
+      displayFreq += 110000;
+  }
+
+  char text[12];
+  sprintf(text, "%3lu.%03lu", displayFreq / 1000, displayFreq % 1000);
+
+  spr.setTextDatum(MR_DATUM);
+  spr.drawString(text, x_air, y, 7);
+}
   else
   {
     // Determine where underscore is located
