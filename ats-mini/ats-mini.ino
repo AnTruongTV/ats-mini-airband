@@ -633,7 +633,7 @@ bool doTune(int16_t enc)
   {
     uint32_t step = getCurrentStep()->step;
     uint32_t stepAdjust = (currentFrequency * 1000 + currentBFO) % step;
-    step = !stepAdjust? step : enc>0? step - stepAdjust : stepAdjust;
+    step = !stepAdjust ? step : enc > 0 ? step - stepAdjust : stepAdjust;
 
     updateBFO(currentBFO + enc * step, true);
   }
@@ -644,9 +644,30 @@ bool doTune(int16_t enc)
   else
   {
     uint16_t step = getCurrentStep()->step;
+
+    // AIR + DCV 100 MHz:
+    // 108.000 - 117.950 MHz dùng 50 kHz
+    // tại 118.000, tune xuống cũng dùng 50 kHz
+    if (bandIdx == 2 && currentDCVIdx == 1)
+    {
+      if (currentFrequency < 18000 ||
+          (currentFrequency == 18000 && enc < 0))
+      {
+        step = 50;
+      }
+    }
+
     uint16_t stepAdjust = currentFrequency % step;
-    stepAdjust = (currentMode==FM) && (step==20)? (stepAdjust+10) % step : stepAdjust;
-    step = !stepAdjust? step : enc>0? step - stepAdjust : stepAdjust;
+
+    stepAdjust = (currentMode == FM) && (step == 20)
+      ? (stepAdjust + 10) % step
+      : stepAdjust;
+
+    step = !stepAdjust
+      ? step
+      : enc > 0
+        ? step - stepAdjust
+        : stepAdjust;
 
     // Tune to a new frequency
     updateFrequency(currentFrequency + step * enc, true);
@@ -654,12 +675,13 @@ bool doTune(int16_t enc)
 
   // Clear current station name and information
   clearStationInfo();
+
   // Check for named frequencies
   identifyFrequency(currentFrequency + currentBFO / 1000);
+
   // Will need a redraw
   return(true);
 }
-
 //
 // Rotate digit
 //
