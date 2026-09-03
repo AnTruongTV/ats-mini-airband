@@ -204,6 +204,7 @@ extern uint8_t currentAirSpacing;
 static inline bool isSSB() { return(currentMode>FM && currentMode<AM); }
 
 void useBand(const Band *band);
+void applyBandwidth();
 bool updateFrequency(int newFreq, bool wrap = true);
 bool updateBFO(int newBFO, bool wrap = true);
 bool doSeek(int16_t enc);
