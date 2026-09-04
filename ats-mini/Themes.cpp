@@ -435,6 +435,53 @@ ColorTheme theme[] =
     0xD3F2, // scan_snr
     0xFD95, // scan_rssi
   },
+  {
+    "Aviation",
+    0x0000, // bg - black
+    0x07FF, // text - cyan
+    0x5D7F, // text_muted - muted cyan
+    0xF800, // text_warn - red
+    0x07FF, // smeter_icon
+    0x07FF, // smeter_bar
+    0xFFE0, // smeter_bar_plus - amber/yellow
+    0x2104, // smeter_bar_empty
+    0x07FF, // save_icon
+    0x07FF, // stereo_icon
+    0x07FF, // rf_icon
+    0x001F, // rf_icon_conn
+    0xFFE0, // batt_voltage - amber
+    0x07FF, // batt_border
+    0x07E0, // batt_full
+    0xF800, // batt_low
+    0x0000, // batt_charge
+    0x07FF, // batt_icon
+    0x07FF, // band_text
+    0x07FF, // mode_text
+    0x07FF, // mode_border
+    0x0000, // box_bg
+    0x07FF, // box_border
+    0x07FF, // box_text
+    0x18E3, // box_off_bg
+    0x5D7F, // box_off_text
+    0x0000, // menu_bg
+    0x07FF, // menu_border
+    0x07FF, // menu_hdr
+    0x5D7F, // menu_item
+    0x0194, // menu_hl_bg - dark cyan
+    0xFFFF, // menu_hl_text
+    0x07FF, // menu_param
+    0xFD20, // freq_text - amber
+    0xFFE0, // funit_text - yellow/amber
+    0x07FF, // freq_hl
+    0xFFFF, // freq_hl_sel
+    0x07FF, // rds_text
+    0x07FF, // scale_text
+    0x07FF, // scale_pointer
+    0x5D7F, // scale_line
+    0x2104, // scan_grid
+    0x07FF, // scan_snr
+    0xFFE0, // scan_rssi
+  },
 };
 
 uint8_t themeIdx = 0;
