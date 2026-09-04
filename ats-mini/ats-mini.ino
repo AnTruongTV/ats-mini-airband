@@ -1053,9 +1053,12 @@ void loop()
       switch(currentCmd)
       {
         case CMD_NONE:
-          // Activate frequency input mode
-          currentCmd = CMD_FREQ;
-          needRedraw = true;
+        // Disable direct digit tuning on AIR band
+          if (bandIdx != 2)
+          {
+            currentCmd = CMD_FREQ;
+            needRedraw = true;
+          }
           break;
         case CMD_FREQ:
           // Select digit
