@@ -337,11 +337,30 @@ void drawFrequency(uint32_t freq, int x, int y, int ux, int uy, uint8_t hl)
 void drawScale(uint32_t freq)
 {
   // 1. Tính toán Offset DCV cho tần số Scale nếu ở Airband
-  if (bandIdx == 2)
+uint32_t displayScaleFreq = freq;
+
+if (bandIdx == 2)
+{
+  // AIR 8.33 communication band:
+  // scale follow channel designator on screen
+  if (currentAirSpacing == AIR_833 &&
+      (
+        currentDCVIdx == 2 ||
+        (currentDCVIdx == 1 && freq >= 18000)
+      ))
   {
-    if (currentDCVIdx == 1)      freq += 100000; // +100 MHz
-    else if (currentDCVIdx == 2) freq += 110000; // +110 MHz
+    displayScaleFreq = currentAirChannel;
   }
+  else
+  {
+    // 25 kHz / instrument band
+    if (currentDCVIdx == 1)
+      displayScaleFreq += 100000;
+    else if (currentDCVIdx == 2)
+      displayScaleFreq += 110000;
+  }
+}
+  freq = displayScaleFreq;
 
   // Scale pointer
   spr.fillTriangle(156, 120, 160, 130, 164, 120, TH.scale_pointer);
