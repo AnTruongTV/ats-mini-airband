@@ -1,11 +1,13 @@
-# ATS Mini
+# ATS Mini With AIR -> AM Converter
 
-![](docs/source/_static/esp32-si4732-ui-theme.jpg)
+<img width="2252" height="3050" alt="image" src="https://github.com/user-attachments/assets/cc7a85aa-8866-4643-9b84-b57c54ece932" />
 
-This firmware is for use on the SI4732 (ESP32-S3) Mini/Pocket Receiver
+
+This firmware is a modified version of original [ats-mini](https://github.com/esp32-si4732/ats-mini) to be able to use with AIR -> AM down converter.
 
 Based on the following sources:
 
+* Original project:  https://github.com/esp32-si4732/ats-mini
 * Volos Projects:    https://github.com/VolosR/TEmbedFMRadio
 * PU2CLR, Ricardo:   https://github.com/pu2clr/SI4735
 * Ralph Xavier:      https://github.com/ralphxavier/SI4735
@@ -14,7 +16,7 @@ Based on the following sources:
 
 ## Releases
 
-Check out the [Releases](https://github.com/esp32-si4732/ats-mini/releases) page.
+Check out the [Releases](https://github.com/AnTruongTV/ats-mini-airband/releases) page.
 
 ## Documentation
 
