@@ -622,6 +622,112 @@ bool doSeek(int16_t enc, int16_t enca)
 }
 
 //
+// Handle 8.33khz
+//
+uint16_t getNextAir833Freq(uint16_t freq, int16_t enc)
+{
+  // Raw frequency tương ứng 118.000 MHz
+  uint16_t baseFreq;
+
+  if (currentDCVIdx == 1)       // DCV 100 MHz
+    baseFreq = 18000;
+  else if (currentDCVIdx == 2)  // DCV 110 MHz
+    baseFreq = 8000;
+  else
+    return freq;
+
+  // Không xử lý vùng dưới 118 MHz
+  if (freq < baseFreq)
+    return freq;
+
+  uint32_t offset = freq - baseFreq;
+
+  // Tìm channel 8.33 gần nhất
+  int32_t channel = (offset * 3 + 12) / 25;
+
+  channel += enc;
+
+  if (channel < 0)
+    channel = 0;
+
+  // 8.333... kHz = 25 / 3 kHz
+  uint32_t newOffset = (channel * 25 + 1) / 3;
+
+  return baseFreq + newOffset;
+}
+
+uint32_t getNextAir833Channel(uint32_t channel, int16_t enc)
+{
+  uint32_t block = (channel / 25) * 25;
+  uint32_t rem   = channel % 25;
+
+  int pos;
+
+  if (rem == 0)       pos = 0;
+  else if (rem == 5)  pos = 1;
+  else if (rem == 10) pos = 2;
+  else if (rem == 15) pos = 3;
+  else                pos = 0;
+
+  pos += enc;
+
+  while (pos < 0)
+  {
+    block -= 25;
+    pos += 4;
+  }
+
+  while (pos > 3)
+  {
+    block += 25;
+    pos -= 4;
+  }
+
+  static const uint8_t offsets[] = { 0, 5, 10, 15 };
+
+  uint32_t result = block + offsets[pos];
+
+  if (result < 118000)
+    result = 118000;
+
+  if (currentDCVIdx == 1 && result > 130000)
+    result = 130000;
+  else if (currentDCVIdx == 2 && result > 137000)
+    result = 137000;
+
+  return result;
+}
+
+uint16_t airChannelToCarrier(uint32_t channel)
+{
+  // Lấy phần 25 kHz block
+  uint32_t block = (channel / 25) * 25;
+  uint32_t rem   = channel % 25;
+
+  uint32_t carrier = block;
+
+  if (rem == 0 || rem == 5)
+    carrier = block;        // .000 / .005 -> carrier .000
+  else if (rem == 10)
+    carrier = block + 8;    // .010 -> carrier .0083 ≈ .008
+  else if (rem == 15)
+    carrier = block + 17;   // .015 -> carrier .0167 ≈ .017
+
+  // Đổi RF display về raw tuner frequency
+  if (currentDCVIdx == 1)
+    carrier -= 100000;
+  else if (currentDCVIdx == 2)
+    carrier -= 110000;
+
+  return (uint16_t)carrier;
+}
+
+bool isAir25Channel(uint16_t freq)
+{
+  return (freq % 25) == 0;
+}
+
+//
 // Handle tuning
 //
 bool doTune(int16_t enc)
@@ -633,7 +739,7 @@ bool doTune(int16_t enc)
   {
     uint32_t step = getCurrentStep()->step;
     uint32_t stepAdjust = (currentFrequency * 1000 + currentBFO) % step;
-    step = !stepAdjust? step : enc>0? step - stepAdjust : stepAdjust;
+    step = !stepAdjust ? step : enc > 0 ? step - stepAdjust : stepAdjust;
 
     updateBFO(currentBFO + enc * step, true);
   }
@@ -644,22 +750,143 @@ bool doTune(int16_t enc)
   else
   {
     uint16_t step = getCurrentStep()->step;
+    if (bandIdx == 2 &&
+    currentAirSpacing == AIR_833 &&
+    (
+      currentDCVIdx == 2 ||
+      (currentDCVIdx == 1 &&
+        (currentFrequency > 18000 ||
+          (currentFrequency == 18000 &&
+            (currentAirChannel > 118000 ||
+              (currentAirChannel == 118000 && enc > 0)))))
+    ))
+  {
+
+  // AIR 8.33 band-edge wrapping
+if (currentDCVIdx == 1 &&
+    currentAirChannel == 130000 &&
+    enc > 0)
+{
+  // DCV100: 130.000 -> 108.000
+  currentAirChannel = 118000;
+  updateFrequency(8000, false);
+
+  bands[bandIdx].bandwidthIdx = 6;
+  applyBandwidth();
+
+  clearStationInfo();
+  identifyFrequency(currentFrequency);
+  return true;
+}
+
+if (currentDCVIdx == 2 &&
+    currentAirChannel == 118000 &&
+    enc < 0)
+{
+  // DCV110: 118.000 -> 137.000
+  currentAirChannel = 137000;
+  updateFrequency(27000, false);
+
+  bands[bandIdx].bandwidthIdx = 6;
+  applyBandwidth();
+
+  clearStationInfo();
+  identifyFrequency(currentFrequency);
+  return true;
+}
+
+  if (currentDCVIdx == 2 &&
+    currentAirChannel == 137000 &&
+    enc > 0)
+{
+  currentAirChannel = 118000;
+  updateFrequency(8000, false);
+
+  bands[bandIdx].bandwidthIdx = 6;
+  applyBandwidth();
+
+  clearStationInfo();
+  identifyFrequency(currentFrequency);
+  return true;
+}
+
+  int16_t airEnc = enc;
+
+  if (abs(enc) > 1)
+    airEnc = enc * 3;
+
+    currentAirChannel = getNextAir833Channel(currentAirChannel, airEnc);
+
+  uint16_t newFreq = airChannelToCarrier(currentAirChannel);
+  updateFrequency(newFreq, true);
+   
+  if ((currentAirChannel % 25) == 0)
+    bands[bandIdx].bandwidthIdx = 6; // 6.0k
+  else
+    bands[bandIdx].bandwidthIdx = 5; // 4.0k
+
+  applyBandwidth();
+
+  clearStationInfo();
+  identifyFrequency(currentFrequency);
+  return true;
+  }
+    // AIR + DCV 100 MHz:
+    // 108.000 - 117.950 MHz dùng 50 kHz
+    // tại 118.000, tune xuống cũng dùng 50 kHz
+    if (bandIdx == 2 && currentDCVIdx == 1)
+    {
+      if (currentFrequency < 18000 ||
+          (currentFrequency == 18000 && enc < 0))
+      {
+        step = 50;
+      }
+    }
+
     uint16_t stepAdjust = currentFrequency % step;
-    stepAdjust = (currentMode==FM) && (step==20)? (stepAdjust+10) % step : stepAdjust;
-    step = !stepAdjust? step : enc>0? step - stepAdjust : stepAdjust;
+
+    stepAdjust = (currentMode == FM) && (step == 20)
+      ? (stepAdjust + 10) % step
+      : stepAdjust;
+
+    step = !stepAdjust
+      ? step
+      : enc > 0
+        ? step - stepAdjust
+        : stepAdjust;
 
     // Tune to a new frequency
     updateFrequency(currentFrequency + step * enc, true);
+    // Sync AIR channel state after DCV100 band wrap
+    if (bandIdx == 2 &&
+      currentDCVIdx == 1 &&
+      currentAirSpacing == AIR_833 &&
+      currentFrequency == 30000)
+    {
+      currentAirChannel = 130000;
+      bands[bandIdx].bandwidthIdx = 6;
+      applyBandwidth();
+    }
+    if (bandIdx == 2 &&
+      currentDCVIdx == 1 &&
+      currentAirSpacing == AIR_833 &&
+      currentFrequency == 18000)
+    {
+      currentAirChannel = 118000;
+      bands[bandIdx].bandwidthIdx = 6; // 6.0k
+      applyBandwidth();
+    }
   }
 
   // Clear current station name and information
   clearStationInfo();
+
   // Check for named frequencies
   identifyFrequency(currentFrequency + currentBFO / 1000);
+
   // Will need a redraw
   return(true);
 }
-
 //
 // Rotate digit
 //
@@ -826,9 +1053,12 @@ void loop()
       switch(currentCmd)
       {
         case CMD_NONE:
-          // Activate frequency input mode
-          currentCmd = CMD_FREQ;
-          needRedraw = true;
+        // Disable direct digit tuning on AIR band
+          if (bandIdx != 2)
+          {
+            currentCmd = CMD_FREQ;
+            needRedraw = true;
+          }
           break;
         case CMD_FREQ:
           // Select digit

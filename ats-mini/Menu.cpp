@@ -186,6 +186,14 @@ const char *dcvDesc[] = {
 
 uint8_t currentDCVIdx = 0;
 
+static const char *airStepDesc[] = {
+  "25k",
+  "8.33k"
+};
+
+uint8_t currentAirSpacing = AIR_25K;
+uint32_t currentAirChannel = 118000;
+
 int getTotalDCV() {
   return ITEM_COUNT(dcvDesc);
 }
@@ -202,6 +210,24 @@ uint16_t getAirbandMaxFreq() {
   }
   return getCurrentBand()->maximumFreq;
 }
+
+//
+// Check instrument band or Comm band
+//
+bool isAirCommBand()
+{
+  if (bandIdx != 2)
+    return false;
+
+  if (currentDCVIdx == 2) // 110 MHz DCV: bắt đầu từ 118 MHz
+    return true;
+
+  if (currentDCVIdx == 1) // 100 MHz DCV
+    return currentFrequency >= 18000; // 100 + 18 = 118 MHz
+
+  return false;
+}
+
 //
 // Memory Menu
 //
@@ -527,6 +553,11 @@ static void setBandwidth()
   }
 }
 
+void applyBandwidth()
+{
+  setBandwidth();
+}
+
 // Seek mode. Pass true to toggle, false to return the current one
 uint8_t seekMode(bool toggle)
 {
@@ -659,6 +690,7 @@ void doDCV(int16_t enc) {
     if (bandIdx == 2 && currentDCVIdx != 0)
   {
     updateFrequency(getCurrentBand()->minimumFreq, false);
+    currentAirChannel = 118000;
   }
 
   // Khi tắt DCV về 0 mà máy đang ở Airband (index 2) -> Đưa thẳng về VHF (index 0)
@@ -910,7 +942,45 @@ static void clickMemory(uint8_t idx, bool shortPress)
 void doStep(int16_t enc)
 {
   if (bandIdx == 2)
-  return;
+  {
+    int16_t dir = enc * scrollDirection;
+    
+    if (dir < 0 && currentAirSpacing < AIR_833)
+      currentAirSpacing++;
+
+    if (dir > 0 && currentAirSpacing > AIR_25K)
+      currentAirSpacing--;
+
+    // Sync channel display khi vào 8.33
+    if (currentAirSpacing == AIR_833)
+    {
+      uint32_t rfFreq = currentFrequency;
+
+      if (currentDCVIdx == 1)
+        rfFreq += 100000;
+      else if (currentDCVIdx == 2)
+        rfFreq += 110000;
+
+      currentAirChannel = rfFreq;
+    }
+
+    // Auto bandwidth to AIR spacing
+    if (currentAirSpacing == AIR_833)
+    {
+      if ((currentAirChannel % 25) == 0)
+        bands[bandIdx].bandwidthIdx = 6; // 6.0k
+      else
+        bands[bandIdx].bandwidthIdx = 5; // 4.0k
+    }
+    else
+    {
+      bands[bandIdx].bandwidthIdx = 6; // 25k mode
+    }
+
+    setBandwidth();
+
+    return;
+  }
   
   uint8_t idx = bands[bandIdx].currentStepIdx;
 
@@ -919,7 +989,6 @@ void doStep(int16_t enc)
 
   rx.setFrequencyStep(steps[currentMode][idx].step);
 
-  // Set seek spacing
   if(currentMode==FM)
     rx.setSeekFmSpacing(steps[currentMode][idx].spacing);
   else
@@ -1013,9 +1082,12 @@ void doBandwidth(int16_t enc)
 {
   if (bandIdx == 2)
   {
-    bands[bandIdx].bandwidthIdx = 6;
-    setBandwidth();
-    return;
+  if (currentAirSpacing == AIR_833)
+    bands[bandIdx].bandwidthIdx = 5; // 4.0 kHz
+  else
+    bands[bandIdx].bandwidthIdx = 6; // 6.0 kHz
+  setBandwidth();
+  return;
   }
 
   uint8_t idx = bands[bandIdx].bandwidthIdx;
@@ -1345,14 +1417,39 @@ static void drawStep(int x, int y, int sx)
   if (bandIdx == 2)
   {
   drawCommon(menu[MENU_STEP], x, y, sx, true);
-  drawZoomedMenu("25k");
 
-  spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
+  int centerY = 64 + y;
+
   spr.setTextDatum(MC_DATUM);
-  spr.drawString("25k", 40+x+(sx/2), 64+y, 2);
+
+  if (currentAirSpacing == AIR_833)
+    {
+    // 8.33k nằm giữa
+    drawZoomedMenu("8.33k");
+
+    spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
+    spr.drawString("8.33k", 40 + x + (sx / 2), centerY, 2);
+
+    // 25k nằm dưới
+    spr.setTextColor(TH.menu_item);
+    spr.drawString("25k", 40 + x + (sx / 2), centerY + 16, 2);
+    }
+  else
+    {
+    // 8.33k nằm trên
+    spr.setTextColor(TH.menu_item);
+    spr.drawString("8.33k", 40 + x + (sx / 2), centerY - 16, 2);
+
+    // 25k nằm giữa
+    drawZoomedMenu("25k");
+
+    spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
+    spr.drawString("25k", 40 + x + (sx / 2), centerY, 2);
+    }
+
   return;
   }
-  
+
   int count = getLastStep(currentMode) + 1;
   int idx   = bands[bandIdx].currentStepIdx + count;
 
@@ -1368,9 +1465,15 @@ static void drawStep(int x, int y, int sx)
     }
 
     spr.setTextDatum(MC_DATUM);
-    spr.drawString(steps[currentMode][abs((idx+i)%count)].desc, 40+x+(sx/2), 64+y+(i*16), 2);
+    spr.drawString(
+      steps[currentMode][abs((idx+i)%count)].desc,
+      40+x+(sx/2),
+      64+y+(i*16),
+      2
+    );
   }
 }
+
 
 static void drawSeek(int x, int y, int sx)
 {
@@ -1942,9 +2045,11 @@ static void drawInfo(int x, int y, int sx)
   spr.setTextColor(TH.box_text);
   spr.fillSmoothRoundRect(1+x, 1+y, 76+sx, 110, 4, TH.box_border);
   spr.fillSmoothRoundRect(2+x, 2+y, 74+sx, 108, 4, TH.box_bg);
-
   spr.drawString("Step:", 6+x, 64+y+(-3*16), 2);
-  spr.drawString(getCurrentStep()->desc, 48+x, 64+y+(-3*16), 2);
+  if (bandIdx == 2)
+    spr.drawString(airStepDesc[currentAirSpacing], 48+x, 64+y+(-3*16), 2);
+  else
+    spr.drawString(getCurrentStep()->desc, 48+x, 64+y+(-3*16), 2);
 
   spr.drawString("BW:", 6+x, 64+y+(-2*16), 2);
   spr.drawString(getCurrentBandwidth()->desc, 48+x, 64+y+(-2*16), 2);

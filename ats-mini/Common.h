@@ -176,6 +176,7 @@ extern bool zoomMenu;
 extern int8_t scrollDirection;
 extern uint8_t utcOffsetIdx;
 extern uint8_t uiLayoutIdx;
+extern uint32_t currentAirChannel;
 
 extern int8_t FmAgcIdx;
 extern int8_t AmAgcIdx;
@@ -197,9 +198,14 @@ extern uint8_t disableAgc;
 
 extern const int CALMax;
 
+enum AirSpacing { AIR_25K = 0, AIR_833 = 1};
+
+extern uint8_t currentAirSpacing;
+
 static inline bool isSSB() { return(currentMode>FM && currentMode<AM); }
 
 void useBand(const Band *band);
+void applyBandwidth();
 bool updateFrequency(int newFreq, bool wrap = true);
 bool updateBFO(int newBFO, bool wrap = true);
 bool doSeek(int16_t enc);
