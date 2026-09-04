@@ -810,7 +810,12 @@ if (currentDCVIdx == 2 &&
   return true;
 }
 
-  currentAirChannel = getNextAir833Channel(currentAirChannel, enc);
+  int16_t airEnc = enc;
+
+  if (abs(enc) > 1)
+    airEnc = enc * 3;
+
+    currentAirChannel = getNextAir833Channel(currentAirChannel, airEnc);
 
   uint16_t newFreq = airChannelToCarrier(currentAirChannel);
   updateFrequency(newFreq, true);
