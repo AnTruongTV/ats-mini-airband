@@ -229,8 +229,6 @@ void setup()
 
   // Attached pin to allows SI4732 library to mute audio as required to minimise loud clicks
   rx.setAudioMuteMcuPin(AUDIO_MUTE);
-  // Keep receiver audio muted during startup / splash
-  rx.setHardwareAudioMute(true);
 
   // If loading preferences fails...
   if(!prefsLoad(SAVE_SETTINGS|SAVE_VERIFY))
@@ -263,6 +261,9 @@ void setup()
   delay(50);
   rx.setVolume(volume);
   rx.setMaxSeekTime(SEEK_TIMEOUT);
+
+  // Keep receiver audio muted during startup / splash
+  rx.setHardwareAudioMute(true);
 
   // Draw display for the first time
   if(splashDraw())
