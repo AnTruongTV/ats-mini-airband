@@ -1080,15 +1080,9 @@ void doBand(int16_t enc)
 
 void doBandwidth(int16_t enc)
 {
+  // AIR bandwidth is controlled automatically
   if (bandIdx == 2)
-  {
-  if (currentAirSpacing == AIR_833)
-    bands[bandIdx].bandwidthIdx = 5; // 4.0 kHz
-  else
-    bands[bandIdx].bandwidthIdx = 6; // 6.0 kHz
-  setBandwidth();
-  return;
-  }
+    return;
 
   uint8_t idx = bands[bandIdx].bandwidthIdx;
 
@@ -1577,15 +1571,18 @@ static void drawBandwidth(int x, int y, int sx)
 {
   if (bandIdx == 2)
   {
-  drawCommon(menu[MENU_BW], x, y, sx, true);
-  drawZoomedMenu("6.0k");
+    const char *airBw = getCurrentBandwidth()->desc;
 
-  spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
-  spr.setTextDatum(MC_DATUM);
-  spr.drawString("6.0k", 40+x+(sx/2), 64+y, 2);
-  return;
+    drawCommon(menu[MENU_BW], x, y, sx, true);
+    drawZoomedMenu(airBw);
+
+    spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
+    spr.setTextDatum(MC_DATUM);
+    spr.drawString(airBw, 40+x+(sx/2), 64+y, 2);
+
+    return;
   }
-  
+
   int count = getLastBandwidth(currentMode) + 1;
   int idx   = bands[bandIdx].bandwidthIdx + count;
 
@@ -1594,14 +1591,27 @@ static void drawBandwidth(int x, int y, int sx)
   for(int i=-2 ; i<3 ; i++)
   {
     if(i==0) {
-      drawZoomedMenu(bandwidths[currentMode][abs((idx+i)%count)].desc);
-      spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
-    } else {
+      drawZoomedMenu(
+        bandwidths[currentMode][abs((idx+i)%count)].desc
+      );
+
+      spr.setTextColor(
+        TH.menu_hl_text,
+        TH.menu_hl_bg
+      );
+    }
+    else {
       spr.setTextColor(TH.menu_item);
     }
 
     spr.setTextDatum(MC_DATUM);
-    spr.drawString(bandwidths[currentMode][abs((idx+i)%count)].desc, 40+x+(sx/2), 64+y+(i*16), 2);
+
+    spr.drawString(
+      bandwidths[currentMode][abs((idx+i)%count)].desc,
+      40+x+(sx/2),
+      64+y+(i*16),
+      2
+    );
   }
 }
 
