@@ -253,9 +253,8 @@ void setup()
   if (bandIdx == 2 && currentDCVIdx == 0) {
     bandIdx = 0;
   }
-  // Audio Amplifier Enable. G8PTN: Added
-  // After the SI4732 has been setup, enable the audio amplifier
-  if(PIN_AMP_EN >= 0) digitalWrite(PIN_AMP_EN, HIGH);
+  
+  // Keep audio amplifier disabled during startup/splash
 
   // SI4732 STARTUP!
   selectBand(bandIdx, false);
@@ -271,6 +270,12 @@ void setup()
   }
   drawScreen();
   ledcWrite(PIN_LCD_BL, currentBrt);
+
+  // Splash finished - enable audio amplifier
+  if(PIN_AMP_EN >= 0)
+  {
+    digitalWrite(PIN_AMP_EN, HIGH);
+  }
 
   // Interrupt actions for Rotary encoder
   // Note: Moved to end of setup to avoid inital interrupt actions
