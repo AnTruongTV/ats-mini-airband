@@ -84,6 +84,8 @@ spr.drawFastHLine(0, 72, 320, TFT_WHITE);
 spr.drawFastHLine(72, 102, 248, TFT_WHITE);
 spr.drawFastHLine(72, 119, 248, TFT_WHITE);
 spr.drawFastVLine(254, 119, 51, TFT_WHITE);
+spr.drawFastVLine(270, 119, 18, TFT_WHITE);
+spr.drawFastHLine(254, 136, 66, TFT_WHITE);
 
 // 7 boxes - adjusted to your new mockup
 // Time
@@ -105,17 +107,17 @@ spr.setTextDatum(MC_DATUM);
 // ----- TIME -----
 spr.setTextColor(TFT_WHITE, TFT_BLACK);
 const char *timeText = clockGet();
-spr.drawString(timeText ? timeText : "--:--", 21, 10, 2);
+spr.drawString(timeText ? timeText : "12:26", 22, 10, 2);
 
 // ----- DATE -----
 uint16_t year;
 uint8_t month, day, weekday;
-char dateText[6] = "--/--";
+char dateText[6] = "07/05";
 
 if (clockGetDate(&year, &month, &day, &weekday))
   sprintf(dateText, "%02u/%02u", day, month);
 
-spr.drawString(dateText, 64, 10, 2);
+spr.drawString(dateText, 65, 10, 2);
 
 // ----- BFO -----
 bool bfoOn =
@@ -126,11 +128,10 @@ uint16_t c = bfoOn ? TFT_GREEN : TFT_DARKGREY;
 
 spr.drawRect(88, 2, 29, 16, c);
 spr.setTextColor(c, TFT_BLACK);
-spr.drawString("BFO", 102, 10, 2);
+spr.drawString("BFO", 103, 10, 2);
 
 // ----- MODE -----
 spr.setTextColor(TFT_WHITE, TFT_BLACK);
 spr.setTextDatum(MC_DATUM);
 spr.drawString(bandModeDesc[currentMode], 132, 10, 2);
-
 }
