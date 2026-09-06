@@ -383,4 +383,7 @@ spr.drawString(rssiText, 160, 148, 2);
 // Saving data
 if (prefsAreWritten())
   drawPixelIcon(258, 122, saveIcon, 12, TFT_WHITE);
+
+// Voltage
+drawBattery(0, 0);
 }
