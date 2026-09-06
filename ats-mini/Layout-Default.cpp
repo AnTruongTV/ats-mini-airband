@@ -235,11 +235,36 @@ spr.drawString(getCurrentBand()->bandName, 228, 10, 2);
 // ----- Step -----
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
-spr.drawString(getCurrentStep()->desc, 273, 10, 2);
+if (bandIdx == 2)
+{
+  if (currentAirSpacing == AIR_833)
+    spr.drawString("8.33k", 272, 10, 2);
+  else
+    spr.drawString("25k", 272, 10, 2);
+}
+else
+{
+  spr.drawString(getCurrentStep()->desc, 272, 10, 2);
+}
 
 // ----- Draw BLT+Wifi -----
-drawPixelIcon(295, 3, bleIcon, 13, TFT_BLUE);
-drawPixelIcon(303, 6, wifiIcon, 8, TFT_GREEN);
+// BLE
+int8_t bleStatus = getBleStatus();
+
+if (bleStatus)
+{
+  uint16_t bleColor = bleStatus > 0 ? TFT_GREEN : TFT_RED;
+  drawPixelIcon(295, 3, bleIcon, 13, bleColor);
+}
+
+// WiFi
+int8_t wifiStatus = getWiFiStatus();
+
+if (wifiStatus)
+{
+  uint16_t wifiColor = wifiStatus > 0 ? TFT_GREEN : TFT_RED;
+  drawPixelIcon(303, 6, wifiIcon, 8, wifiColor);
+}
 
 spr.setTextColor(TFT_WHITE);
 
