@@ -239,7 +239,7 @@ spr.setTextDatum(MC_DATUM);
 if (bandIdx == 2)
 {
   if (currentAirSpacing == AIR_833)
-    spr.drawString("8.33k", 272, 10, 2);
+    spr.drawString("8.33k", 273, 10, 2);
   else
     spr.drawString("25k", 272, 10, 2);
 }
@@ -254,7 +254,7 @@ int8_t bleStatus = getBleStatus();
 
 if (bleStatus)
 {
-  uint16_t bleColor = bleStatus > 0 ? TFT_GREEN : TFT_RED;
+  uint16_t bleColor = bleStatus > 0 ? TFT_BLUE : TFT_RED;
   drawPixelIcon(295, 3, bleIcon, 13, bleColor);
 }
 
@@ -369,6 +369,38 @@ const char *strengthText[] =
 if (strength < 1 || strength > 17)
   strength = 1;
 
+uint16_t signalColor(int strength)
+{
+  strength = constrain(strength, 1, 17);
+
+  // S9 and above = red
+  if (strength >= 10)
+    return TFT_RED;
+
+  // S0 -> S9 : green -> yellow -> red
+  float t = (strength - 1) / 8.0f;
+
+  uint8_t r;
+  uint8_t g;
+
+  if (t < 0.5f)
+  {
+    // green -> yellow
+    float p = t * 2.0f;
+    r = 255 * p;
+    g = 255;
+  }
+  else
+  {
+    // yellow -> red
+    float p = (t - 0.5f) * 2.0f;
+    r = 255;
+    g = 255 * (1.0f - p);
+  }
+
+  return spr.color565(r, g, 0);
+}
+
 snprintf(snrText, sizeof(snrText), "SNR: %udB", snr);
 
 if (muteOn(MUTE_MAIN, 2))
@@ -379,11 +411,11 @@ else
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
 
-// SIG, tighter spacing
-spr.drawString("SIG:", 5, 21, 2);
-spr.drawString(strengthText[strength], 31, 21, 2);
 spr.drawString(snrText, 5, 38, 2);
 spr.drawString(volText, 5, 55, 2);
+spr.drawString("SIG:", 5, 21, 2);
+spr.setTextColor(signalColor(strength));
+spr.drawString(strengthText[strength], 31, 21, 2);
 
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
