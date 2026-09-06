@@ -377,7 +377,11 @@ else
   snprintf(agcAttText, sizeof(agcAttText), "ATT:%d", agcNdx);
 
 // AVC
-snprintf(avcText, sizeof(avcText), "AVC:%u", currentAVC[currentMode]);
+if (currentMode == FM)
+  snprintf(avcText, sizeof(avcText), "AVC:n/a");
+else
+  snprintf(avcText, sizeof(avcText), "AVC:%ddB",
+           isSSB() ? SsbAvcIdx : AmAvcIdx);
 
 // SQL
 uint8_t sqlRaw   = currentSquelch[currentMode];
