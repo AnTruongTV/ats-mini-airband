@@ -86,14 +86,20 @@ spr.drawFastHLine(72, 119, 248, TFT_WHITE);
 spr.drawFastVLine(254, 119, 51, TFT_WHITE);
 
 // 7 boxes - adjusted to your new mockup
-spr.drawRect(1,   1, 40, 17, TFT_WHITE);  // time
-spr.drawRect(42,  1, 45, 17, TFT_WHITE);  // date
-spr.drawRect(88,  1, 31, 17, TFT_WHITE);  // BFO
-spr.drawRect(120, 1, 33, 17, TFT_WHITE);  // mode
-spr.drawRect(154, 1, 57, 17, TFT_WHITE);  // bandwidth
-spr.drawRect(212, 1, 43, 17, TFT_WHITE);  // band
-spr.drawRect(256, 1, 42, 17, TFT_WHITE);  // step
-
+// Time
+spr.drawRect(2,   2, 40, 16, TFT_WHITE);
+// Date
+spr.drawRect(43,  2, 44, 16, TFT_WHITE);
+// BFO
+spr.drawRect(88,  2, 29, 16, TFT_WHITE);
+// Mode
+spr.drawRect(118, 2, 29, 16, TFT_WHITE);
+// Bandwidth
+spr.drawRect(148, 2, 54, 16, TFT_WHITE);
+// Band
+spr.drawRect(203, 2, 49, 16, TFT_WHITE);
+// Step
+spr.drawRect(253, 2, 40, 16, TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
 
 // ----- TIME -----
@@ -116,18 +122,15 @@ bool bfoOn =
   (currentMode == USB && getCurrentBand()->usbCal != 0) ||
   (currentMode == LSB && getCurrentBand()->lsbCal != 0);
 
-uint16_t bfoColor = bfoOn ? TFT_GREEN : TFT_DARKGREY;
+uint16_t c = bfoOn ? TFT_GREEN : TFT_DARKGREY;
 
-spr.drawRect(88, 1, 31, 17, bfoColor);
-spr.setTextColor(bfoColor, TFT_BLACK);
-spr.drawString("BFO", 103, 10, 2);
+spr.drawRect(88, 2, 29, 16, c);
+spr.setTextColor(c, TFT_BLACK);
+spr.drawString("BFO", 102, 10, 2);
 
 // ----- MODE -----
 spr.setTextColor(TFT_WHITE, TFT_BLACK);
-spr.drawString(bandModeDesc[currentMode], 136, 10, 2);
+spr.setTextDatum(MC_DATUM);
+spr.drawString(bandModeDesc[currentMode], 132, 10, 2);
 
-// ----- TEMP PLACEHOLDERS FOR NOW -----
-spr.drawString("F6.0kHz", 182, 10, 2);
-spr.drawString("160M",    233, 10, 2);
-spr.drawString("8.33k",   277, 10, 2);
 }
