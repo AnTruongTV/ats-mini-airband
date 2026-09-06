@@ -383,14 +383,4 @@ spr.drawString(rssiText, 160, 148, 2);
 // Saving data
 if (prefsAreWritten())
   drawPixelIcon(258, 122, saveIcon, 12, TFT_WHITE);
-
-//Battery voltage
-float battVoltage = batteryMonitor();
-
-char battText[8];
-snprintf(battText, sizeof(battText), "%.2fV", battVoltage);
-
-spr.setTextColor(TFT_WHITE);
-spr.setTextDatum(TL_DATUM);
-spr.drawString(battText, 277, 120, 2);
 }
