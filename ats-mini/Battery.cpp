@@ -73,72 +73,80 @@ bool drawBattery(int x, int y)
   // Measure battery voltage and status
   batteryMonitor();
 
-  // Set display information
-  spr.drawRoundRect(x, y + 1, 28, 14, 3, TH.batt_border);
-  spr.drawLine(x + 29, y + 5, x + 29, y + 10, TH.batt_border);
-  spr.drawLine(x + 30, y + 6, x + 30, y + 9, TH.batt_border);
+  char voltage[8];
+  sprintf(voltage, "%.02fV", batteryVolts);
 
-  spr.setTextDatum(TR_DATUM);
-  spr.setTextColor(TH.batt_voltage);
+  spr.setTextColor(TFT_WHITE);
+  spr.setTextDatum(TL_DATUM);
+  spr.drawString(voltage, 277, 120, 2);
 
-  if(switchThemeEditor())
-  {
-    // Alternate between five battery states every 10 seconds
-    batteryState = (millis() % 50000u) / 10000u;
-    batteryVolts = batteryState >= 4 ? 4.5 : 4.0;
-  }
+  return true;
+  // // Set display information
+  // spr.drawRoundRect(x, y + 1, 28, 14, 3, TH.batt_border);
+  // spr.drawLine(x + 29, y + 5, x + 29, y + 10, TH.batt_border);
+  // spr.drawLine(x + 30, y + 6, x + 30, y + 9, TH.batt_border);
 
-  // The hardware has a load sharing circuit to allow simultaneous charge and power
-  // With USB(5V) connected the voltage reading will be approx. VBUS - Diode Drop = 4.65V
-  // If the average voltage is greater than 4.3V, show ligtning on the display
-  if(batteryVolts > 4.3)
-  {
-    spr.fillRoundRect(x + 2, y + 3, 24, 10, 2, TH.batt_charge);
-    spr.drawLine(x + 9 + 8, y + 1, x + 9 + 6, y + 1 + 5, TH.bg);
-    spr.drawLine(x + 9 + 6, y + 1 + 5, x + 9 + 10, y + 1 + 5, TH.bg);
-    spr.drawLine(x + 9 + 11, y + 1 + 6, x + 9 + 4, y + 1 + 13, TH.bg);
-    spr.drawLine(x + 9 + 2, y + 1 + 13, x + 9 + 4, y + 1 + 8, TH.bg);
-    spr.drawLine(x + 9 + 4, y + 1 + 8, x + 9 + 0, y + 1 + 8, TH.bg);
-    spr.drawLine(x + 9 - 1, y + 1 + 7, x + 9 + 6, y + 1 + 0, TH.bg);
-    spr.fillTriangle(x + 9 + 7, y + 1, x + 9 + 4, y + 1 + 6, x + 9, y + 1 + 7, TH.batt_icon);
-    spr.fillTriangle(x + 9 + 5, y + 1 + 6, x + 9 + 10, y + 1 + 6, x + 9 + 3, y + 1 + 13, TH.batt_icon);
-    spr.fillRect(x + 9 + 1, y + 1 + 6, 9, 2, TH.batt_icon);
-    spr.drawPixel(x + 9 + 3, y + 1 + 12, TH.batt_icon);
-    return false;
-  }
-  else
-  {
-    char voltage[8];
-    uint16_t color;
-    int level;
+  // spr.setTextDatum(TR_DATUM);
+  // spr.setTextColor(TH.batt_voltage);
 
-    // Text representation of the voltage
-    sprintf(voltage, "%.02fV", batteryVolts);
+  // if(switchThemeEditor())
+  // {
+  //   // Alternate between five battery states every 10 seconds
+  //   batteryState = (millis() % 50000u) / 10000u;
+  //   batteryVolts = batteryState >= 4 ? 4.5 : 4.0;
+  // }
 
-    // Battery bar color and width
-    switch(batteryState)
-    {
-      case 0:
-        color = TH.batt_low;
-        level = 6;
-        break;
-      case 1:
-        color = TH.batt_full;
-        level = 12;
-        break;
-      case 2:
-        color = TH.batt_full;
-        level = 18;
-        break;
-      case 3:
-      default:
-        color = TH.batt_full;
-        level = 24;
-        break;
-    }
+  // // The hardware has a load sharing circuit to allow simultaneous charge and power
+  // // With USB(5V) connected the voltage reading will be approx. VBUS - Diode Drop = 4.65V
+  // // If the average voltage is greater than 4.3V, show ligtning on the display
+  // if(batteryVolts > 4.3)
+  // {
+  //   spr.fillRoundRect(x + 2, y + 3, 24, 10, 2, TH.batt_charge);
+  //   spr.drawLine(x + 9 + 8, y + 1, x + 9 + 6, y + 1 + 5, TH.bg);
+  //   spr.drawLine(x + 9 + 6, y + 1 + 5, x + 9 + 10, y + 1 + 5, TH.bg);
+  //   spr.drawLine(x + 9 + 11, y + 1 + 6, x + 9 + 4, y + 1 + 13, TH.bg);
+  //   spr.drawLine(x + 9 + 2, y + 1 + 13, x + 9 + 4, y + 1 + 8, TH.bg);
+  //   spr.drawLine(x + 9 + 4, y + 1 + 8, x + 9 + 0, y + 1 + 8, TH.bg);
+  //   spr.drawLine(x + 9 - 1, y + 1 + 7, x + 9 + 6, y + 1 + 0, TH.bg);
+  //   spr.fillTriangle(x + 9 + 7, y + 1, x + 9 + 4, y + 1 + 6, x + 9, y + 1 + 7, TH.batt_icon);
+  //   spr.fillTriangle(x + 9 + 5, y + 1 + 6, x + 9 + 10, y + 1 + 6, x + 9 + 3, y + 1 + 13, TH.batt_icon);
+  //   spr.fillRect(x + 9 + 1, y + 1 + 6, 9, 2, TH.batt_icon);
+  //   spr.drawPixel(x + 9 + 3, y + 1 + 12, TH.batt_icon);
+  //   return false;
+  // }
+  // else
+  // {
+  //   char voltage[8];
+  //   uint16_t color;
+  //   int level;
 
-    spr.fillRoundRect(x + 2, y + 3, level, 10, 2, color);
-    spr.drawString(voltage, x - 3, y, 2);
-    return true;
-  }
+  //   // Text representation of the voltage
+  //   sprintf(voltage, "%.02fV", batteryVolts);
+
+  //   // Battery bar color and width
+  //   switch(batteryState)
+  //   {
+  //     case 0:
+  //       color = TH.batt_low;
+  //       level = 6;
+  //       break;
+  //     case 1:
+  //       color = TH.batt_full;
+  //       level = 12;
+  //       break;
+  //     case 2:
+  //       color = TH.batt_full;
+  //       level = 18;
+  //       break;
+  //     case 3:
+  //     default:
+  //       color = TH.batt_full;
+  //       level = 24;
+  //       break;
+  //   }
+
+  //   spr.fillRoundRect(x + 2, y + 3, level, 10, 2, color);
+  //   spr.drawString(voltage, x - 3, y, 2);
+  //   return true;
+  // }
 }
