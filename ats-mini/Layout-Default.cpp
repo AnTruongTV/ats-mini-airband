@@ -296,12 +296,17 @@ char sigText[16];
 char snrText[16];
 char volText[16];
 
+int strength = getStrength(rssi);
+
+if (strength < 1) strength = 1;
+if (strength > 17) strength = 17;
+
 const char *strengthText[] =
 {
   "",
   "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8",
   "S9", "S9+10", "S9+20", "S9+30", "S9+40", "S9+50",
-  "S9+60", "S9+60"
+  "S9+60", "Peak"
 };
 
 // SIG
