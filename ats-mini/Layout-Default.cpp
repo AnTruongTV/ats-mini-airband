@@ -252,7 +252,7 @@ if (currentMode == FM)
   spr.drawFloat(currentFrequency / 100.0, 2, 262, 46, 7);
 
   spr.setTextDatum(MC_DATUM);
-  spr.drawString("MHz", 289, 63, 4);
+  spr.drawString("MHz", 289, 61, 4);
 }
 
 // =====================
@@ -293,7 +293,7 @@ else if (bandIdx == 2)
   spr.drawString(freqText, 262, 46, 7);
 
   spr.setTextDatum(MC_DATUM);
-  spr.drawString("MHz", 289, 63, 4);
+  spr.drawString("MHz", 289, 61, 4);
 }
 
 // =====================
@@ -412,4 +412,7 @@ drawBattery(0, 0);
 
 // Draw battery
 drawPixelIcon(263, 144, batteryShell, 18, TFT_WHITE);
+
+// Menu
+drawSideBar(currentCmd, 4, 77, 0);
 }
