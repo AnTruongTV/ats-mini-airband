@@ -45,6 +45,22 @@ const char *wifiIcon[] =
   "......11......"
 };
 
+const char *saveIcon[] =
+{
+  "...111...",
+  "...111...",
+  "...111...",
+  "...111...",
+  "...111...",
+  ".1111111.",
+  "..11111..",
+  "...111...",
+  "....1....",
+  ".........",
+  "1.......1",
+  "111111111"
+};
+
 void drawLayoutDefault(const char *statusLine1, const char *statusLine2)
 {
   #if 0
@@ -213,7 +229,7 @@ if (currentMode == FM)
   spr.drawFloat(currentFrequency / 100.0, 2, 262, 46, 7);
 
   spr.setTextDatum(MC_DATUM);
-  spr.drawString("MHz", 292, 52, 4);
+  spr.drawString("MHz", 289, 66, 4);
 }
 
 // =====================
@@ -254,7 +270,7 @@ else if (bandIdx == 2)
   spr.drawString(freqText, 262, 46, 7);
 
   spr.setTextDatum(MC_DATUM);
-  spr.drawString("MHz", 292, 52, 4);
+  spr.drawString("MHz", 289, 66, 4);
 }
 
 // =====================
@@ -317,9 +333,9 @@ else
   
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
-spr.drawString(sigText, 5, 24, 2);
-spr.drawString(snrText, 5, 41, 2);
-spr.drawString(volText, 5, 58, 2);
+spr.drawString(sigText, 5, 21, 2);
+spr.drawString(snrText, 5, 38, 2);
+spr.drawString(volText, 5, 55, 2);
 
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
@@ -357,8 +373,12 @@ else
 snprintf(rssiText, sizeof(rssiText), "RSSI:%udBuV", rssi);
 
 // Draw
-spr.drawString(agcText,   79, 128, 2);
-spr.drawString(attText,   79, 151, 2);
-spr.drawString(sqlText,  160, 128, 2);
-spr.drawString(rssiText, 160, 151, 2);
+spr.drawString(agcText,   79, 125, 2);
+spr.drawString(attText,   79, 148, 2);
+spr.drawString(sqlText,  160, 125, 2);
+spr.drawString(rssiText, 160, 148, 2);
+
+// Saving data
+if (prefsAreWritten())
+  drawPixelIcon(258, 122, saveIcon, 12, TFT_WHITE);
 }
