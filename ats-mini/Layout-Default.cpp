@@ -74,7 +74,7 @@ void drawLayoutDefault(const char *statusLine1, const char *statusLine2)
   }
   #endif
 // Dark grey test background
-spr.fillSprite(0x2104);
+spr.fillSprite(TFT_BLACK);
 
 // Main divider lines
 spr.drawRect(0, 0, 320, 170, TFT_WHITE);
