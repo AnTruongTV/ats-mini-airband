@@ -238,8 +238,8 @@ spr.setTextDatum(MC_DATUM);
 spr.drawString(getCurrentStep()->desc, 273, 10, 2);
 
 // ----- Draw BLT+Wifi -----
-drawPixelIcon(295, 3, bleIcon, 13, TFT_WHITE);
-drawPixelIcon(303, 6, wifiIcon, 8, TFT_WHITE);
+drawPixelIcon(295, 3, bleIcon, 13, TFT_BLUE);
+drawPixelIcon(303, 6, wifiIcon, 8, TFT_GREEN);
 
 spr.setTextColor(TFT_WHITE);
 
@@ -365,22 +365,19 @@ spr.drawString(volText, 5, 55, 2);
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
 
-char agcText[16];
-char attText[16];
-char sqlText[20];
+char agcAttText[16];
+char avcText[16];
+char sqlText[16];
 char rssiText[20];
 
-// AGC
+// AGC / ATT combined
 if (agcIdx == 0)
-  snprintf(agcText, sizeof(agcText), "AGC: ON");
+  snprintf(agcAttText, sizeof(agcAttText), "AGC:ON");
 else
-  snprintf(agcText, sizeof(agcText), "AGC: OFF");
+  snprintf(agcAttText, sizeof(agcAttText), "ATT:%d", agcNdx);
 
-// ATT
-if (agcIdx == 0)
-  snprintf(attText, sizeof(attText), "ATT: OFF");
-else
-  snprintf(attText, sizeof(attText), "ATT: %d", agcNdx);
+// AVC
+snprintf(avcText, sizeof(avcText), "AVC:%u", currentAVC[currentMode]);
 
 // SQL
 uint8_t sqlRaw   = currentSquelch[currentMode];
@@ -388,24 +385,28 @@ uint8_t sqlValue = sqlRaw & 0x7F;
 bool sqlSNR      = sqlRaw & 0x80;
 
 if (sqlValue == 0)
-  snprintf(sqlText, sizeof(sqlText), "SQL: OFF");
+  snprintf(sqlText, sizeof(sqlText), "SQL:OFF");
 else if (sqlSNR)
-  snprintf(sqlText, sizeof(sqlText), "SQL: %udB", sqlValue);
+  snprintf(sqlText, sizeof(sqlText), "SQL:%udB", sqlValue);
 else
-  snprintf(sqlText, sizeof(sqlText), "SQL: %udBuV", sqlValue);
+  snprintf(sqlText, sizeof(sqlText), "SQL:%udBuV", sqlValue);
 
 // RSSI
-snprintf(rssiText, sizeof(rssiText), "RSSI: %udBuV", rssi);
+snprintf(rssiText, sizeof(rssiText), "RSSI:%udBuV", rssi);
 
 // Draw
-spr.drawString(agcText,   79, 125, 2);
-spr.drawString(attText,   79, 148, 2);
-spr.drawString(sqlText,  160, 125, 2);
-spr.drawString(rssiText, 160, 148, 2);
+spr.setTextColor(TFT_WHITE);
+spr.setTextDatum(TL_DATUM);
 
-// Saving data
+spr.drawString(agcAttText, 79, 125, 2);
+spr.drawString(avcText,    79, 148, 2);
+
+spr.drawString(sqlText,   160, 125, 2);
+spr.drawString(rssiText,  160, 148, 2);
+
+// Saving icon
 if (prefsAreWritten())
-  drawPixelIcon(258, 122, saveIcon, 12, TFT_WHITE);
+  drawPixelIcon(258, 122, saveIcon, 12, TFT_RED);
 
 // Voltage
 drawBattery(0, 0);
