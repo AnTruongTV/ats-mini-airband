@@ -346,13 +346,13 @@ const char *strengthText[] =
 if (strength < 1 || strength > 17)
   strength = 1;
 
-snprintf(sigText, sizeof(sigText), "SIG:%s", strengthText[strength]);
-snprintf(snrText, sizeof(snrText), "SNR:%udB", snr);
+snprintf(sigText, sizeof(sigText), "SIG: %s", strengthText[strength]);
+snprintf(snrText, sizeof(snrText), "SNR: %udB", snr);
 
 if (muteOn(MUTE_MAIN, 2))
-  snprintf(volText, sizeof(volText), "Vol:Muted");
+  snprintf(volText, sizeof(volText), "Vol: Muted");
 else
-  snprintf(volText, sizeof(volText), "Vol:%u", volume);
+  snprintf(volText, sizeof(volText), "Vol: %u", volume);
   
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
@@ -370,15 +370,15 @@ char rssiText[20];
 
 // AGC
 if (agcIdx == 0)
-  snprintf(agcText, sizeof(agcText), "AGC:ON");
+  snprintf(agcText, sizeof(agcText), "AGC: ON");
 else
-  snprintf(agcText, sizeof(agcText), "AGC:OFF");
+  snprintf(agcText, sizeof(agcText), "AGC: OFF");
 
 // ATT
 if (agcIdx == 0)
-  snprintf(attText, sizeof(attText), "ATT:OFF");
+  snprintf(attText, sizeof(attText), "ATT: OFF");
 else
-  snprintf(attText, sizeof(attText), "ATT:%d", agcNdx);
+  snprintf(attText, sizeof(attText), "ATT: %d", agcNdx);
 
 // SQL
 uint8_t sqlRaw   = currentSquelch[currentMode];
@@ -386,14 +386,14 @@ uint8_t sqlValue = sqlRaw & 0x7F;
 bool sqlSNR      = sqlRaw & 0x80;
 
 if (sqlValue == 0)
-  snprintf(sqlText, sizeof(sqlText), "SQL:OFF");
+  snprintf(sqlText, sizeof(sqlText), "SQL: OFF");
 else if (sqlSNR)
-  snprintf(sqlText, sizeof(sqlText), "SQL:%udB", sqlValue);
+  snprintf(sqlText, sizeof(sqlText), "SQL: %udB", sqlValue);
 else
-  snprintf(sqlText, sizeof(sqlText), "SQL:%udBuV", sqlValue);
+  snprintf(sqlText, sizeof(sqlText), "SQL: %udBuV", sqlValue);
 
 // RSSI
-snprintf(rssiText, sizeof(rssiText), "RSSI:%udBuV", rssi);
+snprintf(rssiText, sizeof(rssiText), "RSSI: %udBuV", rssi);
 
 // Draw
 spr.drawString(agcText,   79, 125, 2);
