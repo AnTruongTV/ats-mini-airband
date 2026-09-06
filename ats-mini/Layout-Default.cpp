@@ -346,17 +346,19 @@ const char *strengthText[] =
 if (strength < 1 || strength > 17)
   strength = 1;
 
-snprintf(sigText, sizeof(sigText), "SIG: %s", strengthText[strength]);
 snprintf(snrText, sizeof(snrText), "SNR: %udB", snr);
 
 if (muteOn(MUTE_MAIN, 2))
   snprintf(volText, sizeof(volText), "Vol: Muted");
 else
   snprintf(volText, sizeof(volText), "Vol: %u", volume);
-  
+
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
-spr.drawString(sigText, 5, 21, 2);
+
+// SIG, tighter spacing
+spr.drawString("SIG:", 5, 21, 2);
+spr.drawString(strengthText[strength], 31, 21, 2);
 spr.drawString(snrText, 5, 38, 2);
 spr.drawString(volText, 5, 55, 2);
 
