@@ -4,37 +4,50 @@
 #include "Menu.h"
 #include "Draw.h"
 
-void drawNewBle(int x, int y, uint16_t c)
+void drawPixelIcon(int x, int y, const char *icon[], int h, uint16_t c)
 {
-  spr.drawLine(x+3, y,   x+3, y+12, c);
-  spr.drawLine(x+3, y,   x+7, y+4,  c);
-  spr.drawLine(x+7, y+4, x,   y+10, c);
-  spr.drawLine(x,   y+2, x+7, y+8,  c);
-  spr.drawLine(x+7, y+8, x+3, y+12, c);
+  for (int row = 0; row < h; row++)
+  {
+    for (int col = 0; icon[row][col] != 0; col++)
+    {
+      if (icon[row][col] == '1')
+        spr.drawPixel(x + col, y + row, c);
+    }
+  }
 }
 
-void drawNewWifi(int x, int y, uint16_t c)
+const char *bleIcon[] =
 {
-  // upper arc
-  spr.drawPixel(x+2, y,   c);
-  spr.drawFastHLine(x+3, y-1, 5, c);
-  spr.drawPixel(x+8, y,   c);
+  "..11...",
+  "..11...",
+  "..11.1.",
+  "..11..1",
+  "1.11.1.",
+  ".1111..",
+  "..11...",
+  "..11...",
+  ".1111..",
+  "1.11.1.",
+  "..11..1",
+  "..11.1.",
+  "..11...",
+  "..11...",
+  "..11..."
+};
 
-  spr.drawPixel(x+1, y+1, c);
-  spr.drawPixel(x+9, y+1, c);
-
-  // middle arc
-  spr.drawPixel(x+3, y+3, c);
-  spr.drawFastHLine(x+4, y+2, 3, c);
-  spr.drawPixel(x+7, y+3, c);
-
-  // lower arc
-  spr.drawPixel(x+4, y+5, c);
-  spr.drawPixel(x+6, y+5, c);
-
-  // dot
-  spr.drawPixel(x+5, y+7, c);
-}
+const char *wifiIcon[] =
+{
+  "...11111111...",
+  "..1........1..",
+  ".1..........1.",
+  "1..11111111..1",
+  "..1........1..",
+  ".1..111111..1.",
+  "..1........1..",
+  "...11111111...",
+  ".....1111.....",
+  ".....1111....."
+};
 
 void drawLayoutDefault(const char *statusLine1, const char *statusLine2)
 {
@@ -177,19 +190,56 @@ else
 
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
-spr.drawString(bwText, 174, 10, 2);
+spr.drawString(bwText, 175, 10, 2);
 
 // ----- Band name -----
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
-spr.drawString(getCurrentBand()->bandName, 227, 10, 2);
+spr.drawString(getCurrentBand()->bandName, 228, 10, 2);
 
 // ----- Step -----
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
-spr.drawString(getCurrentStep()->desc, 272, 10, 2);
+spr.drawString(getCurrentStep()->desc, 273, 10, 2);
 
 // ----- Draw BLT+Wifi -----
-drawNewBle(297, 3, TFT_WHITE);
-drawNewWifi(308, 7, TFT_WHITE);
+drawPixelIcon(295, 2, bleIcon, 15, TFT_WHITE);
+drawPixelIcon(306, 3, wifiIcon, 10, TFT_WHITE);
+
+// ----- Draw HF -----
+spr.setTextColor(TFT_WHITE);
+spr.setTextDatum(MR_DATUM);
+
+// Main kHz part
+spr.drawString("99999", 262, 47, 7);
+
+// Small .888
+spr.setTextDatum(ML_DATUM);
+spr.drawString(".888", 267, 58, 4);
+
+// kHz above the small digits
+spr.setTextDatum(MC_DATUM);
+spr.drawString("kHz", 292, 38, 2);
+
+#if 0
+spr.setTextColor(TFT_WHITE);
+spr.setTextDatum(MR_DATUM);
+
+// Main frequency
+spr.drawString("108.00", 262, 47, 7);
+
+// MHz
+spr.setTextDatum(MC_DATUM);
+spr.drawString("MHz", 292, 57, 2);
+
+spr.setTextColor(TFT_WHITE);
+spr.setTextDatum(MR_DATUM);
+
+// Main air frequency
+spr.drawString("136.000", 262, 47, 7);
+
+// MHz
+spr.setTextDatum(MC_DATUM);
+spr.drawString("MHz", 292, 57, 2);
+#endif
 }
