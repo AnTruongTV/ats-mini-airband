@@ -6,8 +6,6 @@
 
 void drawLayoutDefault(const char *statusLine1, const char *statusLine2)
 {
-  //For temporary UI dev
-  spr.fillSprite(0x2104);
   #if 0
   // Draw preferences write request icon
   drawSaveIndicator(SAVE_OFFSET_X, SAVE_OFFSET_Y);
@@ -75,26 +73,24 @@ void drawLayoutDefault(const char *statusLine1, const char *statusLine2)
       drawScale(isSSB()? (currentFrequency + currentBFO/1000) : currentFrequency);
   }
   #endif
-  uint16_t lineColor = TFT_WHITE;
+// Dark grey test background
+spr.fillSprite(0x2104);
 
-// Outer 320x170 border
-spr.drawRect(0, 0, 320, 170, lineColor);
+// Main divider lines
+spr.drawRect(0, 0, 320, 170, TFT_WHITE);
+spr.drawFastHLine(0, 19, 320, TFT_WHITE);
+spr.drawFastVLine(72, 19, 151, TFT_WHITE);
+spr.drawFastHLine(0, 72, 320, TFT_WHITE);
+spr.drawFastHLine(72, 102, 248, TFT_WHITE);
+spr.drawFastHLine(72, 119, 248, TFT_WHITE);
+spr.drawFastVLine(254, 119, 51, TFT_WHITE);
 
-// Top bar bottom
-spr.drawFastHLine(0, 19, 320, lineColor);
-
-// Left panel separator
-spr.drawFastVLine(72, 19, 151, lineColor);
-
-// Bottom of main frequency area
-spr.drawFastHLine(0, 72, 320, lineColor);
-
-// Bottom of Channel Name
-spr.drawFastHLine(72, 102, 248, lineColor);
-
-// Bottom of frequency scale
-spr.drawFastHLine(72, 119, 248, lineColor);
-
-// Battery / voltage section separator
-spr.drawFastVLine(254, 119, 51, lineColor);
+// Top boxes
+spr.drawRect(2,   2, 40, 16, TFT_WHITE);
+spr.drawRect(44,  2, 44, 16, TFT_WHITE);
+spr.drawRect(90,  2, 31, 16, TFT_WHITE);
+spr.drawRect(123, 2, 29, 16, TFT_WHITE);
+spr.drawRect(154, 2, 54, 16, TFT_WHITE);
+spr.drawRect(210, 2, 35, 16, TFT_WHITE);
+spr.drawRect(247, 2, 40, 16, TFT_WHITE);
 }
