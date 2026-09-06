@@ -133,5 +133,13 @@ spr.drawString("BFO", 103, 10, 2);
 // ----- MODE -----
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
-spr.drawString(bandModeDesc[currentMode], 132, 10, 2);
+spr.drawString(bandModeDesc[currentMode], 133, 10, 2);
+
+// ----- Bandwidth -----
+char bwText[10];
+sprintf(bwText, "F%s", getCurrentBandwidth()->desc);
+
+spr.setTextColor(TFT_WHITE);
+spr.setTextDatum(MC_DATUM);
+spr.drawString(bwText, 174, 10, 2);
 }
