@@ -84,9 +84,6 @@ bool drawBattery(int x, int y)
 
   int bars = getBatteryBars(batteryVolts);
 
-// shell
-drawPixelIcon(263, 144, batteryShell, 18, TFT_WHITE);
-
 // bars
 if (bars >= 1)
   spr.fillRect(267, 148, 8, 10, TFT_RED);
