@@ -6,6 +6,9 @@
 
 void drawLayoutDefault(const char *statusLine1, const char *statusLine2)
 {
+  //For temporary UI dev
+  spr.fillSprite(0x2104);
+  #if 0
   // Draw preferences write request icon
   drawSaveIndicator(SAVE_OFFSET_X, SAVE_OFFSET_Y);
 
@@ -71,4 +74,27 @@ void drawLayoutDefault(const char *statusLine1, const char *statusLine2)
     else
       drawScale(isSSB()? (currentFrequency + currentBFO/1000) : currentFrequency);
   }
+  #endif
+  uint16_t lineColor = TFT_WHITE;
+
+// Outer 320x170 border
+spr.drawRect(0, 0, 320, 170, lineColor);
+
+// Top bar bottom
+spr.drawFastHLine(0, 19, 320, lineColor);
+
+// Left panel separator
+spr.drawFastVLine(72, 19, 151, lineColor);
+
+// Bottom of main frequency area
+spr.drawFastHLine(0, 72, 320, lineColor);
+
+// Bottom of Channel Name
+spr.drawFastHLine(72, 102, 248, lineColor);
+
+// Bottom of frequency scale
+spr.drawFastHLine(72, 119, 248, lineColor);
+
+// Battery / voltage section separator
+spr.drawFastVLine(254, 119, 51, lineColor);
 }
