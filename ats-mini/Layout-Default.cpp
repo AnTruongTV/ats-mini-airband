@@ -136,10 +136,24 @@ spr.setTextDatum(MC_DATUM);
 spr.drawString(bandModeDesc[currentMode], 133, 10, 2);
 
 // ----- Bandwidth -----
-char bwText[10];
-sprintf(bwText, "F%s", getCurrentBandwidth()->desc);
+char bwText[12];
+
+if (strcmp(getCurrentBandwidth()->desc, "Auto") == 0)
+  sprintf(bwText, "F%s", getCurrentBandwidth()->desc);
+else
+  sprintf(bwText, "F%sHz", getCurrentBandwidth()->desc);
 
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
 spr.drawString(bwText, 174, 10, 2);
+
+// ----- Band name -----
+spr.setTextColor(TFT_WHITE);
+spr.setTextDatum(MC_DATUM);
+spr.drawString(getCurrentBand()->bandName, 227, 10, 2);
+
+// ----- Step -----
+spr.setTextColor(TFT_WHITE);
+spr.setTextDatum(MC_DATUM);
+spr.drawString(getCurrentStep()->desc, 272, 10, 2);
 }
