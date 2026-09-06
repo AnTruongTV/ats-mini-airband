@@ -85,39 +85,49 @@ spr.drawFastHLine(72, 102, 248, TFT_WHITE);
 spr.drawFastHLine(72, 119, 248, TFT_WHITE);
 spr.drawFastVLine(254, 119, 51, TFT_WHITE);
 
-// Top boxes
-spr.drawRect(2,   2, 40, 16, TFT_WHITE);
-spr.drawRect(44,  2, 44, 16, TFT_WHITE);
-spr.drawRect(123, 2, 29, 16, TFT_WHITE);
-spr.drawRect(154, 2, 54, 16, TFT_WHITE);
-spr.drawRect(210, 2, 35, 16, TFT_WHITE);
-spr.drawRect(247, 2, 40, 16, TFT_WHITE);
-spr.drawFastVLine(270, 119, 18, TFT_WHITE);
-spr.drawFastHLine(254, 136, 66, TFT_WHITE);
+// 7 boxes - adjusted to your new mockup
+spr.drawRect(1,   1, 40, 17, TFT_WHITE);  // time
+spr.drawRect(42,  1, 45, 17, TFT_WHITE);  // date
+spr.drawRect(88,  1, 31, 17, TFT_WHITE);  // BFO
+spr.drawRect(120, 1, 33, 17, TFT_WHITE);  // mode
+spr.drawRect(154, 1, 57, 17, TFT_WHITE);  // bandwidth
+spr.drawRect(212, 1, 43, 17, TFT_WHITE);  // band
+spr.drawRect(256, 1, 42, 17, TFT_WHITE);  // step
 
-// Time + Date
-spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
 
+// ----- TIME -----
+spr.setTextColor(TFT_WHITE, TFT_BLACK);
 const char *timeText = clockGet();
-spr.drawString(timeText ? timeText : "--:--", 22, 10, 2);
+spr.drawString(timeText ? timeText : "--:--", 21, 10, 2);
 
+// ----- DATE -----
 uint16_t year;
 uint8_t month, day, weekday;
 char dateText[6] = "--/--";
 
-if(clockGetDate(&year, &month, &day, &weekday))
+if (clockGetDate(&year, &month, &day, &weekday))
   sprintf(dateText, "%02u/%02u", day, month);
 
-spr.drawString(dateText, 66, 10, 2);
-// BFO
-int16_t cal = currentMode == USB ? getCurrentBand()->usbCal :
-              currentMode == LSB ? getCurrentBand()->lsbCal : 0;
+spr.drawString(dateText, 64, 10, 2);
 
-uint16_t c = cal ? TFT_GREEN : TFT_DARKGREY;
+// ----- BFO -----
+bool bfoOn =
+  (currentMode == USB && getCurrentBand()->usbCal != 0) ||
+  (currentMode == LSB && getCurrentBand()->lsbCal != 0);
 
-spr.drawRect(90, 2, 31, 16, c);
-spr.setTextColor(c);
-spr.setTextDatum(MC_DATUM);
-spr.drawString("BFO", 105, 10, 2);
+uint16_t bfoColor = bfoOn ? TFT_GREEN : TFT_DARKGREY;
+
+spr.drawRect(88, 1, 31, 17, bfoColor);
+spr.setTextColor(bfoColor, TFT_BLACK);
+spr.drawString("BFO", 103, 10, 2);
+
+// ----- MODE -----
+spr.setTextColor(TFT_WHITE, TFT_BLACK);
+spr.drawString(getModeShort(), 136, 10, 2);
+
+// ----- TEMP PLACEHOLDERS FOR NOW -----
+spr.drawString("F6.0kHz", 182, 10, 2);
+spr.drawString("160M",    233, 10, 2);
+spr.drawString("8.33k",   277, 10, 2);
 }
