@@ -213,7 +213,7 @@ if (currentMode == FM)
   spr.drawFloat(currentFrequency / 100.0, 2, 262, 46, 7);
 
   spr.setTextDatum(MC_DATUM);
-  spr.drawString("MHz", 292, 57, 2);
+  spr.drawString("MHz", 292, 52, 4);
 }
 
 // =====================
@@ -254,7 +254,7 @@ else if (bandIdx == 2)
   spr.drawString(freqText, 262, 46, 7);
 
   spr.setTextDatum(MC_DATUM);
-  spr.drawString("MHz", 292, 57, 2);
+  spr.drawString("MHz", 292, 52, 4);
 }
 
 // =====================
@@ -289,11 +289,6 @@ spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
 
 // ===== SIGNAL INFO =====
-spr.setTextColor(TFT_WHITE);
-spr.setTextDatum(TL_DATUM);
-
-spr.setTextColor(TFT_WHITE);
-spr.setTextDatum(TL_DATUM);
 
 char sigText[16];
 char snrText[16];
@@ -319,7 +314,9 @@ if (muteOn(MUTE_MAIN, 2))
   snprintf(volText, sizeof(volText), "Vol:Muted");
 else
   snprintf(volText, sizeof(volText), "Vol:%u", volume);
-
+  
+spr.setTextColor(TFT_WHITE);
+spr.setTextDatum(TL_DATUM);
 spr.drawString(sigText, 5, 25, 2);
 spr.drawString(snrText, 5, 32, 2);
 spr.drawString(volText, 5, 59, 2);
