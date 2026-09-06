@@ -310,7 +310,7 @@ const char *strengthText[] =
 };
 
 // SIG
-sprintf(sigText, "SIG:%s", strengthText[getStrength(rssi)]);
+sprintf(sigText, "SIG:%s", strengthText[strength]);
 spr.drawString(sigText, 5, 25, 2);
 
 // SNR
