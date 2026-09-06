@@ -18,35 +18,31 @@ void drawPixelIcon(int x, int y, const char *icon[], int h, uint16_t c)
 
 const char *bleIcon[] =
 {
-  "..11...",
-  "..11...",
-  "..11.1.",
-  "..11..1",
-  "1.11.1.",
-  ".1111..",
-  "..11...",
-  "..11...",
-  ".1111..",
-  "1.11.1.",
-  "..11..1",
-  "..11.1.",
-  "..11...",
-  "..11...",
-  "..11..."
+  "...1...",
+  "...11..",
+  "...1.1.",
+  "1..1..1",
+  ".1.1.1.",
+  "..111..",
+  "...1...",
+  "..111..",
+  ".1.1.1.",
+  "1..1..1",
+  "...1.1.",
+  "...11..",
+  "...1..."
 };
 
 const char *wifiIcon[] =
 {
   "...11111111...",
   "..1........1..",
-  ".1..........1.",
-  "1..11111111..1",
-  "..1........1..",
   ".1..111111..1.",
-  "..1........1..",
-  "...11111111...",
-  ".....1111.....",
-  ".....1111....."
+  "1..1......1..1",
+  "..1..1111..1..",
+  "....1....1....",
+  "......11......",
+  "......11......"
 };
 
 void drawLayoutDefault(const char *statusLine1, const char *statusLine2)
@@ -206,48 +202,121 @@ spr.drawString(getCurrentStep()->desc, 273, 10, 2);
 drawPixelIcon(295, 2, bleIcon, 15, TFT_WHITE);
 drawPixelIcon(306, 3, wifiIcon, 10, TFT_WHITE);
 
-// ----- Draw HF -----
 spr.setTextColor(TFT_WHITE);
 
-// Main frequency: 1 px up
-spr.setTextDatum(MR_DATUM);
-spr.drawString("99999", 262, 46, 7);
+// =====================
+// FM
+// =====================
+if (currentMode == FM)
+{
+  spr.setTextDatum(MR_DATUM);
+  spr.drawFloat(currentFrequency / 100.0, 2, 262, 46, 7);
 
-// .888: 3 px down
-spr.setTextDatum(ML_DATUM);
-spr.drawString(".888", 267, 61, 4);
+  spr.setTextDatum(MC_DATUM);
+  spr.drawString("MHz", 292, 57, 2);
+}
 
-// kHz: larger font
-spr.setTextDatum(MC_DATUM);
-spr.drawString("kHz", 292, 39, 4);
+// =====================
+// AIR
+// =====================
+else if (bandIdx == 2)
+{
+  uint32_t displayFreq;
 
-#if 0
-spr.setTextColor(TFT_WHITE);
+  if (currentAirSpacing == AIR_833 &&
+      (
+        currentDCVIdx == 2 ||
+        (currentDCVIdx == 1 && currentFrequency >= 18000)
+      ))
+  {
+    displayFreq = currentAirChannel;
+  }
+  else
+  {
+    displayFreq = currentFrequency;
 
-// Main frequency: 1 px up
-spr.setTextDatum(MR_DATUM);
-spr.drawString("108.00", 262, 46, 7);
+    if (currentDCVIdx == 1)
+      displayFreq += 100000;
+    else if (currentDCVIdx == 2)
+      displayFreq += 110000;
+  }
 
-// MHz
-spr.setTextDatum(MC_DATUM);
-spr.drawString("MHz", 292, 57, 2);
+  char freqText[12];
 
-spr.setTextColor(TFT_WHITE);
+  sprintf(
+    freqText,
+    "%lu.%03lu",
+    displayFreq / 1000,
+    displayFreq % 1000
+  );
 
-// Main frequency: 1 px up
-spr.setTextDatum(MR_DATUM);
-spr.drawString("136.000", 262, 46, 7);
+  spr.setTextDatum(MR_DATUM);
+  spr.drawString(freqText, 262, 46, 7);
 
-// MHz
-spr.setTextDatum(MC_DATUM);
-spr.drawString("MHz", 292, 57, 2);
-#endif
+  spr.setTextDatum(MC_DATUM);
+  spr.drawString("MHz", 292, 57, 2);
+}
+
+// =====================
+// HF / AM / SSB
+// =====================
+else
+{
+  uint32_t freqHz;
+
+  if (isSSB())
+    freqHz = currentFrequency * 1000 + currentBFO;
+  else
+    freqHz = currentFrequency * 1000;
+
+  // Large kHz part
+  spr.setTextDatum(MR_DATUM);
+  spr.drawNumber(freqHz / 1000, 262, 46, 7);
+
+  // Small .xxx part
+  char fracText[8];
+  sprintf(fracText, ".%03lu", freqHz % 1000);
+
+  spr.setTextDatum(ML_DATUM);
+  spr.drawString(fracText, 267, 61, 4);
+
+  // kHz opposite .xxx
+  spr.setTextDatum(MC_DATUM);
+  spr.drawString("kHz", 292, 39, 4);
+}
 
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
 
 // ===== SIGNAL INFO =====
-spr.drawString("SIG: S9+20", 3, 22, 2);
-spr.drawString("SNR: 38dB", 3, 39, 2);
-spr.drawString("Vol: Muted", 3, 56, 2);
+spr.setTextColor(TFT_WHITE);
+spr.setTextDatum(TL_DATUM);
+
+char sigText[16];
+char snrText[16];
+char volText[16];
+
+const char *strengthText[] =
+{
+  "",
+  "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8",
+  "S9", "S9+10", "S9+20", "S9+30", "S9+40", "S9+50",
+  "S9+60", "S9+60"
+};
+
+// SIG
+sprintf(sigText, "SIG:%s", strengthText[getStrength(rssi)]);
+spr.drawString(sigText, 5, 25, 2);
+
+// SNR
+sprintf(snrText, "SNR:%udB", snr);
+spr.drawString(snrText, 5, 32, 2);
+
+// VOL
+if (muteOn(MUTE_MAIN))
+  sprintf(volText, "Vol:Muted");
+else
+  sprintf(volText, "Vol:%u", volume);
+
+spr.drawString(volText, 5, 59, 2);
 }
