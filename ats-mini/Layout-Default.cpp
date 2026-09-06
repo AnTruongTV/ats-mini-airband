@@ -199,8 +199,8 @@ spr.setTextDatum(MC_DATUM);
 spr.drawString(getCurrentStep()->desc, 273, 10, 2);
 
 // ----- Draw BLT+Wifi -----
-drawPixelIcon(295, 2, bleIcon, 15, TFT_WHITE);
-drawPixelIcon(306, 3, wifiIcon, 10, TFT_WHITE);
+drawPixelIcon(295, 3, bleIcon, 13, TFT_WHITE);
+drawPixelIcon(303, 6, wifiIcon, 8, TFT_WHITE);
 
 spr.setTextColor(TFT_WHITE);
 
@@ -292,14 +292,14 @@ spr.setTextDatum(TL_DATUM);
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
 
+spr.setTextColor(TFT_WHITE);
+spr.setTextDatum(TL_DATUM);
+
 char sigText[16];
 char snrText[16];
 char volText[16];
 
 int strength = getStrength(rssi);
-
-if (strength < 1) strength = 1;
-if (strength > 17) strength = 17;
 
 const char *strengthText[] =
 {
@@ -309,19 +309,18 @@ const char *strengthText[] =
   "S9+60", "Peak"
 };
 
-// SIG
-sprintf(sigText, "SIG:%s", strengthText[strength]);
-spr.drawString(sigText, 5, 25, 2);
+if (strength < 1 || strength > 17)
+  strength = 1;
 
-// SNR
-sprintf(snrText, "SNR:%udB", snr);
-spr.drawString(snrText, 5, 32, 2);
+snprintf(sigText, sizeof(sigText), "SIG:%s", strengthText[strength]);
+snprintf(snrText, sizeof(snrText), "SNR:%udB", snr);
 
-// VOL
-if (muteOn(MUTE_MAIN))
-  sprintf(volText, "Vol:Muted");
+if (muteOn(MUTE_MAIN, 2))
+  snprintf(volText, sizeof(volText), "Vol:Muted");
 else
-  sprintf(volText, "Vol:%u", volume);
+  snprintf(volText, sizeof(volText), "Vol:%u", volume);
 
+spr.drawString(sigText, 5, 25, 2);
+spr.drawString(snrText, 5, 32, 2);
 spr.drawString(volText, 5, 59, 2);
 }
