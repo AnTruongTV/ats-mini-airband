@@ -93,4 +93,22 @@ spr.drawRect(123, 2, 29, 16, TFT_WHITE);
 spr.drawRect(154, 2, 54, 16, TFT_WHITE);
 spr.drawRect(210, 2, 35, 16, TFT_WHITE);
 spr.drawRect(247, 2, 40, 16, TFT_WHITE);
+spr.drawFastVLine(270, 119, 18, TFT_WHITE);
+spr.drawFastHLine(254, 136, 66, TFT_WHITE);
+
+// Time + Date
+spr.setTextColor(TFT_WHITE);
+spr.setTextDatum(MC_DATUM);
+
+const char *timeText = clockGet();
+spr.drawString(timeText ? timeText : "--:--", 22, 10, 2);
+
+uint16_t year;
+uint8_t month, day, weekday;
+char dateText[6] = "--/--";
+
+if(clockGetDate(&year, &month, &day, &weekday))
+  sprintf(dateText, "%02u/%02u", day, month);
+
+spr.drawString(dateText, 66, 10, 2);
 }
