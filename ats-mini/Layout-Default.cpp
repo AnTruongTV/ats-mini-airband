@@ -124,7 +124,7 @@ spr.drawString("BFO", 103, 10, 2);
 
 // ----- MODE -----
 spr.setTextColor(TFT_WHITE, TFT_BLACK);
-spr.drawString(getModeShort(), 136, 10, 2);
+spr.drawString(bandModeDesc[currentMode], 136, 10, 2);
 
 // ----- TEMP PLACEHOLDERS FOR NOW -----
 spr.drawString("F6.0kHz", 182, 10, 2);
