@@ -208,38 +208,46 @@ drawPixelIcon(306, 3, wifiIcon, 10, TFT_WHITE);
 
 // ----- Draw HF -----
 spr.setTextColor(TFT_WHITE);
+
+// Main frequency: 1 px up
 spr.setTextDatum(MR_DATUM);
+spr.drawString("99999", 262, 46, 7);
 
-// Main kHz part
-spr.drawString("99999", 262, 47, 7);
-
-// Small .888
+// .888: 3 px down
 spr.setTextDatum(ML_DATUM);
-spr.drawString(".888", 267, 58, 4);
+spr.drawString(".888", 267, 61, 4);
 
-// kHz above the small digits
+// kHz: larger font
 spr.setTextDatum(MC_DATUM);
-spr.drawString("kHz", 292, 38, 2);
+spr.drawString("kHz", 292, 39, 4);
 
 #if 0
 spr.setTextColor(TFT_WHITE);
-spr.setTextDatum(MR_DATUM);
 
-// Main frequency
-spr.drawString("108.00", 262, 47, 7);
+// Main frequency: 1 px up
+spr.setTextDatum(MR_DATUM);
+spr.drawString("108.00", 262, 46, 7);
 
 // MHz
 spr.setTextDatum(MC_DATUM);
 spr.drawString("MHz", 292, 57, 2);
 
 spr.setTextColor(TFT_WHITE);
-spr.setTextDatum(MR_DATUM);
 
-// Main air frequency
-spr.drawString("136.000", 262, 47, 7);
+// Main frequency: 1 px up
+spr.setTextDatum(MR_DATUM);
+spr.drawString("136.000", 262, 46, 7);
 
 // MHz
 spr.setTextDatum(MC_DATUM);
 spr.drawString("MHz", 292, 57, 2);
 #endif
+
+spr.setTextColor(TFT_WHITE);
+spr.setTextDatum(TL_DATUM);
+
+// ===== SIGNAL INFO =====
+spr.drawString("SIG: S9+20", 3, 22, 2);
+spr.drawString("SNR: 38dB", 3, 39, 2);
+spr.drawString("Vol: Muted", 3, 56, 2);
 }
