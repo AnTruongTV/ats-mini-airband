@@ -4,7 +4,6 @@
 #include "Menu.h"
 #include "Draw.h"
 #include "Storage.h"
-#include "Battery.h"
 
 void drawPixelIcon(int x, int y, const char *icon[], int h, uint16_t c)
 {
