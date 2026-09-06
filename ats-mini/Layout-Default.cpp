@@ -4,6 +4,7 @@
 #include "Menu.h"
 #include "Draw.h"
 #include "Storage.h"
+#include "BleMode.h"
 
 void drawPixelIcon(int x, int y, const char *icon[], int h, uint16_t c)
 {
@@ -257,7 +258,6 @@ if (bleStatus)
   drawPixelIcon(295, 3, bleIcon, 13, bleColor);
 }
 
-// WiFi
 int8_t wifiStatus = getWiFiStatus();
 
 if (wifiStatus)
@@ -265,8 +265,6 @@ if (wifiStatus)
   uint16_t wifiColor = wifiStatus > 0 ? TFT_GREEN : TFT_RED;
   drawPixelIcon(303, 6, wifiIcon, 8, wifiColor);
 }
-
-spr.setTextColor(TFT_WHITE);
 
 // =====================
 // FM
