@@ -88,7 +88,6 @@ spr.drawFastVLine(254, 119, 51, TFT_WHITE);
 // Top boxes
 spr.drawRect(2,   2, 40, 16, TFT_WHITE);
 spr.drawRect(44,  2, 44, 16, TFT_WHITE);
-spr.drawRect(90,  2, 31, 16, TFT_WHITE);
 spr.drawRect(123, 2, 29, 16, TFT_WHITE);
 spr.drawRect(154, 2, 54, 16, TFT_WHITE);
 spr.drawRect(210, 2, 35, 16, TFT_WHITE);
@@ -111,4 +110,14 @@ if(clockGetDate(&year, &month, &day, &weekday))
   sprintf(dateText, "%02u/%02u", day, month);
 
 spr.drawString(dateText, 66, 10, 2);
+// BFO
+int16_t cal = currentMode == USB ? getCurrentBand()->usbCal :
+              currentMode == LSB ? getCurrentBand()->lsbCal : 0;
+
+uint16_t c = cal ? TFT_GREEN : TFT_DARKGREY;
+
+spr.drawRect(90, 2, 31, 16, c);
+spr.setTextColor(c);
+spr.setTextDatum(MC_DATUM);
+spr.drawString("BFO", 105, 10, 2);
 }
