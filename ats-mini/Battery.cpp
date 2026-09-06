@@ -62,6 +62,15 @@ float batteryMonitor()
   return(batteryVolts);
 }
 
+int getBatteryBars(float v)
+{
+  if (v >= 4.00) return 4;
+  if (v >= 3.85) return 3;
+  if (v >= 3.70) return 2;
+  if (v >= 3.50) return 1;
+  return 0;
+}
+
 //
 // Show last measured battery voltage and status at given screen
 // coordinates. Return true if voltage was drawn.
@@ -72,6 +81,24 @@ bool drawBattery(int x, int y)
 
   // Measure battery voltage and status
   batteryMonitor();
+
+  int bars = getBatteryBars(batteryVolts);
+
+// shell
+drawPixelIcon(263, 144, batteryShell, 18, TFT_WHITE);
+
+// bars
+if (bars >= 1)
+  spr.fillRect(267, 148, 8, 10, TFT_RED);
+
+if (bars >= 2)
+  spr.fillRect(277, 148, 8, 10, TFT_YELLOW);
+
+if (bars >= 3)
+  spr.fillRect(287, 148, 8, 10, TFT_GREEN);
+
+if (bars >= 4)
+  spr.fillRect(297, 148, 8, 10, TFT_GREEN);
 
   char voltage[8];
   sprintf(voltage, "%.02fV", batteryVolts);
