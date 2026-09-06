@@ -105,7 +105,7 @@ spr.drawRect(253, 2, 40, 16, TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
 
 // ----- TIME -----
-spr.setTextColor(TFT_WHITE, TFT_BLACK);
+spr.setTextColor(TFT_WHITE);
 const char *timeText = clockGet();
 spr.drawString(timeText ? timeText : "12:26", 22, 10, 2);
 
@@ -127,11 +127,11 @@ bool bfoOn =
 uint16_t c = bfoOn ? TFT_GREEN : TFT_DARKGREY;
 
 spr.drawRect(88, 2, 29, 16, c);
-spr.setTextColor(c, TFT_BLACK);
+spr.setTextColor(c);
 spr.drawString("BFO", 103, 10, 2);
 
 // ----- MODE -----
-spr.setTextColor(TFT_WHITE, TFT_BLACK);
+spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
 spr.drawString(bandModeDesc[currentMode], 132, 10, 2);
 }
