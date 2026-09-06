@@ -4,6 +4,38 @@
 #include "Menu.h"
 #include "Draw.h"
 
+void drawNewBle(int x, int y, uint16_t c)
+{
+  spr.drawLine(x+3, y,   x+3, y+12, c);
+  spr.drawLine(x+3, y,   x+7, y+4,  c);
+  spr.drawLine(x+7, y+4, x,   y+10, c);
+  spr.drawLine(x,   y+2, x+7, y+8,  c);
+  spr.drawLine(x+7, y+8, x+3, y+12, c);
+}
+
+void drawNewWifi(int x, int y, uint16_t c)
+{
+  // upper arc
+  spr.drawPixel(x+2, y,   c);
+  spr.drawFastHLine(x+3, y-1, 5, c);
+  spr.drawPixel(x+8, y,   c);
+
+  spr.drawPixel(x+1, y+1, c);
+  spr.drawPixel(x+9, y+1, c);
+
+  // middle arc
+  spr.drawPixel(x+3, y+3, c);
+  spr.drawFastHLine(x+4, y+2, 3, c);
+  spr.drawPixel(x+7, y+3, c);
+
+  // lower arc
+  spr.drawPixel(x+4, y+5, c);
+  spr.drawPixel(x+6, y+5, c);
+
+  // dot
+  spr.drawPixel(x+5, y+7, c);
+}
+
 void drawLayoutDefault(const char *statusLine1, const char *statusLine2)
 {
   #if 0
@@ -156,4 +188,8 @@ spr.drawString(getCurrentBand()->bandName, 227, 10, 2);
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
 spr.drawString(getCurrentStep()->desc, 272, 10, 2);
+
+// ----- Draw BLT+Wifi -----
+drawNewBle(297, 3, TFT_WHITE);
+drawNewWifi(308, 7, TFT_WHITE);
 }
