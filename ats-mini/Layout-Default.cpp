@@ -18,6 +18,34 @@ void drawPixelIcon(int x, int y, const char *icon[], int h, uint16_t c)
   }
 }
 
+uint16_t signalColor(int strength)
+{
+  strength = constrain(strength, 1, 17);
+
+  if (strength >= 10)
+    return TFT_RED;
+
+  float t = (strength - 1) / 8.0f;
+
+  uint8_t r;
+  uint8_t g;
+
+  if (t < 0.5f)
+  {
+    float p = t * 2.0f;
+    r = 255 * p;
+    g = 255;
+  }
+  else
+  {
+    float p = (t - 0.5f) * 2.0f;
+    r = 255;
+    g = 255 * (1.0f - p);
+  }
+
+  return spr.color565(r, g, 0);
+}
+
 const char *bleIcon[] =
 {
   "...1...",
@@ -368,38 +396,6 @@ const char *strengthText[] =
 
 if (strength < 1 || strength > 17)
   strength = 1;
-
-uint16_t signalColor(int strength)
-{
-  strength = constrain(strength, 1, 17);
-
-  // S9 and above = red
-  if (strength >= 10)
-    return TFT_RED;
-
-  // S0 -> S9 : green -> yellow -> red
-  float t = (strength - 1) / 8.0f;
-
-  uint8_t r;
-  uint8_t g;
-
-  if (t < 0.5f)
-  {
-    // green -> yellow
-    float p = t * 2.0f;
-    r = 255 * p;
-    g = 255;
-  }
-  else
-  {
-    // yellow -> red
-    float p = (t - 0.5f) * 2.0f;
-    r = 255;
-    g = 255 * (1.0f - p);
-  }
-
-  return spr.color565(r, g, 0);
-}
 
 snprintf(snrText, sizeof(snrText), "SNR: %udB", snr);
 
