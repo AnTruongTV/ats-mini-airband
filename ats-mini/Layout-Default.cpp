@@ -20,30 +20,27 @@ void drawPixelIcon(int x, int y, const char *icon[], int h, uint16_t c)
 
 uint16_t signalColor(int strength)
 {
-  strength = constrain(strength, 1, 17);
-
-  if (strength >= 10)
-    return TFT_RED;
-
-  float t = (strength - 1) / 8.0f;
-
-  uint8_t r;
-  uint8_t g;
-
-  if (t < 0.5f)
+  switch (strength)
   {
-    float p = t * 2.0f;
-    r = 255 * p;
-    g = 255;
+    case 1:  return TFT_GREEN;   // S0
+    case 2:  return spr.color565(64, 255, 0);    // S1
+    case 3:  return spr.color565(128, 255, 0);   // S2
+    case 4:  return spr.color565(180, 255, 0);   // S3 yellow-green
+    case 5:  return spr.color565(220, 255, 0);   // S4
+    case 6:  return spr.color565(255, 255, 0);   // S5
+    case 7:  return spr.color565(255, 220, 0);   // S6 lime/yellow
+    case 8:  return spr.color565(255, 190, 0);   // S7
+    case 9:  return spr.color565(255, 160, 0);   // S8 yellow
+    case 10: return spr.color565(255, 128, 0);   // S9 yellow/orange
+    case 11: return spr.color565(255, 96, 0);    // S9+10
+    case 12: return spr.color565(255, 64, 0);    // S9+20 orange
+    case 13: return spr.color565(255, 40, 0);    // S9+30
+    case 14: return spr.color565(255, 24, 0);    // S9+40 orange-red
+    case 15: return spr.color565(255, 12, 0);    // S9+50
+    case 16: return TFT_RED;                     // S9+60
+    case 17: return TFT_RED;                     // Peak
+    default: return TFT_WHITE;
   }
-  else
-  {
-    float p = (t - 0.5f) * 2.0f;
-    r = 255;
-    g = 255 * (1.0f - p);
-  }
-
-  return spr.color565(r, g, 0);
 }
 
 const char *bleIcon[] =
