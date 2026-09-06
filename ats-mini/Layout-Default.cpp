@@ -148,12 +148,12 @@ spr.setTextDatum(MC_DATUM);
 // ----- TIME -----
 spr.setTextColor(TFT_WHITE);
 const char *timeText = clockGet();
-spr.drawString(timeText ? timeText : "12:26", 22, 10, 2);
+spr.drawString(timeText ? timeText : "--:--", 22, 10, 2);
 
 // ----- DATE -----
 uint16_t year;
 uint8_t month, day, weekday;
-char dateText[6] = "07/05";
+char dateText[6] = "--/--";
 
 if (clockGetDate(&year, &month, &day, &weekday))
   sprintf(dateText, "%02u/%02u", day, month);
@@ -326,32 +326,39 @@ spr.setTextDatum(TL_DATUM);
 
 char agcText[16];
 char attText[16];
-char sqlText[16];
-char rssiText[16];
+char sqlText[20];
+char rssiText[20];
 
-// AGC / ATT
-int agc = getCurrentAGC();
-
-if (agc == 0)
-{
+// AGC
+if (agcIdx == 0)
   snprintf(agcText, sizeof(agcText), "AGC:ON");
-  snprintf(attText, sizeof(attText), "ATT:OFF");
-}
 else
-{
   snprintf(agcText, sizeof(agcText), "AGC:OFF");
-  snprintf(attText, sizeof(attText), "ATT:%d", agc - 1);
-}
+
+// ATT
+if (agcIdx == 0)
+  snprintf(attText, sizeof(attText), "ATT:OFF");
+else
+  snprintf(attText, sizeof(attText), "ATT:%d", agcNdx);
 
 // SQL
-snprintf(sqlText, sizeof(sqlText), "SQL:%d", getCurrentSquelch());
+uint8_t sqlRaw   = currentSquelch[currentMode];
+uint8_t sqlValue = sqlRaw & 0x7F;
+bool sqlSNR      = sqlRaw & 0x80;
+
+if (sqlValue == 0)
+  snprintf(sqlText, sizeof(sqlText), "SQL:OFF");
+else if (sqlSNR)
+  snprintf(sqlText, sizeof(sqlText), "SQL:%udB", sqlValue);
+else
+  snprintf(sqlText, sizeof(sqlText), "SQL:%udBuV", sqlValue);
 
 // RSSI
 snprintf(rssiText, sizeof(rssiText), "RSSI:%udBuV", rssi);
 
-// draw
-spr.drawString(agcText,  79, 128, 2);
-spr.drawString(attText,  79, 151, 2);
-spr.drawString(sqlText, 160, 128, 2);
-spr.drawString(rssiText,160, 151, 2);
+// Draw
+spr.drawString(agcText,   79, 128, 2);
+spr.drawString(attText,   79, 151, 2);
+spr.drawString(sqlText,  160, 128, 2);
+spr.drawString(rssiText, 160, 151, 2);
 }
