@@ -317,7 +317,41 @@ else
   
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
-spr.drawString(sigText, 5, 25, 2);
-spr.drawString(snrText, 5, 32, 2);
-spr.drawString(volText, 5, 59, 2);
+spr.drawString(sigText, 5, 24, 2);
+spr.drawString(snrText, 5, 41, 2);
+spr.drawString(volText, 5, 58, 2);
+
+spr.setTextColor(TFT_WHITE);
+spr.setTextDatum(TL_DATUM);
+
+char agcText[16];
+char attText[16];
+char sqlText[16];
+char rssiText[16];
+
+// AGC / ATT
+int agc = getCurrentAGC();
+
+if (agc == 0)
+{
+  snprintf(agcText, sizeof(agcText), "AGC:ON");
+  snprintf(attText, sizeof(attText), "ATT:OFF");
+}
+else
+{
+  snprintf(agcText, sizeof(agcText), "AGC:OFF");
+  snprintf(attText, sizeof(attText), "ATT:%d", agc - 1);
+}
+
+// SQL
+snprintf(sqlText, sizeof(sqlText), "SQL:%d", getCurrentSquelch());
+
+// RSSI
+snprintf(rssiText, sizeof(rssiText), "RSSI:%udBuV", rssi);
+
+// draw
+spr.drawString(agcText,  79, 128, 2);
+spr.drawString(attText,  79, 151, 2);
+spr.drawString(sqlText, 160, 128, 2);
+spr.drawString(rssiText,160, 151, 2);
 }
