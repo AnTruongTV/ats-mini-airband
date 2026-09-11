@@ -54,7 +54,7 @@ static void drawNewBandScale()
     // These are the CENTRES of the two scale-end circles
     constexpr int SCALE_LEFT_X    = 122;
     constexpr int SCALE_RIGHT_X   = 268;
-    constexpr int SCALE_Y         = 111;
+    constexpr int SCALE_Y         = 108;
 
     constexpr int DOT_START_X     = 126;
     constexpr int DOT_END_X       = 264;
@@ -225,11 +225,12 @@ static void drawNewBandScale()
     // Current-frequency marker
     // ============================================================
 
-    spr.drawFastVLine(
-        markerX,
-        SCALE_Y - 3,
-        7,
-        TFT_WHITE
+    spr.fillRect(
+    markerX - 1,
+    SCALE_Y - 1,
+    3,
+    3,
+    TFT_RED
     );
 
     // Restore common datum
