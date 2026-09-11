@@ -606,39 +606,44 @@ else
 // STATION / CHANNEL NAME
 // =====================
 
-const char *stationName = getStationName();
-
-if (stationName && stationName[0] != '\0')
+if (bandIdx != 2)
 {
-    spr.setTextColor(TFT_WHITE);
-    spr.setTextDatum(TC_DATUM);
+    const char *stationName = getStationName();
 
-    // 0xFF means a long EiBi station name
-    if ((uint8_t)stationName[0] == 0xFF)
+    if (stationName && stationName[0] != '\0')
     {
-        spr.drawString(
-            stationName + 1,
-            196,   // center of usable right-side area
-            79,
-            2
-        );
-    }
-    else
-    {
-        int font = 4;
+        spr.setTextColor(TFT_WHITE);
+        spr.setTextDatum(TC_DATUM);
 
-        // Fall back to smaller font if name is too wide
-        if (spr.textWidth(stationName, font) > 238)
-            font = 2;
+        // 0xFF means a long EiBi station name
+        if ((uint8_t)stationName[0] == 0xFF)
+        {
+            spr.drawString(
+                stationName + 1,
+                196,   // center of usable right-side area
+                80,
+                2
+            );
+        }
+        else
+        {
+            int font = 4;
 
-        spr.drawString(
-            stationName,
-            196,
-            76,
-            font
-        );
+            // Fall back to smaller font if name is too wide
+            if (spr.textWidth(stationName, font) > 238)
+                font = 2;
+
+            spr.drawString(
+                stationName,
+                196,
+                77,
+                font
+            );
+        }
     }
 }
+
+drawNewBandScale();
   
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
