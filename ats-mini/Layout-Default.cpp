@@ -28,9 +28,9 @@ static void formatBandEdge(char *buf, size_t len, uint32_t freq)
         snprintf(
             buf,
             len,
-            "%lu.%03lu",
+            "%lu.%02lu",
             freq / 1000,
-            freq % 1000
+            (freq % 1000) / 10
         );
     }
 
@@ -225,11 +225,10 @@ static void drawNewBandScale()
     // Current-frequency marker
     // ============================================================
 
-    spr.fillRect(
-    markerX - 2,
-    SCALE_Y - 2,
-    5,
-    5,
+    spr.fillCircle(
+    markerX,
+    SCALE_Y,
+    2,
     TFT_RED
     );
 
@@ -541,34 +540,35 @@ else if (bandIdx == 2)
 {
   uint32_t displayFreq;
 
-  if (currentDCVIdx == 1 || currentDCVIdx == 2)
-    {
-        const char *dcvText =
-            (currentDCVIdx == 1) ? "100" : "110";
+ if (currentDCVIdx == 1 || currentDCVIdx == 2)
+{
+    const char *dcvText =
+        (currentDCVIdx == 1) ? "100" : "110";
 
-        constexpr int BOX_X = 291;
-        constexpr int BOX_Y = 19;
-        constexpr int BOX_W = 26;
-        constexpr int BOX_H = 12;
+    constexpr int DCV_X = 280;
+    constexpr int DCV_Y = 26;
+    constexpr int DCV_W = 27;
+    constexpr int DCV_H = 16;
 
-        spr.drawRect(
-            BOX_X,
-            BOX_Y,
-            BOX_W,
-            BOX_H,
-            TFT_CYAN
-        );
+    spr.drawRoundRect(
+        DCV_X,
+        DCV_Y,
+        DCV_W,
+        DCV_H,
+        2,
+        TFT_WHITE
+    );
 
-        spr.setTextColor(TFT_CYAN);
-        spr.setTextDatum(MC_DATUM);
+    spr.setTextColor(TFT_WHITE);
+    spr.setTextDatum(MC_DATUM);
 
-        spr.drawString(
-            dcvText,
-            BOX_X + BOX_W / 2,
-            BOX_Y + BOX_H / 2,
-            1
-        );
-    }
+    spr.drawString(
+        dcvText,
+        DCV_X + DCV_W / 2,
+        DCV_Y + DCV_H / 2,
+        1
+    );
+}
   
   if (currentAirSpacing == AIR_833 &&
       (
