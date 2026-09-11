@@ -49,12 +49,12 @@ static void drawNewBandScale()
     // ============================================================
 
     constexpr int LEFT_FREQ_X     = 75;
-    constexpr int FREQ_Y          = 106;
+    constexpr int FREQ_Y          = 103;
 
     // These are the CENTRES of the two scale-end circles
     constexpr int SCALE_LEFT_X    = 122;
     constexpr int SCALE_RIGHT_X   = 268;
-    constexpr int SCALE_Y         = 108;
+    constexpr int SCALE_Y         = 111;
 
     constexpr int DOT_START_X     = 126;
     constexpr int DOT_END_X       = 264;
