@@ -226,10 +226,10 @@ static void drawNewBandScale()
     // ============================================================
 
     spr.fillRect(
-    markerX - 1,
-    SCALE_Y - 1,
-    3,
-    3,
+    markerX - 2,
+    SCALE_Y - 2,
+    5,
+    5,
     TFT_RED
     );
 
@@ -541,6 +541,35 @@ else if (bandIdx == 2)
 {
   uint32_t displayFreq;
 
+  if (currentDCVIdx == 1 || currentDCVIdx == 2)
+    {
+        const char *dcvText =
+            (currentDCVIdx == 1) ? "100" : "110";
+
+        constexpr int BOX_X = 291;
+        constexpr int BOX_Y = 19;
+        constexpr int BOX_W = 26;
+        constexpr int BOX_H = 12;
+
+        spr.drawRect(
+            BOX_X,
+            BOX_Y,
+            BOX_W,
+            BOX_H,
+            TFT_CYAN
+        );
+
+        spr.setTextColor(TFT_CYAN);
+        spr.setTextDatum(MC_DATUM);
+
+        spr.drawString(
+            dcvText,
+            BOX_X + BOX_W / 2,
+            BOX_Y + BOX_H / 2,
+            1
+        );
+    }
+  
   if (currentAirSpacing == AIR_833 &&
       (
         currentDCVIdx == 2 ||
