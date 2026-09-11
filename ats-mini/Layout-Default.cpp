@@ -550,23 +550,25 @@ else if (bandIdx == 2)
     constexpr int DCV_W = 27;
     constexpr int DCV_H = 16;
 
+    // Exact rounded outline from mockup
     spr.drawRoundRect(
         DCV_X,
         DCV_Y,
         DCV_W,
         DCV_H,
-        2,
+        3,
         TFT_WHITE
     );
 
     spr.setTextColor(TFT_WHITE);
     spr.setTextDatum(MC_DATUM);
 
+    // Font 2
     spr.drawString(
         dcvText,
-        DCV_X + DCV_W / 2,
-        DCV_Y + DCV_H / 2,
-        1
+        293,
+        34,
+        2
     );
 }
   
