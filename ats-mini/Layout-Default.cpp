@@ -6,6 +6,236 @@
 #include "Storage.h"
 #include "BleMode.h"
 
+static void formatBandEdge(char *buf, size_t len, uint32_t freq)
+{
+    // FM frequencies are stored in 10 kHz units:
+    // 8750 -> 87.50 MHz
+    if (currentMode == FM)
+    {
+        snprintf(
+            buf,
+            len,
+            "%lu.%02lu",
+            freq / 100,
+            freq % 100
+        );
+    }
+
+    // AIR display frequency is handled in kHz:
+    // 118000 -> 118.000 MHz
+    else if (bandIdx == 2)
+    {
+        snprintf(
+            buf,
+            len,
+            "%lu.%03lu",
+            freq / 1000,
+            freq % 1000
+        );
+    }
+
+    // AM / SW / SSB: show normal kHz values
+    else
+    {
+        snprintf(buf, len, "%lu", freq);
+    }
+}
+
+
+static void drawNewBandScale()
+{
+    // ============================================================
+    // Exact coordinates from the UI mockup
+    // ============================================================
+
+    constexpr int LEFT_FREQ_X     = 75;
+    constexpr int FREQ_Y          = 106;
+
+    // These are the CENTRES of the two scale-end circles
+    constexpr int SCALE_LEFT_X    = 122;
+    constexpr int SCALE_RIGHT_X   = 268;
+    constexpr int SCALE_Y         = 111;
+
+    constexpr int DOT_START_X     = 126;
+    constexpr int DOT_END_X       = 264;
+
+    constexpr int RIGHT_FREQ_X    = 274;
+
+    // ============================================================
+    // Current band information
+    // ============================================================
+
+    const Band *band = getCurrentBand();
+
+    uint32_t displayFreq = currentFrequency;
+    uint32_t displayMin  = band->minimumFreq;
+    uint32_t displayMax  = band->maximumFreq;
+
+    // ============================================================
+    // AIR / DCV
+    // ============================================================
+
+    if (bandIdx == 2)
+    {
+        uint32_t dcvOffset = 0;
+
+        if (currentDCVIdx == 1)
+            dcvOffset = 100000;
+
+        else if (currentDCVIdx == 2)
+            dcvOffset = 110000;
+
+        // -----------------------------
+        // Frequency shown to the user
+        // -----------------------------
+
+        if (
+            currentAirSpacing == AIR_833 &&
+            (
+                currentDCVIdx == 2 ||
+                (currentDCVIdx == 1 && currentFrequency >= 18000)
+            )
+        )
+        {
+            // Keep scale marker aligned with displayed
+            // 8.33 kHz channel designator
+            displayFreq = currentAirChannel;
+        }
+        else
+        {
+            displayFreq = currentFrequency + dcvOffset;
+        }
+
+        // -----------------------------
+        // Visible band limits
+        // -----------------------------
+
+        displayMin = band->minimumFreq + dcvOffset;
+        displayMax = band->maximumFreq + dcvOffset;
+
+        // 110 MHz DCV hardware limit:
+        // raw tuner max 27 MHz -> displayed 137 MHz
+        if (currentDCVIdx == 2)
+            displayMax = 137000;
+    }
+
+    // ============================================================
+    // SSB BFO correction
+    // ============================================================
+
+    else if (isSSB())
+    {
+        // Scale is in kHz, so keep the fractional BFO only for
+        // position calculation.
+        int64_t correctedHz =
+            (int64_t)currentFrequency * 1000 +
+            currentBFO;
+
+        if (correctedHz < 0)
+            correctedHz = 0;
+
+        displayFreq = correctedHz / 1000;
+    }
+
+    // ============================================================
+    // Safety
+    // ============================================================
+
+    if (displayMax <= displayMin)
+        return;
+
+    uint32_t markerFreq = displayFreq;
+
+    if (markerFreq < displayMin)
+        markerFreq = displayMin;
+
+    if (markerFreq > displayMax)
+        markerFreq = displayMax;
+
+    // ============================================================
+    // Format edge labels
+    // ============================================================
+
+    char leftText[16];
+    char rightText[16];
+
+    formatBandEdge(leftText, sizeof(leftText), displayMin);
+    formatBandEdge(rightText, sizeof(rightText), displayMax);
+
+    spr.setTextColor(TFT_WHITE);
+
+    // Left edge frequency
+    spr.setTextDatum(TL_DATUM);
+    spr.drawString(leftText, LEFT_FREQ_X, FREQ_Y, 2);
+
+    // Right edge frequency
+    spr.setTextDatum(TL_DATUM);
+    spr.drawString(rightText, RIGHT_FREQ_X, FREQ_Y, 2);
+
+    // ============================================================
+    // Endpoint circles
+    // ============================================================
+
+    spr.drawCircle(
+        SCALE_LEFT_X,
+        SCALE_Y,
+        2,
+        TFT_WHITE
+    );
+
+    spr.drawCircle(
+        SCALE_RIGHT_X,
+        SCALE_Y,
+        2,
+        TFT_WHITE
+    );
+
+    // ============================================================
+    // Dotted scale
+    // ============================================================
+
+    for (int x = DOT_START_X; x <= DOT_END_X; x += 3)
+    {
+        spr.drawPixel(
+            x,
+            SCALE_Y,
+            TFT_WHITE
+        );
+    }
+
+    // ============================================================
+    // Frequency -> scale position
+    //
+    // Integer math instead of float, so this is lightweight on ESP32.
+    // ============================================================
+
+    uint32_t range =
+        displayMax - displayMin;
+
+    uint32_t offset =
+        markerFreq - displayMin;
+
+    int markerX =
+        SCALE_LEFT_X +
+        ((uint64_t)offset *
+         (SCALE_RIGHT_X - SCALE_LEFT_X)) /
+        range;
+
+    // ============================================================
+    // Current-frequency marker
+    // ============================================================
+
+    spr.drawFastVLine(
+        markerX,
+        SCALE_Y - 3,
+        7,
+        TFT_WHITE
+    );
+
+    // Restore common datum
+    spr.setTextDatum(TL_DATUM);
+}
+
 void drawPixelIcon(int x, int y, const char *icon[], int h, uint16_t c)
 {
   for (int row = 0; row < h; row++)
@@ -372,6 +602,44 @@ else
   spr.drawString("kHz", 292, 39, 4);
 }
 
+// =====================
+// STATION / CHANNEL NAME
+// =====================
+
+const char *stationName = getStationName();
+
+if (stationName && stationName[0] != '\0')
+{
+    spr.setTextColor(TFT_WHITE);
+    spr.setTextDatum(TC_DATUM);
+
+    // 0xFF means a long EiBi station name
+    if ((uint8_t)stationName[0] == 0xFF)
+    {
+        spr.drawString(
+            stationName + 1,
+            196,   // center of usable right-side area
+            79,
+            2
+        );
+    }
+    else
+    {
+        int font = 4;
+
+        // Fall back to smaller font if name is too wide
+        if (spr.textWidth(stationName, font) > 238)
+            font = 2;
+
+        spr.drawString(
+            stationName,
+            196,
+            76,
+            font
+        );
+    }
+}
+  
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
 
