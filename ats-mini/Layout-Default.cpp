@@ -759,26 +759,26 @@ else
   snprintf(volValue, sizeof(volValue), "%u", volume);
 
 int valueX = VOL_X + spr.textWidth("Vol:", 2) + 2;
+int w = spr.textWidth(volValue, 2);
 
-spr.drawString(volValue, valueX, VOL_Y, 2);
-
+// Red background first
 if (mainMuted || sqlMuted)
 {
-  int w = spr.textWidth(volValue, 2);
-
-  spr.drawRect(
+  spr.fillRect(
     valueX - 1,
-    VOL_Y - 1,
+    VOL_Y + 1,
     w + 2,
-    17,
+    14,
     TFT_RED
   );
 }
 
-spr.drawString(snrText, 5, 41, 2);
-drawSignalBars(strength);
+// Text on top
 spr.setTextColor(TFT_WHITE);
-spr.setTextDatum(TL_DATUM);
+spr.drawString(volValue, valueX, VOL_Y, 2);
+
+// Signal bars
+drawSignalBars(strength);
 
 char agcAttText[16];
 char avcText[16];
