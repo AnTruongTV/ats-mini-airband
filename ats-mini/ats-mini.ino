@@ -960,8 +960,6 @@ bool processRssiSnr()
   static uint8_t updateCounter = 0;
   bool needRedraw = false;
 
-  static uint8_t updateCounter = 0;
-
   rx.getCurrentReceivedSignalQuality();
   int newRSSI = rx.getCurrentRSSI();
   int newSNR = rx.getCurrentSNR();
