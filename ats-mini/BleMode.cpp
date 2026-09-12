@@ -114,7 +114,7 @@ int bleLoop(uint8_t bleMode)
   if (BLEHid.isStarted() && !BLEHid.isConnected() && BLEHid.isConnectPending() && BLEHid.peerName())
   {
     drawScreen();
-    drawScreen("Connecting BLE HID", BLEHid.peerName());
+    drawScreen("BLE connecting...", BLEHid.peerName());
     delay(500);
   }
 
