@@ -483,6 +483,8 @@ spr.drawRect(148, 2, 54, 16, TFT_WHITE);
 spr.drawRect(203, 2, 49, 16, TFT_WHITE);
 // Step
 spr.drawRect(253, 2, 40, 16, TFT_WHITE);
+
+spr.drawFastHLine(0, 38, 72, TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
 
 // ----- TIME -----
@@ -748,7 +750,7 @@ spr.setTextDatum(TL_DATUM);
 
 spr.drawString(snrText, 5, 41, 2);
 spr.drawString(volText, 5, 55, 2);
-spr.setTextColor(signalColor(strength));
+drawSignalBars(strength);
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
 
