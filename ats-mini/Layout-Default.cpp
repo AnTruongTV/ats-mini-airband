@@ -275,8 +275,6 @@ uint16_t signalColor(int strength)
 
 void drawSignalBars(int strength)
 {
-  constexpr int BAR_COUNT = 16;
-
   constexpr int START_X = 4;
   constexpr int BASE_Y  = 34;
 
@@ -747,11 +745,11 @@ char volValue[12];
 
 bool mainMuted = muteOn(MUTE_MAIN, 2);
 
-uint8_t sqlRaw   = currentSquelch[currentMode];
-uint8_t sqlValue = sqlRaw & 0x7F;
+uint8_t volSqlRaw   = currentSquelch[currentMode];
+uint8_t volSqlValue = volSqlRaw & 0x7F;
 
-bool sqlEnabled = (sqlValue > 0);
-bool sqlMuted   = muteOn(MUTE_SQL, 2);
+bool sqlEnabled = (volSqlValue > 0);
+bool sqlMuted   = muteOn(MUTE_SQUELCH, 2);
 
 if (mainMuted)
   snprintf(volValue, sizeof(volValue), "Muted");
@@ -804,7 +802,7 @@ else
 uint8_t sqlRaw   = currentSquelch[currentMode];
 uint8_t sqlValue = sqlRaw & 0x7F;
 bool sqlSNR      = sqlRaw & 0x80;
-
+  
 if (sqlValue == 0)
   snprintf(sqlText, sizeof(sqlText), "SQL:OFF");
 else if (sqlSNR)
