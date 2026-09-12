@@ -817,11 +817,31 @@ snprintf(rssiText, sizeof(rssiText), "RSSI:%udBuV", rssi);
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
 
-spr.drawString(agcAttText, 79, 125, 2);
-spr.drawString(avcText,    79, 148, 2);
+// Network / BLE status temporarily replaces AGC/AVC/SQL/RSSI
+if ((statusLine1 && statusLine1[0]) ||
+    (statusLine2 && statusLine2[0]))
+{
+  constexpr int INFO_X  = 75;   // 72 + 3 px compensation
+  constexpr int INFO_Y1 = 125;
+  constexpr int INFO_Y2 = 148;
 
-spr.drawString(sqlText,   160, 125, 2);
-spr.drawString(rssiText,  160, 148, 2);
+  spr.setTextColor(TFT_WHITE);
+  spr.setTextDatum(TL_DATUM);
+
+  if (statusLine1 && statusLine1[0])
+    spr.drawString(statusLine1, INFO_X, INFO_Y1, 2);
+
+  if (statusLine2 && statusLine2[0])
+    spr.drawString(statusLine2, INFO_X, INFO_Y2, 2);
+}
+else
+{
+  spr.drawString(agcAttText, 79, 125, 2);
+  spr.drawString(avcText,    79, 148, 2);
+
+  spr.drawString(sqlText,   160, 125, 2);
+  spr.drawString(rssiText,  160, 148, 2);
+}
 
 // Saving icon
 if (prefsAreWritten())
