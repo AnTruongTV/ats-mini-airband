@@ -20,7 +20,7 @@
 
 // SI473/5 and UI
 #define MIN_ELAPSED_TIME         5  // 300
-#define MIN_ELAPSED_RSSI_TIME  200  // RSSI check uses IN_ELAPSED_RSSI_TIME * 6 = 1.2s
+#define MIN_ELAPSED_RSSI_TIME  100  // RSSI check uses IN_ELAPSED_RSSI_TIME * 6 = 1.2s
 #define ELAPSED_COMMAND      10000  // time to turn off the last command controlled by encoder. Time to goes back to the VFO control // G8PTN: Increased time and corrected comment
 #define DEFAULT_VOLUME          35  // change it for your favorite sound volume
 #define DEFAULT_SLEEP            0  // Default sleep interval, range = 0 (off) to 255 in steps of 5
@@ -957,48 +957,46 @@ bool clickFreq(bool shortPress)
 
 bool processRssiSnr()
 {
-  static uint32_t updateCounter = 0;
   bool needRedraw = false;
 
   rx.getCurrentReceivedSignalQuality();
   int newRSSI = rx.getCurrentRSSI();
   int newSNR = rx.getCurrentSNR();
 
-  // Apply squelch if the volume is not muted
+  // Apply squelch
   uint8_t squelchValue = currentSquelch[currentMode] & 0x7f;
-  uint8_t squelchParam = (currentSquelch[currentMode] & 0x80)? newSNR:newRSSI;
-  if(squelchValue)
+  uint8_t squelchParam =
+      (currentSquelch[currentMode] & 0x80) ? newSNR : newRSSI;
+
+  if (squelchValue)
   {
-    if(squelchParam >= squelchValue && muteOn(MUTE_SQUELCH))
+    if (squelchParam >= squelchValue && muteOn(MUTE_SQUELCH))
     {
       muteOn(MUTE_SQUELCH, false);
     }
-    else if(squelchParam < squelchValue && !muteOn(MUTE_SQUELCH))
+    else if (squelchParam < squelchValue && !muteOn(MUTE_SQUELCH))
     {
       muteOn(MUTE_SQUELCH, true);
     }
   }
-  else if(muteOn(MUTE_SQUELCH))
+  else if (muteOn(MUTE_SQUELCH))
   {
     muteOn(MUTE_SQUELCH, false);
   }
 
-  // G8PTN: Based on 1.2s interval, update RSSI & SNR
-  if(!(updateCounter++ & 7))
+  // Update displayed RSSI / SNR immediately
+  if (newRSSI != rssi)
   {
-    // Show RSSI status only if this condition has changed
-    if(newRSSI != rssi)
-    {
-      rssi = newRSSI;
-      needRedraw = true;
-    }
-    // Show SNR status only if this condition has changed
-    if(newSNR != snr)
-    {
-      snr = newSNR;
-      needRedraw = true;
-    }
+    rssi = newRSSI;
+    needRedraw = true;
   }
+
+  if (newSNR != snr)
+  {
+    snr = newSNR;
+    needRedraw = true;
+  }
+
   return needRedraw;
 }
 
