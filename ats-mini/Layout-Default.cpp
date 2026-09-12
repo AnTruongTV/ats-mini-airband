@@ -277,8 +277,8 @@ void drawSignalBars(int strength)
 {
   constexpr int BAR_COUNT = 16;
 
-  constexpr int START_X = 3;
-  constexpr int BASE_Y  = 33;
+  constexpr int START_X = 4;
+  constexpr int BASE_Y  = 36;
 
   constexpr int BAR_W   = 3;
   constexpr int BAR_GAP = 1;
@@ -286,35 +286,28 @@ void drawSignalBars(int strength)
   if (strength < 1)
     strength = 1;
 
-  // Peak = full 16 bars
   int litBars = strength;
+
   if (litBars > 16)
     litBars = 16;
 
-  static const uint8_t barHeights[BAR_COUNT] =
-  {
-     4,  8, 12, 16,
-    20, 24, 28, 32,
-    36, 36, 36, 36,
-    36, 36, 36, 36
-  };
-
-  for (int i = 0; i < BAR_COUNT; i++)
+  for (int i = 0; i < litBars; i++)
   {
     int x = START_X + i * (BAR_W + BAR_GAP);
-    int h = barHeights[i];
-    int y = BASE_Y - h;
 
-    if (i < litBars)
-    {
-      spr.fillRect(
-        x,
-        y,
-        BAR_W,
-        h,
-        signalColor(i + 1)
-      );
-    }
+    // 1,2,3...10 then stay at 10
+    int h = i + 1;
+
+    if (h > 10)
+      h = 10;
+
+    spr.fillRect(
+      x,
+      BASE_Y - h,
+      BAR_W,
+      h,
+      signalColor(i + 1)
+    );
   }
 }
 
