@@ -278,7 +278,7 @@ void drawSignalBars(int strength)
   constexpr int BAR_COUNT = 16;
 
   constexpr int START_X = 4;
-  constexpr int BASE_Y  = 36;
+  constexpr int BASE_Y  = 34;
 
   constexpr int BAR_W   = 3;
   constexpr int BAR_GAP = 1;
