@@ -273,6 +273,51 @@ uint16_t signalColor(int strength)
   }
 }
 
+void drawSignalBars(int strength)
+{
+  constexpr int BAR_COUNT = 16;
+
+  constexpr int START_X = 3;
+  constexpr int BASE_Y  = 33;
+
+  constexpr int BAR_W   = 3;
+  constexpr int BAR_GAP = 1;
+
+  if (strength < 1)
+    strength = 1;
+
+  // Peak = full 16 bars
+  int litBars = strength;
+  if (litBars > 16)
+    litBars = 16;
+
+  static const uint8_t barHeights[BAR_COUNT] =
+  {
+     4,  8, 12, 16,
+    20, 24, 28, 32,
+    36, 36, 36, 36,
+    36, 36, 36, 36
+  };
+
+  for (int i = 0; i < BAR_COUNT; i++)
+  {
+    int x = START_X + i * (BAR_W + BAR_GAP);
+    int h = barHeights[i];
+    int y = BASE_Y - h;
+
+    if (i < litBars)
+    {
+      spr.fillRect(
+        x,
+        y,
+        BAR_W,
+        h,
+        signalColor(i + 1)
+      );
+    }
+  }
+}
+
 const char *bleIcon[] =
 {
   "...1...",
@@ -688,14 +733,6 @@ char volText[16];
 
 int strength = getStrength(rssi);
 
-const char *strengthText[] =
-{
-  "",
-  "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8",
-  "S9", "S9+10", "S9+20", "S9+30", "S9+40", "S9+50",
-  "S9+60", "Peak"
-};
-
 if (strength < 1 || strength > 17)
   strength = 1;
 
@@ -709,12 +746,9 @@ else
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
 
-spr.drawString(snrText, 5, 38, 2);
+spr.drawString(snrText, 5, 41, 2);
 spr.drawString(volText, 5, 55, 2);
-spr.drawString("SIG:", 5, 21, 2);
 spr.setTextColor(signalColor(strength));
-spr.drawString(strengthText[strength], 31, 21, 2);
-
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
 
