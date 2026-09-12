@@ -722,9 +722,7 @@ spr.setTextDatum(TL_DATUM);
 
 // ===== SIGNAL INFO =====
 
-char sigText[16];
 char snrText[16];
-char volText[16];
 
 int strength = getStrength(rssi);
 
@@ -733,16 +731,53 @@ if (strength < 1 || strength > 17)
 
 snprintf(snrText, sizeof(snrText), "SNR: %udB", snr);
 
-if (muteOn(MUTE_MAIN, 2))
-  snprintf(volText, sizeof(volText), "Vol: Muted");
-else
-  snprintf(volText, sizeof(volText), "Vol: %u", volume);
-
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
 
+// SNR
 spr.drawString(snrText, 5, 41, 2);
-spr.drawString(volText, 5, 55, 2);
+
+// Volume
+constexpr int VOL_X = 5;
+constexpr int VOL_Y = 55;
+
+spr.drawString("Vol:", VOL_X, VOL_Y, 2);
+
+char volValue[12];
+
+bool mainMuted = muteOn(MUTE_MAIN, 2);
+
+uint8_t sqlRaw   = currentSquelch[currentMode];
+uint8_t sqlValue = sqlRaw & 0x7F;
+
+bool sqlEnabled = (sqlValue > 0);
+bool sqlMuted   = muteOn(MUTE_SQL, 2);
+
+if (mainMuted)
+  snprintf(volValue, sizeof(volValue), "Muted");
+else if (sqlEnabled)
+  snprintf(volValue, sizeof(volValue), "%u/sq", volume);
+else
+  snprintf(volValue, sizeof(volValue), "%u", volume);
+
+int valueX = VOL_X + spr.textWidth("Vol:", 2) + 2;
+
+spr.drawString(volValue, valueX, VOL_Y, 2);
+
+if (mainMuted || sqlMuted)
+{
+  int w = spr.textWidth(volValue, 2);
+
+  spr.drawRect(
+    valueX - 1,
+    VOL_Y - 1,
+    w + 2,
+    17,
+    TFT_RED
+  );
+}
+
+spr.drawString(snrText, 5, 41, 2);
 drawSignalBars(strength);
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(TL_DATUM);
