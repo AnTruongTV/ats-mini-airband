@@ -957,13 +957,16 @@ bool clickFreq(bool shortPress)
 
 bool processRssiSnr()
 {
+  static uint8_t updateCounter = 0;
   bool needRedraw = false;
+
+  static uint8_t updateCounter = 0;
 
   rx.getCurrentReceivedSignalQuality();
   int newRSSI = rx.getCurrentRSSI();
   int newSNR = rx.getCurrentSNR();
 
-  // Apply squelch
+  // Apply squelch every 100 ms
   uint8_t squelchValue = currentSquelch[currentMode] & 0x7f;
   uint8_t squelchParam =
       (currentSquelch[currentMode] & 0x80) ? newSNR : newRSSI;
@@ -971,30 +974,31 @@ bool processRssiSnr()
   if (squelchValue)
   {
     if (squelchParam >= squelchValue && muteOn(MUTE_SQUELCH))
-    {
       muteOn(MUTE_SQUELCH, false);
-    }
     else if (squelchParam < squelchValue && !muteOn(MUTE_SQUELCH))
-    {
       muteOn(MUTE_SQUELCH, true);
-    }
   }
   else if (muteOn(MUTE_SQUELCH))
   {
     muteOn(MUTE_SQUELCH, false);
   }
 
-  // Update displayed RSSI / SNR immediately
-  if (newRSSI != rssi)
+  // Update displayed RSSI/SNR every 3 checks
+  if (++updateCounter >= 3)
   {
-    rssi = newRSSI;
-    needRedraw = true;
-  }
+    updateCounter = 0;
 
-  if (newSNR != snr)
-  {
-    snr = newSNR;
-    needRedraw = true;
+    if (newRSSI != rssi)
+    {
+      rssi = newRSSI;
+      needRedraw = true;
+    }
+
+    if (newSNR != snr)
+    {
+      snr = newSNR;
+      needRedraw = true;
+    }
   }
 
   return needRedraw;
