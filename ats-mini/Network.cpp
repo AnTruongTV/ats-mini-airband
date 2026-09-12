@@ -287,7 +287,7 @@ static bool wifiInitAP()
 //
 static bool wifiConnect()
 {
-  String status = "Connecting to WiFi network...";
+  String status = "WiFi connecting...";
 
   // Clean credentials
   wifiMulti.APlistClean();
@@ -338,7 +338,7 @@ static bool wifiConnect()
   if (wifiStatus != WL_CONNECTED)
   {
     // WiFi connection failed
-    drawScreen(status.c_str(), "No WiFi connection");
+    drawScreen(status.c_str(), "WiFi failed");
     // Done
     return(false);
   }
@@ -346,8 +346,8 @@ static bool wifiConnect()
   {
     // WiFi connection succeeded
     drawScreen(
-      ("Connected to WiFi network (" + WiFi.SSID() + ")").c_str(),
-      ("IP : " + WiFi.localIP().toString() + " or atsmini.local").c_str()
+      ("WiFi: " + WiFi.SSID()).c_str(),
+      ("IP: " + WiFi.localIP().toString()).c_str()
     );
     // Done
     ajaxInterval = 1000;
