@@ -89,6 +89,7 @@ Band *getCurrentBand() { return(&bands[bandIdx]); }
 #define MENU_SETTINGS    12
 
 int8_t menuIdx = MENU_MEMORY;
+static int8_t menuScrollOffset = 0;
 
 static const char *menu[] =
 {
@@ -1373,13 +1374,39 @@ void drawNewMenu()
     // Header
     spr.drawString("Menu", 36, 80, 2);
 
-    // First 6 real menu items
-    drawNewMenuItem(menu[0], 96,  menuIdx == 0, false);
-    drawNewMenuItem(menu[1], 109, menuIdx == 1, false);
-    drawNewMenuItem(menu[2], 122, menuIdx == 2, false);
-    drawNewMenuItem(menu[3], 135, menuIdx == 3, false);
-    drawNewMenuItem(menu[4], 148, menuIdx == 4, false);
-    drawNewMenuItem(menu[5], 161, menuIdx == 5, false);
+    bool menuActive = (currentCmd == CMD_MENU);
+
+    constexpr int VISIBLE_ROWS = 6;
+    constexpr int FIRST_Y = 96;
+    constexpr int ROW_SPACING = 13;
+
+    // Keep selected item visible
+    if (menuIdx < menuScrollOffset)
+    {
+        menuScrollOffset = menuIdx;
+    }
+    else if (menuIdx >= menuScrollOffset + VISIBLE_ROWS)
+    {
+        menuScrollOffset = menuIdx - VISIBLE_ROWS + 1;
+    }
+
+    // Draw visible window
+    for (int row = 0; row < VISIBLE_ROWS; row++)
+    {
+        int itemIndex = menuScrollOffset + row;
+
+        if (itemIndex > LAST_ITEM(menu))
+            break;
+
+        int y = FIRST_Y + row * ROW_SPACING;
+
+        drawNewMenuItem(
+            menu[itemIndex],
+            y,
+            menuIdx == itemIndex,
+            menuActive
+        );
+    }
 }
 
 static void drawCommon(const char *title, int x, int y, int sx, bool cursor = false)
