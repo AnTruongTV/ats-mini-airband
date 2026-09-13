@@ -535,10 +535,10 @@ spr.drawString(bandModeDesc[currentMode], 133, 10, 2);
 // ----- Bandwidth -----
 char bwText[12];
 
-if (strcmp(getCurrentBandwidth()->desc, "Auto") == 0)
-  sprintf(bwText, "F%s", getCurrentBandwidth()->desc);
+if (bandIdx == 2 || bandIdx == 3)
+    snprintf(bwText, sizeof(bwText), "FAuto");
 else
-  sprintf(bwText, "F%sHz", getCurrentBandwidth()->desc);
+    snprintf(bwText, sizeof(bwText), "F%sHz", getCurrentBandwidth()->desc);
 
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
