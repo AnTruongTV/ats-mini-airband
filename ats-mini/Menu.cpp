@@ -1300,6 +1300,89 @@ void selectBand(uint8_t idx, bool drawLoadingSSB)
 // Draw functions
 //
 
+static void drawNewMenuItem(
+    const char *text,
+    int y,
+    bool selected,
+    bool active
+)
+{
+    constexpr int CENTER_X = 36;
+    constexpr int GAP = 2;
+    constexpr int FONT = 2;
+
+    // Measure text
+    int textW  = spr.textWidth(text, FONT);
+    int arrowW = spr.textWidth(">", FONT);
+
+    // Plain item, no selector
+    if (!selected)
+    {
+        spr.setTextDatum(MC_DATUM);
+        spr.setTextColor(TFT_WHITE);
+        spr.drawString(text, CENTER_X, y, FONT);
+        return;
+    }
+
+    // Width of: > text <
+    int totalW =
+        arrowW +
+        GAP +
+        textW +
+        GAP +
+        arrowW;
+
+    int startX = CENTER_X - totalW / 2;
+
+    // Selector color:
+    // gray = idle
+    // blue = menu active
+    uint16_t selectorColor =
+        active ? TFT_BLUE : TFT_DARKGREY;
+
+    spr.setTextDatum(ML_DATUM);
+
+    // >
+    spr.setTextColor(selectorColor);
+    spr.drawString(">", startX, y, FONT);
+
+    // text
+    spr.setTextColor(TFT_WHITE);
+    spr.drawString(
+        text,
+        startX + arrowW + GAP,
+        y,
+        FONT
+    );
+
+    // <
+    spr.setTextColor(selectorColor);
+    spr.drawString(
+        "<",
+        startX + arrowW + GAP + textW + GAP,
+        y,
+        FONT
+    );
+}
+
+void drawNewMenu()
+{
+    // Header
+    spr.setTextDatum(MC_DATUM);
+    spr.setTextColor(TFT_WHITE);
+
+    // You wanted ONLY the header moved upward 3 px
+    spr.drawString("Menu", 36, 80, 2);
+
+    // Temporary items - KEEP the positions we already tested
+    drawNewMenuItem("Memory", 96,  false, false);
+    drawNewMenuItem("Band",   109, true,  false);
+    drawNewMenuItem("Step",   122, false, false);
+    drawNewMenuItem("Mode",   135, false, false);
+    drawNewMenuItem("AGC",    148, false, false);
+    drawNewMenuItem("SQL",    161, false, false);
+}
+
 static void drawCommon(const char *title, int x, int y, int sx, bool cursor = false)
 {
   spr.setTextDatum(MC_DATUM);
