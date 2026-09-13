@@ -1367,20 +1367,19 @@ static void drawNewMenuItem(
 
 void drawNewMenu()
 {
-    // Header
     spr.setTextDatum(MC_DATUM);
     spr.setTextColor(TFT_WHITE);
 
-    // You wanted ONLY the header moved upward 3 px
+    // Header
     spr.drawString("Menu", 36, 80, 2);
 
-    // Temporary items - KEEP the positions we already tested
-    drawNewMenuItem("Memory", 96,  false, false);
-    drawNewMenuItem("Band",   109, true,  false);
-    drawNewMenuItem("Step",   122, false, false);
-    drawNewMenuItem("Mode",   135, false, false);
-    drawNewMenuItem("AGC",    148, false, false);
-    drawNewMenuItem("SQL",    161, false, false);
+    // First 6 real menu items
+    drawNewMenuItem(menu[0], 96,  menuIdx == 0, false);
+    drawNewMenuItem(menu[1], 109, menuIdx == 1, false);
+    drawNewMenuItem(menu[2], 122, menuIdx == 2, false);
+    drawNewMenuItem(menu[3], 135, menuIdx == 3, false);
+    drawNewMenuItem(menu[4], 148, menuIdx == 4, false);
+    drawNewMenuItem(menu[5], 161, menuIdx == 5, false);
 }
 
 static void drawCommon(const char *title, int x, int y, int sx, bool cursor = false)
