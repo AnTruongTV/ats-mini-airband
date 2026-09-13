@@ -1900,6 +1900,154 @@ static void drawNewModeMenu()
     }
 }
 
+static void drawNewBandwidthMenu()
+{
+    spr.setTextColor(TFT_WHITE);
+    spr.setTextDatum(MC_DATUM);
+
+    // Header
+    spr.drawString("BW", 36, 80, 2);
+
+    constexpr int MAX_VISIBLE_ROWS = 6;
+    constexpr int FIRST_Y = 96;
+    constexpr int ROW_SPACING = 13;
+
+    // ============================================================
+    // AIR
+    // Display Auto.
+    // Actual bandwidth remains controlled dynamically
+    // by the existing AIR logic.
+    // ============================================================
+
+    if (bandIdx == 2)
+    {
+        drawNewMenuItem(
+            "Auto",
+            FIRST_Y,
+            true,
+            true
+        );
+
+        return;
+    }
+
+    // ============================================================
+    // NDB
+    // Display Auto.
+    // Actual receiver bandwidth will be fixed at 6.0 kHz.
+    // ============================================================
+
+    if (bandIdx == 3)
+    {
+        drawNewMenuItem(
+            "Auto",
+            FIRST_Y,
+            true,
+            true
+        );
+
+        return;
+    }
+
+    // ============================================================
+    // Normal FM / AM / SSB bandwidth list
+    // ============================================================
+
+    const Bandwidth *bwList = nullptr;
+    int bwCount = 0;
+    int selectedIdx = bands[bandIdx].bandwidthIdx;
+
+    if (currentMode == FM)
+    {
+        bwList = bandwidthFM;
+        bwCount = LAST_ITEM(bandwidthFM) + 1;
+    }
+    else if (currentMode == AM)
+    {
+        bwList = bandwidthAM;
+        bwCount = LAST_ITEM(bandwidthAM) + 1;
+    }
+    else
+    {
+        // LSB / USB
+        bwList = bandwidthSSB;
+        bwCount = LAST_ITEM(bandwidthSSB) + 1;
+    }
+
+    if (bwCount <= 0)
+        return;
+
+    // Safety
+    if (selectedIdx < 0)
+        selectedIdx = 0;
+
+    if (selectedIdx >= bwCount)
+        selectedIdx = bwCount - 1;
+
+    // ============================================================
+    // Six or fewer entries
+    // ============================================================
+
+    if (bwCount <= MAX_VISIBLE_ROWS)
+    {
+        for (int row = 0; row < bwCount; row++)
+        {
+            int y =
+                FIRST_Y + row * ROW_SPACING;
+
+            drawNewMenuItem(
+                bwList[row].desc,
+                y,
+                row == selectedIdx,
+                true
+            );
+        }
+
+        return;
+    }
+
+    // ============================================================
+    // More than six entries
+    //
+    // Keep selected item visible.
+    // ============================================================
+
+    int scrollOffset =
+        selectedIdx - (MAX_VISIBLE_ROWS - 1);
+
+    if (scrollOffset < 0)
+        scrollOffset = 0;
+
+    if (scrollOffset >
+        bwCount - MAX_VISIBLE_ROWS)
+    {
+        scrollOffset =
+            bwCount - MAX_VISIBLE_ROWS;
+    }
+
+    // ============================================================
+    // Draw visible window
+    // ============================================================
+
+    for (int row = 0;
+         row < MAX_VISIBLE_ROWS;
+         row++)
+    {
+        int itemIndex =
+            scrollOffset + row;
+
+        int y =
+            FIRST_Y + row * ROW_SPACING;
+
+        drawNewMenuItem(
+            bwList[itemIndex].desc,
+            y,
+            itemIndex == selectedIdx,
+            true
+        );
+    }
+}
+
 void drawNewMenuPanel()
 {
     if (currentCmd == CMD_BAND)
@@ -1913,6 +2061,10 @@ void drawNewMenuPanel()
     else if (currentCmd == CMD_MODE)
     {
         drawNewModeMenu();
+    }
+    else if (currentCmd == CMD_BW)
+    {
+        drawNewBandwidthMenu();
     }
     else
     {
