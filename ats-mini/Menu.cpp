@@ -1435,6 +1435,22 @@ static void drawNewBandMenu()
     }
 }
 
+void drawNewMenuPanel()
+{
+    if (currentCmd == CMD_MENU)
+    {
+        drawNewMenu();
+    }
+    else if (menuIdx == MENU_BAND)
+    {
+        drawNewBandMenu();
+    }
+    else
+    {
+        drawNewMenu();
+    }
+}
+
 void drawNewMenu()
 {
     spr.setTextDatum(MC_DATUM);
