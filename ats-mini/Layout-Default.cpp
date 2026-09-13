@@ -49,25 +49,20 @@ static void drawNewBandScale()
     // ============================================================
 
     // Band-edge text anchor points
-    // Band-edge label centres
-    constexpr int LEFT_FREQ_X  = 94;
-    constexpr int RIGHT_FREQ_X = 294;
+    constexpr int LEFT_FREQ_X  = 96;
+    constexpr int RIGHT_FREQ_X = 295;
 
-    // Keep original vertical position
-    constexpr int FREQ_Y = 103;
-
-    // Scale
+    // Scale end circles
     constexpr int SCALE_LEFT_X  = 122;
     constexpr int SCALE_RIGHT_X = 268;
     constexpr int SCALE_Y       = 111;
 
+    // Dotted line between endpoint circles
     constexpr int DOT_START_X = 126;
     constexpr int DOT_END_X   = 264;
 
-    // Text optical centering.
-    // MC_DATUM uses the text centre, then +3 px compensates
-    // for the way TFT_eSPI Font 2 visually sits high.
-    constexpr int FREQ_Y = SCALE_Y + 3;
+    // Keep the old vertical position
+    constexpr int FREQ_Y = 103;
 
 
     // ============================================================
