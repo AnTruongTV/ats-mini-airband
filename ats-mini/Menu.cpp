@@ -91,6 +91,7 @@ Band *getCurrentBand() { return(&bands[bandIdx]); }
 int8_t menuIdx = MENU_MEMORY;
 static int8_t menuScrollOffset = 0;
 static int8_t previousMenuIdx = MENU_MEMORY;
+static int8_t menuMoveDir = 0;
 
 static const char *menu[] =
 {
@@ -1099,7 +1100,20 @@ void doBandwidth(int16_t enc)
 
 static void doMenu(int16_t enc)
 {
-  menuIdx = wrap_range(menuIdx, enc, 0, LAST_ITEM(menu));
+    if (enc > 0)
+        menuMoveDir = 1;
+    else if (enc < 0)
+        menuMoveDir = -1;
+    else
+        return;
+
+    // Keep the original encoder acceleration
+    menuIdx = wrap_range(
+        menuIdx,
+        enc,
+        0,
+        LAST_ITEM(menu)
+    );
 }
 
 static void clickMenu(int cmd, bool shortPress)
@@ -1315,69 +1329,88 @@ static int wrapMenuIndex(int index)
     return index;
 }
 
-static void drawNewMenuItem(
-    const char *text,
-    int y,
-    bool selected,
-    bool active
-)
+void drawNewMenu()
 {
-    constexpr int CENTER_X = 36;
-    constexpr int GAP = 2;
-    constexpr int FONT = 2;
+    spr.setTextDatum(MC_DATUM);
+    spr.setTextColor(TFT_WHITE);
 
-    // Measure text
-    int textW  = spr.textWidth(text, FONT);
-    int arrowW = spr.textWidth(">", FONT);
+    // Header
+    spr.drawString("Menu", 36, 80, 2);
 
-    // Plain item, no selector
-    if (!selected)
+    bool menuActive = (currentCmd == CMD_MENU);
+
+    constexpr int VISIBLE_ROWS = 6;
+    constexpr int FIRST_Y = 96;
+    constexpr int ROW_SPACING = 13;
+
+    // ------------------------------------------------------------
+    // Find the selected item in the current visible window
+    // ------------------------------------------------------------
+
+    int selectedRow = -1;
+
+    for (int row = 0; row < VISIBLE_ROWS; row++)
     {
-        spr.setTextDatum(MC_DATUM);
-        spr.setTextColor(TFT_WHITE);
-        spr.drawString(text, CENTER_X, y, FONT);
-        return;
+        int itemIndex =
+            wrapMenuIndex(menuScrollOffset + row);
+
+        if (itemIndex == menuIdx)
+        {
+            selectedRow = row;
+            break;
+        }
     }
 
-    // Width of: > text <
-    int totalW =
-        arrowW +
-        GAP +
-        textW +
-        GAP +
-        arrowW;
+    // ------------------------------------------------------------
+    // Selection jumped outside the window.
+    //
+    // Encoder acceleration is allowed, so menuIdx may move
+    // several items at once.
+    //
+    // Moving DOWN:
+    // put selected item on the bottom row.
+    //
+    // Moving UP:
+    // put selected item on the top row.
+    // ------------------------------------------------------------
 
-    int startX = CENTER_X - totalW / 2;
+    if (selectedRow == -1)
+    {
+        if (menuMoveDir > 0)
+        {
+            menuScrollOffset =
+                wrapMenuIndex(
+                    menuIdx - (VISIBLE_ROWS - 1)
+                );
+        }
+        else if (menuMoveDir < 0)
+        {
+            menuScrollOffset =
+                wrapMenuIndex(menuIdx);
+        }
+    }
 
-    // Selector color:
-    // gray = idle
-    // blue = menu active
-    uint16_t selectorColor =
-        active ? TFT_BLUE : TFT_DARKGREY;
+    previousMenuIdx = menuIdx;
 
-    spr.setTextDatum(ML_DATUM);
+    // ------------------------------------------------------------
+    // Draw visible menu rows
+    // ------------------------------------------------------------
 
-    // >
-    spr.setTextColor(selectorColor);
-    spr.drawString(">", startX, y, FONT);
+    for (int row = 0; row < VISIBLE_ROWS; row++)
+    {
+        int itemIndex =
+            wrapMenuIndex(menuScrollOffset + row);
 
-    // text
-    spr.setTextColor(TFT_WHITE);
-    spr.drawString(
-        text,
-        startX + arrowW + GAP,
-        y,
-        FONT
-    );
+        int y =
+            FIRST_Y + row * ROW_SPACING;
 
-    // <
-    spr.setTextColor(selectorColor);
-    spr.drawString(
-        "<",
-        startX + arrowW + GAP + textW + GAP,
-        y,
-        FONT
-    );
+        drawNewMenuItem(
+            getNewMenuName(itemIndex),
+            y,
+            menuIdx == itemIndex,
+            menuActive
+        );
+    }
 }
 
 static const char *getNewMenuName(int index)
