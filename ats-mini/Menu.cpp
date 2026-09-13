@@ -88,12 +88,11 @@ Band *getCurrentBand() { return(&bands[bandIdx]); }
 #define MENU_SOFTMUTE    11
 #define MENU_SETTINGS    12
 
-int8_t menuIdx = MENU_MEMORY;
+static int8_t menuIdx = MENU_MEMORY;
+// Main menu state
 static int8_t menuScrollOffset = 0;
 static int8_t previousMenuIdx = MENU_MEMORY;
-static int8_t menuMoveDir = 0;
-static int8_t bandScrollOffset = 0;
-static int8_t bandMenuMoveDir = 0;
+// Band submenu state
 static int bandScrollOffset = 0;
 static int previousBandIdx = -1;
 
