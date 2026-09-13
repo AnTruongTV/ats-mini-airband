@@ -424,7 +424,7 @@ void drawLayoutDefault(const char *statusLine1, const char *statusLine2)
 
   // Draw left-side menu/info bar
   // @@@ FIXME: Frequency display (above) intersects the side bar!
-  drawSideBar(currentCmd, MENU_OFFSET_X, MENU_OFFSET_Y, MENU_DELTA_X);
+  // drawSideBar(currentCmd, MENU_OFFSET_X, MENU_OFFSET_Y, MENU_DELTA_X);
 
   // Draw S-meter
   drawSMeter(getStrength(rssi), METER_OFFSET_X, METER_OFFSET_Y);
@@ -458,7 +458,9 @@ spr.drawFastHLine(72, 119, 248, TFT_WHITE);
 spr.drawFastVLine(254, 119, 51, TFT_WHITE);
 spr.drawFastVLine(270, 119, 18, TFT_WHITE);
 spr.drawFastHLine(254, 136, 66, TFT_WHITE);
-
+spr.drawFastHLine(0, 87, 73, TFT_WHITE);
+spr.drawFastHLine(0, 38, 72, TFT_WHITE);
+  
 // 7 boxes - adjusted to your new mockup
 // Time
 spr.drawRect(2,   2, 40, 16, TFT_WHITE);
@@ -474,8 +476,6 @@ spr.drawRect(148, 2, 54, 16, TFT_WHITE);
 spr.drawRect(203, 2, 49, 16, TFT_WHITE);
 // Step
 spr.drawRect(253, 2, 40, 16, TFT_WHITE);
-
-spr.drawFastHLine(0, 38, 72, TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
 
 // ----- TIME -----
@@ -854,5 +854,19 @@ drawBattery(0, 0);
 drawPixelIcon(263, 144, batteryShell, 18, TFT_WHITE);
 
 // Menu
-drawSideBar(currentCmd, 0, 73, 0);
+// drawSideBar(currentCmd, 0, 73, 0);
+
+spr.setTextColor(TFT_WHITE);
+spr.setTextDatum(MC_DATUM);
+
+// Header
+spr.drawString("Menu", 36, 83, 2);
+
+// Temporary menu items
+spr.drawString("Memory", 36, 96, 2);
+spr.drawString("Band",   36, 109, 2);
+spr.drawString("Step",   36, 122, 2);
+spr.drawString("Mode",   36, 135, 2);
+spr.drawString("AGC",    36, 148, 2);
+spr.drawString("SQL",    36, 161, 2);
 }
