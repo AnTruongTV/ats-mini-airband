@@ -1028,30 +1028,53 @@ void doAgc(int16_t enc)
 
 void doMode(int16_t enc)
 {
-  if (bandIdx == 2)
-  {
-    currentMode = AM;
-    return;
-  }
-  // This is our current mode for the current band
-  currentMode = bands[bandIdx].bandMode;
+    // AIR and NDB are AM only
+    if (bandIdx == 2 || bandIdx == 3)
+    {
+        currentMode = AM;
+        bands[bandIdx].bandMode = AM;
+        return;
+    }
 
-  // Cannot change away from FM mode
-  if(currentMode==FM) return;
+    // VHF is FM only
+    if (bandIdx == 0)
+    {
+        currentMode = FM;
+        bands[bandIdx].bandMode = FM;
+        return;
+    }
 
-  // Change AM/LSB/USB modes, do not allow FM mode
-  do
-    currentMode = wrap_range(currentMode, enc, 0, LAST_ITEM(bandModeDesc));
-  while(currentMode==FM);
+    // Current mode for this band
+    currentMode = bands[bandIdx].bandMode;
 
-  // Save current band settings
-  bands[bandIdx].currentFreq = currentFrequency + currentBFO / 1000;
-  bands[bandIdx].currentStepIdx = defaultStepIdx[currentMode];
-  bands[bandIdx].bandwidthIdx = defaultBwIdx[currentMode];
-  bands[bandIdx].bandMode = currentMode;
+    // Change only between AM / LSB / USB.
+    do
+    {
+        currentMode =
+            wrap_range(
+                currentMode,
+                enc,
+                0,
+                LAST_ITEM(bandModeDesc)
+            );
+    }
+    while (currentMode == FM);
 
-  // Enable the new band
-  selectBand(bandIdx);
+    // Save current band settings
+    bands[bandIdx].currentFreq =
+        currentFrequency + currentBFO / 1000;
+
+    bands[bandIdx].currentStepIdx =
+        defaultStepIdx[currentMode];
+
+    bands[bandIdx].bandwidthIdx =
+        defaultBwIdx[currentMode];
+
+    bands[bandIdx].bandMode =
+        currentMode;
+
+    // Enable new mode
+    selectBand(bandIdx);
 }
 
 void doSquelch(int16_t enc)
@@ -1799,6 +1822,84 @@ static void drawNewStepMenu()
     }
 }
 
+static void drawNewModeMenu()
+{
+    spr.setTextColor(TFT_WHITE);
+    spr.setTextDatum(MC_DATUM);
+
+    // Header
+    spr.drawString("Mode", 36, 80, 2);
+
+    constexpr int FIRST_Y = 96;
+    constexpr int ROW_SPACING = 13;
+
+    // ============================================================
+    // VHF: FM only
+    // ============================================================
+
+    if (bandIdx == 0)
+    {
+        drawNewMenuItem(
+            "FM",
+            FIRST_Y,
+            true,
+            true
+        );
+
+        return;
+    }
+
+    // ============================================================
+    // AIR and NDB: AM only
+    // ============================================================
+
+    if (bandIdx == 2 || bandIdx == 3)
+    {
+        drawNewMenuItem(
+            "AM",
+            FIRST_Y,
+            true,
+            true
+        );
+
+        return;
+    }
+
+    // ============================================================
+    // Other HF / SW bands:
+    // AM, LSB, USB
+    // ============================================================
+
+    const char *modeItems[] =
+    {
+        "AM",
+        "LSB",
+        "USB"
+    };
+
+    const int modeValues[] =
+    {
+        AM,
+        LSB,
+        USB
+    };
+
+    constexpr int MODE_COUNT = 3;
+
+    for (int row = 0; row < MODE_COUNT; row++)
+    {
+        int y =
+            FIRST_Y + row * ROW_SPACING;
+
+        drawNewMenuItem(
+            modeItems[row],
+            y,
+            currentMode == modeValues[row],
+            true
+        );
+    }
+}
+
 void drawNewMenuPanel()
 {
     if (currentCmd == CMD_BAND)
@@ -1808,6 +1909,10 @@ void drawNewMenuPanel()
     else if (currentCmd == CMD_STEP)
     {
         drawNewStepMenu();
+    }
+    else if (currentCmd == CMD_MODE)
+    {
+        drawNewModeMenu();
     }
     else
     {
