@@ -1329,6 +1329,79 @@ static int wrapMenuIndex(int index)
     return index;
 }
 
+static const char *getNewMenuName(int index)
+{
+    switch (index)
+    {
+        case 6:  return "BW";
+        case 9:  return "AGC/AT";
+        case 11: return "S.Mute";
+
+        default:
+            return menu[index];
+    }
+}
+
+static void drawNewMenuItem(
+    const char *text,
+    int y,
+    bool selected,
+    bool active
+)
+{
+    constexpr int CENTER_X = 36;
+    constexpr int GAP = 2;
+    constexpr int FONT = 2;
+
+    int textW  = spr.textWidth(text, FONT);
+    int arrowW = spr.textWidth(">", FONT);
+
+    if (!selected)
+    {
+        spr.setTextDatum(MC_DATUM);
+        spr.setTextColor(TFT_WHITE);
+        spr.drawString(text, CENTER_X, y, FONT);
+        return;
+    }
+
+    int totalW =
+        arrowW +
+        GAP +
+        textW +
+        GAP +
+        arrowW;
+
+    int startX =
+        CENTER_X - totalW / 2;
+
+    uint16_t selectorColor =
+        active ? TFT_BLUE : TFT_DARKGREY;
+
+    spr.setTextDatum(ML_DATUM);
+
+    // >
+    spr.setTextColor(selectorColor);
+    spr.drawString(">", startX, y, FONT);
+
+    // item
+    spr.setTextColor(TFT_WHITE);
+    spr.drawString(
+        text,
+        startX + arrowW + GAP,
+        y,
+        FONT
+    );
+
+    // <
+    spr.setTextColor(selectorColor);
+    spr.drawString(
+        "<",
+        startX + arrowW + GAP + textW + GAP,
+        y,
+        FONT
+    );
+}
+
 void drawNewMenu()
 {
     spr.setTextDatum(MC_DATUM);
@@ -1337,16 +1410,14 @@ void drawNewMenu()
     // Header
     spr.drawString("Menu", 36, 80, 2);
 
-    bool menuActive = (currentCmd == CMD_MENU);
+    bool menuActive =
+        (currentCmd == CMD_MENU);
 
     constexpr int VISIBLE_ROWS = 6;
     constexpr int FIRST_Y = 96;
     constexpr int ROW_SPACING = 13;
 
-    // ------------------------------------------------------------
-    // Find the selected item in the current visible window
-    // ------------------------------------------------------------
-
+    // Find selected item in visible window
     int selectedRow = -1;
 
     for (int row = 0; row < VISIBLE_ROWS; row++)
@@ -1361,19 +1432,8 @@ void drawNewMenu()
         }
     }
 
-    // ------------------------------------------------------------
-    // Selection jumped outside the window.
-    //
-    // Encoder acceleration is allowed, so menuIdx may move
-    // several items at once.
-    //
-    // Moving DOWN:
-    // put selected item on the bottom row.
-    //
-    // Moving UP:
-    // put selected item on the top row.
-    // ------------------------------------------------------------
-
+    // If acceleration moves selection outside visible window,
+    // reposition the visible window based on movement direction.
     if (selectedRow == -1)
     {
         if (menuMoveDir > 0)
@@ -1387,96 +1447,6 @@ void drawNewMenu()
         {
             menuScrollOffset =
                 wrapMenuIndex(menuIdx);
-        }
-    }
-
-    previousMenuIdx = menuIdx;
-
-    // ------------------------------------------------------------
-    // Draw visible menu rows
-    // ------------------------------------------------------------
-
-    for (int row = 0; row < VISIBLE_ROWS; row++)
-    {
-        int itemIndex =
-            wrapMenuIndex(menuScrollOffset + row);
-
-        int y =
-            FIRST_Y + row * ROW_SPACING;
-
-        drawNewMenuItem(
-            getNewMenuName(itemIndex),
-            y,
-            menuIdx == itemIndex,
-            menuActive
-        );
-    }
-}
-
-static const char *getNewMenuName(int index)
-{
-    switch (index)
-    {
-        case 6:  return "BW";       // Bandwidth
-        case 9:  return "AGC/AT";  // AGC/ATTN
-        case 11: return "S.Mute";   // SoftMute
-        default: return menu[index];
-    }
-}
-
-void drawNewMenu()
-{
-    spr.setTextDatum(MC_DATUM);
-    spr.setTextColor(TFT_WHITE);
-
-    // Header
-    spr.drawString("Menu", 36, 80, 2);
-
-    bool menuActive = (currentCmd == CMD_MENU);
-
-    constexpr int VISIBLE_ROWS = 6;
-    constexpr int FIRST_Y = 96;
-    constexpr int ROW_SPACING = 13;
-
-    const int MENU_COUNT = LAST_ITEM(menu) + 1;
-
-    // Determine direction, including wrap
-    int delta = menuIdx - previousMenuIdx;
-
-    if (delta > 1)
-        delta -= MENU_COUNT;
-
-    if (delta < -1)
-        delta += MENU_COUNT;
-
-    // Find selected item inside current visible window
-    int selectedRow = -1;
-
-    for (int row = 0; row < VISIBLE_ROWS; row++)
-    {
-        int itemIndex =
-            wrapMenuIndex(menuScrollOffset + row);
-
-        if (itemIndex == menuIdx)
-        {
-            selectedRow = row;
-            break;
-        }
-    }
-
-    // If selected item is outside the window,
-    // scroll exactly one row in the movement direction
-    if (selectedRow == -1)
-    {
-        if (delta > 0)
-        {
-            menuScrollOffset =
-                wrapMenuIndex(menuScrollOffset + 1);
-        }
-        else if (delta < 0)
-        {
-            menuScrollOffset =
-                wrapMenuIndex(menuScrollOffset - 1);
         }
     }
 
