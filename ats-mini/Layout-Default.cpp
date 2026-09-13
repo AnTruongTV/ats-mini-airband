@@ -855,18 +855,4 @@ drawPixelIcon(263, 144, batteryShell, 18, TFT_WHITE);
 
 // Menu
 // drawSideBar(currentCmd, 0, 73, 0);
-
-spr.setTextColor(TFT_WHITE);
-spr.setTextDatum(MC_DATUM);
-
-// Header
-spr.drawString("Menu", 36, 83, 2);
-
-// Temporary menu items
-spr.drawString("Memory", 36, 96, 2);
-spr.drawString("Band",   36, 109, 2);
-spr.drawString("Step",   36, 122, 2);
-spr.drawString("Mode",   36, 135, 2);
-spr.drawString("AGC",    36, 148, 2);
-spr.drawString("SQL",    36, 161, 2);
 }
