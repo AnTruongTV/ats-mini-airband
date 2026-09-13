@@ -1385,7 +1385,7 @@ static const char *getNewMenuName(int index)
     switch (index)
     {
         case 6:  return "BW";       // Bandwidth
-        case 9:  return "AGC/ATT";  // AGC/ATTN
+        case 9:  return "AGC/AT";  // AGC/ATTN
         case 11: return "S.Mute";   // SoftMute
         default: return menu[index];
     }
@@ -1407,19 +1407,16 @@ void drawNewMenu()
 
     const int MENU_COUNT = LAST_ITEM(menu) + 1;
 
-    // ---------------------------------
-    // Detect encoder/menu direction
-    // ---------------------------------
-    bool movedDown =
-        menuIdx == wrapMenuIndex(previousMenuIdx + 1);
+    // Determine direction, including wrap
+    int delta = menuIdx - previousMenuIdx;
 
-    bool movedUp =
-        menuIdx == wrapMenuIndex(previousMenuIdx - 1);
+    if (delta > 1)
+        delta -= MENU_COUNT;
 
-    // ---------------------------------
-    // Check whether selected item is
-    // currently inside our visible window
-    // ---------------------------------
+    if (delta < -1)
+        delta += MENU_COUNT;
+
+    // Find selected item inside current visible window
     int selectedRow = -1;
 
     for (int row = 0; row < VISIBLE_ROWS; row++)
@@ -1434,23 +1431,16 @@ void drawNewMenu()
         }
     }
 
-    // ---------------------------------
-    // If selection moved beyond window,
-    // scroll the list by ONE item.
-    //
-    // This also handles:
-    // Settings -> Band
-    // Band -> Settings
-    // continuously.
-    // ---------------------------------
+    // If selected item is outside the window,
+    // scroll exactly one row in the movement direction
     if (selectedRow == -1)
     {
-        if (movedDown)
+        if (delta > 0)
         {
             menuScrollOffset =
                 wrapMenuIndex(menuScrollOffset + 1);
         }
-        else if (movedUp)
+        else if (delta < 0)
         {
             menuScrollOffset =
                 wrapMenuIndex(menuScrollOffset - 1);
@@ -1459,9 +1449,7 @@ void drawNewMenu()
 
     previousMenuIdx = menuIdx;
 
-    // ---------------------------------
-    // Draw the six visible rows
-    // ---------------------------------
+    // Draw visible rows
     for (int row = 0; row < VISIBLE_ROWS; row++)
     {
         int itemIndex =
