@@ -1412,6 +1412,74 @@ static void drawNewMenuItem(
     );
 }
 
+void drawNewMenu()
+{
+    spr.setTextDatum(MC_DATUM);
+    spr.setTextColor(TFT_WHITE);
+
+    // Header
+    spr.drawString("Menu", 36, 80, 2);
+
+    bool menuActive = (currentCmd == CMD_MENU);
+
+    constexpr int VISIBLE_ROWS = 6;
+    constexpr int FIRST_Y = 96;
+    constexpr int ROW_SPACING = 13;
+
+    // Find selected item in current visible window
+    int selectedRow = -1;
+
+    for (int row = 0; row < VISIBLE_ROWS; row++)
+    {
+        int itemIndex =
+            wrapMenuIndex(menuScrollOffset + row);
+
+        if (itemIndex == menuIdx)
+        {
+            selectedRow = row;
+            break;
+        }
+    }
+
+    // Accelerated encoder may jump several items.
+    // If selection leaves the window, move the window
+    // so the selected item stays visible.
+    if (selectedRow == -1)
+    {
+        if (menuMoveDir > 0)
+        {
+            menuScrollOffset =
+                wrapMenuIndex(
+                    menuIdx - (VISIBLE_ROWS - 1)
+                );
+        }
+        else if (menuMoveDir < 0)
+        {
+            menuScrollOffset =
+                wrapMenuIndex(menuIdx);
+        }
+    }
+
+    previousMenuIdx = menuIdx;
+
+    // Draw visible rows
+    for (int row = 0; row < VISIBLE_ROWS; row++)
+    {
+        int itemIndex =
+            wrapMenuIndex(menuScrollOffset + row);
+
+        int y =
+            FIRST_Y + row * ROW_SPACING;
+
+        drawNewMenuItem(
+            getNewMenuName(itemIndex),
+            y,
+            menuIdx == itemIndex,
+            menuActive
+        );
+    }
+}
+
 static void drawNewBandMenu()
 {
     spr.setTextColor(TFT_WHITE);
@@ -1583,11 +1651,7 @@ static void drawNewBandMenu()
 
 void drawNewMenuPanel()
 {
-    if (currentCmd == CMD_MENU)
-    {
-        drawNewMenu();
-    }
-    else if (menuIdx == MENU_BAND)
+    if (currentCmd == CMD_BAND)
     {
         drawNewBandMenu();
     }
