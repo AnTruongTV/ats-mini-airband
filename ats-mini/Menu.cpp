@@ -1402,6 +1402,39 @@ static void drawNewMenuItem(
     );
 }
 
+static void drawNewBandMenu()
+{
+    spr.setTextColor(TFT_WHITE);
+    spr.setTextDatum(MC_DATUM);
+
+    // Header
+    spr.drawString("Band", 36, 80, 2);
+
+    constexpr int MAX_VISIBLE_ROWS = 6;
+    constexpr int FIRST_Y = 96;
+    constexpr int ROW_SPACING = 13;
+
+    int bandCount = getTotalBands();
+
+    // If there are 6 or fewer bands, just show all of them.
+    int visibleRows =
+        (bandCount < MAX_VISIBLE_ROWS)
+            ? bandCount
+            : MAX_VISIBLE_ROWS;
+
+    for (int row = 0; row < visibleRows; row++)
+    {
+        int y = FIRST_Y + row * ROW_SPACING;
+
+        drawNewMenuItem(
+            bands[row].name,
+            y,
+            row == bandIdx,
+            true
+        );
+    }
+}
+
 void drawNewMenu()
 {
     spr.setTextDatum(MC_DATUM);
