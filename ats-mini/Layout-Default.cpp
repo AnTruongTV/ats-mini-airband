@@ -45,21 +45,27 @@ static void formatBandEdge(char *buf, size_t len, uint32_t freq)
 static void drawNewBandScale()
 {
     // ============================================================
-    // Exact coordinates from the UI mockup
+    // Scale geometry
     // ============================================================
 
-    constexpr int LEFT_FREQ_X     = 75;
-    constexpr int FREQ_Y          = 103;
+    // Band-edge text anchor points
+    constexpr int LEFT_FREQ_X  = 94;
+    constexpr int RIGHT_FREQ_X = 294;
 
-    // These are the CENTRES of the two scale-end circles
-    constexpr int SCALE_LEFT_X    = 122;
-    constexpr int SCALE_RIGHT_X   = 268;
-    constexpr int SCALE_Y         = 111;
+    // Scale end circles
+    constexpr int SCALE_LEFT_X  = 122;
+    constexpr int SCALE_RIGHT_X = 268;
+    constexpr int SCALE_Y       = 111;
 
-    constexpr int DOT_START_X     = 126;
-    constexpr int DOT_END_X       = 264;
+    // Dotted line between endpoint circles
+    constexpr int DOT_START_X = 126;
+    constexpr int DOT_END_X   = 264;
 
-    constexpr int RIGHT_FREQ_X    = 274;
+    // Text optical centering.
+    // MC_DATUM uses the text centre, then +3 px compensates
+    // for the way TFT_eSPI Font 2 visually sits high.
+    constexpr int FREQ_Y = SCALE_Y + 3;
+
 
     // ============================================================
     // Current band information
@@ -71,6 +77,7 @@ static void drawNewBandScale()
     uint32_t displayMin  = band->minimumFreq;
     uint32_t displayMax  = band->maximumFreq;
 
+
     // ============================================================
     // AIR / DCV
     // ============================================================
@@ -81,13 +88,13 @@ static void drawNewBandScale()
 
         if (currentDCVIdx == 1)
             dcvOffset = 100000;
-
         else if (currentDCVIdx == 2)
             dcvOffset = 110000;
 
-        // -----------------------------
+
+        // --------------------------------------------------------
         // Frequency shown to the user
-        // -----------------------------
+        // --------------------------------------------------------
 
         if (
             currentAirSpacing == AIR_833 &&
@@ -103,15 +110,21 @@ static void drawNewBandScale()
         }
         else
         {
-            displayFreq = currentFrequency + dcvOffset;
+            displayFreq =
+                currentFrequency + dcvOffset;
         }
 
-        // -----------------------------
-        // Visible band limits
-        // -----------------------------
 
-        displayMin = band->minimumFreq + dcvOffset;
-        displayMax = band->maximumFreq + dcvOffset;
+        // --------------------------------------------------------
+        // Visible band limits
+        // --------------------------------------------------------
+
+        displayMin =
+            band->minimumFreq + dcvOffset;
+
+        displayMax =
+            band->maximumFreq + dcvOffset;
+
 
         // 110 MHz DCV hardware limit:
         // raw tuner max 27 MHz -> displayed 137 MHz
@@ -119,14 +132,15 @@ static void drawNewBandScale()
             displayMax = 137000;
     }
 
+
     // ============================================================
     // SSB BFO correction
     // ============================================================
 
     else if (isSSB())
     {
-        // Scale is in kHz, so keep the fractional BFO only for
-        // position calculation.
+        // Scale is in kHz, so keep the fractional BFO only
+        // for position calculation.
         int64_t correctedHz =
             (int64_t)currentFrequency * 1000 +
             currentBFO;
@@ -134,8 +148,10 @@ static void drawNewBandScale()
         if (correctedHz < 0)
             correctedHz = 0;
 
-        displayFreq = correctedHz / 1000;
+        displayFreq =
+            correctedHz / 1000;
     }
+
 
     // ============================================================
     // Safety
@@ -152,25 +168,52 @@ static void drawNewBandScale()
     if (markerFreq > displayMax)
         markerFreq = displayMax;
 
+
     // ============================================================
-    // Format edge labels
+    // Format band-edge labels
     // ============================================================
 
     char leftText[16];
     char rightText[16];
 
-    formatBandEdge(leftText, sizeof(leftText), displayMin);
-    formatBandEdge(rightText, sizeof(rightText), displayMax);
+    formatBandEdge(
+        leftText,
+        sizeof(leftText),
+        displayMin
+    );
+
+    formatBandEdge(
+        rightText,
+        sizeof(rightText),
+        displayMax
+    );
+
+
+    // ============================================================
+    // Band-edge labels
+    //
+    // Both numbers are centred around fixed anchor points.
+    // Therefore 520, 64.00, 118.00, etc. stay properly centred
+    // regardless of how many characters they contain.
+    // ============================================================
 
     spr.setTextColor(TFT_WHITE);
+    spr.setTextDatum(MC_DATUM);
 
-    // Left edge frequency
-    spr.setTextDatum(TL_DATUM);
-    spr.drawString(leftText, LEFT_FREQ_X, FREQ_Y, 2);
+    spr.drawString(
+        leftText,
+        LEFT_FREQ_X,
+        FREQ_Y,
+        2
+    );
 
-    // Right edge frequency
-    spr.setTextDatum(TL_DATUM);
-    spr.drawString(rightText, RIGHT_FREQ_X, FREQ_Y, 2);
+    spr.drawString(
+        rightText,
+        RIGHT_FREQ_X,
+        FREQ_Y,
+        2
+    );
+
 
     // ============================================================
     // Endpoint circles
@@ -190,11 +233,14 @@ static void drawNewBandScale()
         TFT_WHITE
     );
 
+
     // ============================================================
     // Dotted scale
     // ============================================================
 
-    for (int x = DOT_START_X; x <= DOT_END_X; x += 3)
+    for (int x = DOT_START_X;
+         x <= DOT_END_X;
+         x += 3)
     {
         spr.drawPixel(
             x,
@@ -203,10 +249,9 @@ static void drawNewBandScale()
         );
     }
 
+
     // ============================================================
     // Frequency -> scale position
-    //
-    // Integer math instead of float, so this is lightweight on ESP32.
     // ============================================================
 
     uint32_t range =
@@ -221,18 +266,20 @@ static void drawNewBandScale()
          (SCALE_RIGHT_X - SCALE_LEFT_X)) /
         range;
 
+
     // ============================================================
     // Current-frequency marker
     // ============================================================
 
     spr.fillCircle(
-    markerX,
-    SCALE_Y,
-    2,
-    TFT_RED
+        markerX,
+        SCALE_Y,
+        2,
+        TFT_RED
     );
 
-    // Restore common datum
+
+    // Restore common datum for other UI drawing
     spr.setTextDatum(TL_DATUM);
 }
 
