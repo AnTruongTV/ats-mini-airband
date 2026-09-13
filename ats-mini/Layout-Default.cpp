@@ -855,4 +855,5 @@ drawPixelIcon(263, 144, batteryShell, 18, TFT_WHITE);
 
 // Menu
 // drawSideBar(currentCmd, 0, 73, 0);
+drawNewMenu();
 }
