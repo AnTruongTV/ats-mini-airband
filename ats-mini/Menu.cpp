@@ -95,6 +95,7 @@ static int8_t previousMenuIdx = MENU_MEMORY;
 // Band submenu state
 static int bandScrollOffset = 0;
 static int previousBandIdx = -1;
+static int8_t menuMoveDir = 0;
 
 static const char *menu[] =
 {
