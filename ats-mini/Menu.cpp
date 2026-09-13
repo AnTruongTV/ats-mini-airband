@@ -90,6 +90,7 @@ Band *getCurrentBand() { return(&bands[bandIdx]); }
 
 int8_t menuIdx = MENU_MEMORY;
 static int8_t menuScrollOffset = 0;
+static int8_t previousMenuIdx = MENU_MEMORY;
 
 static const char *menu[] =
 {
@@ -1301,6 +1302,19 @@ void selectBand(uint8_t idx, bool drawLoadingSSB)
 // Draw functions
 //
 
+static int wrapMenuIndex(int index)
+{
+    const int count = LAST_ITEM(menu) + 1;
+
+    while (index < 0)
+        index += count;
+
+    while (index >= count)
+        index -= count;
+
+    return index;
+}
+
 static void drawNewMenuItem(
     const char *text,
     int y,
@@ -1366,6 +1380,17 @@ static void drawNewMenuItem(
     );
 }
 
+static const char *getNewMenuName(int index)
+{
+    switch (index)
+    {
+        case 6:  return "BW";       // Bandwidth
+        case 9:  return "AGC/ATT";  // AGC/ATTN
+        case 11: return "S.Mute";   // SoftMute
+        default: return menu[index];
+    }
+}
+
 void drawNewMenu()
 {
     spr.setTextDatum(MC_DATUM);
@@ -1380,28 +1405,73 @@ void drawNewMenu()
     constexpr int FIRST_Y = 96;
     constexpr int ROW_SPACING = 13;
 
-    // Keep selected item visible
-    if (menuIdx < menuScrollOffset)
-    {
-        menuScrollOffset = menuIdx;
-    }
-    else if (menuIdx >= menuScrollOffset + VISIBLE_ROWS)
-    {
-        menuScrollOffset = menuIdx - VISIBLE_ROWS + 1;
-    }
+    const int MENU_COUNT = LAST_ITEM(menu) + 1;
 
-    // Draw visible window
+    // ---------------------------------
+    // Detect encoder/menu direction
+    // ---------------------------------
+    bool movedDown =
+        menuIdx == wrapMenuIndex(previousMenuIdx + 1);
+
+    bool movedUp =
+        menuIdx == wrapMenuIndex(previousMenuIdx - 1);
+
+    // ---------------------------------
+    // Check whether selected item is
+    // currently inside our visible window
+    // ---------------------------------
+    int selectedRow = -1;
+
     for (int row = 0; row < VISIBLE_ROWS; row++)
     {
-        int itemIndex = menuScrollOffset + row;
+        int itemIndex =
+            wrapMenuIndex(menuScrollOffset + row);
 
-        if (itemIndex > LAST_ITEM(menu))
+        if (itemIndex == menuIdx)
+        {
+            selectedRow = row;
             break;
+        }
+    }
 
-        int y = FIRST_Y + row * ROW_SPACING;
+    // ---------------------------------
+    // If selection moved beyond window,
+    // scroll the list by ONE item.
+    //
+    // This also handles:
+    // Settings -> Band
+    // Band -> Settings
+    // continuously.
+    // ---------------------------------
+    if (selectedRow == -1)
+    {
+        if (movedDown)
+        {
+            menuScrollOffset =
+                wrapMenuIndex(menuScrollOffset + 1);
+        }
+        else if (movedUp)
+        {
+            menuScrollOffset =
+                wrapMenuIndex(menuScrollOffset - 1);
+        }
+    }
+
+    previousMenuIdx = menuIdx;
+
+    // ---------------------------------
+    // Draw the six visible rows
+    // ---------------------------------
+    for (int row = 0; row < VISIBLE_ROWS; row++)
+    {
+        int itemIndex =
+            wrapMenuIndex(menuScrollOffset + row);
+
+        int y =
+            FIRST_Y + row * ROW_SPACING;
 
         drawNewMenuItem(
-            menu[itemIndex],
+            getNewMenuName(itemIndex),
             y,
             menuIdx == itemIndex,
             menuActive
