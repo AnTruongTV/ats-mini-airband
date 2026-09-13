@@ -94,6 +94,8 @@ static int8_t previousMenuIdx = MENU_MEMORY;
 static int8_t menuMoveDir = 0;
 static int8_t bandScrollOffset = 0;
 static int8_t bandMenuMoveDir = 0;
+static int bandScrollOffset = 0;
+static int previousBandIdx = -1;
 
 static const char *menu[] =
 {
@@ -1072,18 +1074,20 @@ void doSoftMute(int16_t enc)
 
 void doBand(int16_t enc)
 {
-    if (enc > 0)
-        bandMenuMoveDir = 1;
-    else if (enc < 0)
-        bandMenuMoveDir = -1;
-    else
+    if (enc == 0)
         return;
 
-    bands[bandIdx].currentFreq = currentFrequency + currentBFO / 1000;
+    // Save current band settings
+    bands[bandIdx].currentFreq =
+        currentFrequency + currentBFO / 1000;
+
     bands[bandIdx].bandMode = currentMode;
 
+    // Existing firmware logic:
+    // automatically skips AIR when DCV is OFF
     bandIdx = getValidBandIdx(bandIdx, enc);
 
+    // Enable selected band
     selectBand(bandIdx);
 }
 
@@ -1421,7 +1425,7 @@ static void drawNewBandMenu()
     constexpr int ROW_SPACING = 13;
 
     // ------------------------------------------------------------
-    // Build a list of bands that are actually visible/selectable
+    // Build filtered list of selectable bands
     // ------------------------------------------------------------
 
     int validBands[64];
@@ -1431,7 +1435,7 @@ static void drawNewBandMenu()
 
     for (int i = 0; i < totalBands; i++)
     {
-        // AIR is raw band index 2.
+        // AIR is fixed at raw index 2.
         // Hide it completely when DCV is OFF.
         if (i == 2 && currentDCVIdx == 0)
             continue;
@@ -1439,11 +1443,11 @@ static void drawNewBandMenu()
         validBands[validCount++] = i;
     }
 
-    if (validCount <= 0)
+    if (validCount == 0)
         return;
 
     // ------------------------------------------------------------
-    // Find current band inside filtered list
+    // Find selected band inside filtered list
     // ------------------------------------------------------------
 
     int selectedPos = 0;
@@ -1458,7 +1462,7 @@ static void drawNewBandMenu()
     }
 
     // ------------------------------------------------------------
-    // If there are <= 6 valid bands, no scrolling is needed
+    // Six or fewer items: no scrolling
     // ------------------------------------------------------------
 
     if (validCount <= MAX_VISIBLE_ROWS)
@@ -1478,11 +1482,39 @@ static void drawNewBandMenu()
             );
         }
 
+        previousBandIdx = bandIdx;
         return;
     }
 
     // ------------------------------------------------------------
-    // Find selected item inside current 6-row window
+    // Determine movement direction from filtered positions
+    // ------------------------------------------------------------
+
+    int previousPos = selectedPos;
+
+    if (previousBandIdx >= 0)
+    {
+        for (int i = 0; i < validCount; i++)
+        {
+            if (validBands[i] == previousBandIdx)
+            {
+                previousPos = i;
+                break;
+            }
+        }
+    }
+
+    int delta = selectedPos - previousPos;
+
+    // Circular wrap correction
+    if (delta > validCount / 2)
+        delta -= validCount;
+
+    if (delta < -(validCount / 2))
+        delta += validCount;
+
+    // ------------------------------------------------------------
+    // Check whether selected band is visible
     // ------------------------------------------------------------
 
     int selectedRow = -1;
@@ -1500,25 +1532,21 @@ static void drawNewBandMenu()
     }
 
     // ------------------------------------------------------------
-    // Selected item moved outside visible window.
-    //
-    // Same behavior as main menu:
-    //
-    // moving down -> selected appears on bottom row
-    // moving up   -> selected appears on top row
+    // Scroll only when selection leaves the window
     // ------------------------------------------------------------
 
     if (selectedRow == -1)
     {
-        if (bandMenuMoveDir > 0)
+        if (delta > 0)
         {
+            // Put selected item on bottom row
             bandScrollOffset =
                 selectedPos - (MAX_VISIBLE_ROWS - 1);
         }
-        else if (bandMenuMoveDir < 0)
+        else if (delta < 0)
         {
-            bandScrollOffset =
-                selectedPos;
+            // Put selected item on top row
+            bandScrollOffset = selectedPos;
         }
 
         while (bandScrollOffset < 0)
@@ -1528,8 +1556,10 @@ static void drawNewBandMenu()
             bandScrollOffset -= validCount;
     }
 
+    previousBandIdx = bandIdx;
+
     // ------------------------------------------------------------
-    // Draw six visible rows
+    // Draw visible window
     // ------------------------------------------------------------
 
     for (int row = 0; row < MAX_VISIBLE_ROWS; row++)
