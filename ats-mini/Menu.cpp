@@ -92,6 +92,8 @@ int8_t menuIdx = MENU_MEMORY;
 static int8_t menuScrollOffset = 0;
 static int8_t previousMenuIdx = MENU_MEMORY;
 static int8_t menuMoveDir = 0;
+static int8_t bandScrollOffset = 0;
+static int8_t bandMenuMoveDir = 0;
 
 static const char *menu[] =
 {
@@ -1070,15 +1072,19 @@ void doSoftMute(int16_t enc)
 
 void doBand(int16_t enc)
 {
-  // Save current band settings
-  bands[bandIdx].currentFreq = currentFrequency + currentBFO / 1000;
-  bands[bandIdx].bandMode = currentMode;
+    if (enc > 0)
+        bandMenuMoveDir = 1;
+    else if (enc < 0)
+        bandMenuMoveDir = -1;
+    else
+        return;
 
-  // Change band: Tự động bỏ qua Airband nếu DCV OFF
-  bandIdx = getValidBandIdx(bandIdx, enc);
+    bands[bandIdx].currentFreq = currentFrequency + currentBFO / 1000;
+    bands[bandIdx].bandMode = currentMode;
 
-  // Enable the new band
-  selectBand(bandIdx);
+    bandIdx = getValidBandIdx(bandIdx, enc);
+
+    selectBand(bandIdx);
 }
 
 void doBandwidth(int16_t enc)
@@ -1414,91 +1420,133 @@ static void drawNewBandMenu()
     constexpr int FIRST_Y = 96;
     constexpr int ROW_SPACING = 13;
 
-    int bandCount = getTotalBands();
+    // ------------------------------------------------------------
+    // Build a list of bands that are actually visible/selectable
+    // ------------------------------------------------------------
 
-    // If there are 6 or fewer bands, just show all of them.
-    int visibleRows =
-        (bandCount < MAX_VISIBLE_ROWS)
-            ? bandCount
-            : MAX_VISIBLE_ROWS;
+    int validBands[64];
+    int validCount = 0;
 
-    for (int row = 0; row < visibleRows; row++)
+    const int totalBands = getTotalBands();
+
+    for (int i = 0; i < totalBands; i++)
     {
-        int y = FIRST_Y + row * ROW_SPACING;
+        // AIR is raw band index 2.
+        // Hide it completely when DCV is OFF.
+        if (i == 2 && currentDCVIdx == 0)
+            continue;
 
-        drawNewMenuItem(
-            bands[row].bandName,
-            y,
-            row == bandIdx,
-            true
-        );
+        validBands[validCount++] = i;
     }
-}
 
-void drawNewMenu()
-{
-    spr.setTextDatum(MC_DATUM);
-    spr.setTextColor(TFT_WHITE);
+    if (validCount <= 0)
+        return;
 
-    // Header
-    spr.drawString("Menu", 36, 80, 2);
+    // ------------------------------------------------------------
+    // Find current band inside filtered list
+    // ------------------------------------------------------------
 
-    bool menuActive =
-        (currentCmd == CMD_MENU);
+    int selectedPos = 0;
 
-    constexpr int VISIBLE_ROWS = 6;
-    constexpr int FIRST_Y = 96;
-    constexpr int ROW_SPACING = 13;
+    for (int i = 0; i < validCount; i++)
+    {
+        if (validBands[i] == bandIdx)
+        {
+            selectedPos = i;
+            break;
+        }
+    }
 
-    // Find selected item in visible window
+    // ------------------------------------------------------------
+    // If there are <= 6 valid bands, no scrolling is needed
+    // ------------------------------------------------------------
+
+    if (validCount <= MAX_VISIBLE_ROWS)
+    {
+        bandScrollOffset = 0;
+
+        for (int row = 0; row < validCount; row++)
+        {
+            int idx = validBands[row];
+            int y = FIRST_Y + row * ROW_SPACING;
+
+            drawNewMenuItem(
+                bands[idx].bandName,
+                y,
+                idx == bandIdx,
+                true
+            );
+        }
+
+        return;
+    }
+
+    // ------------------------------------------------------------
+    // Find selected item inside current 6-row window
+    // ------------------------------------------------------------
+
     int selectedRow = -1;
 
-    for (int row = 0; row < VISIBLE_ROWS; row++)
+    for (int row = 0; row < MAX_VISIBLE_ROWS; row++)
     {
-        int itemIndex =
-            wrapMenuIndex(menuScrollOffset + row);
+        int pos =
+            (bandScrollOffset + row) % validCount;
 
-        if (itemIndex == menuIdx)
+        if (validBands[pos] == bandIdx)
         {
             selectedRow = row;
             break;
         }
     }
 
-    // If acceleration moves selection outside visible window,
-    // reposition the visible window based on movement direction.
+    // ------------------------------------------------------------
+    // Selected item moved outside visible window.
+    //
+    // Same behavior as main menu:
+    //
+    // moving down -> selected appears on bottom row
+    // moving up   -> selected appears on top row
+    // ------------------------------------------------------------
+
     if (selectedRow == -1)
     {
-        if (menuMoveDir > 0)
+        if (bandMenuMoveDir > 0)
         {
-            menuScrollOffset =
-                wrapMenuIndex(
-                    menuIdx - (VISIBLE_ROWS - 1)
-                );
+            bandScrollOffset =
+                selectedPos - (MAX_VISIBLE_ROWS - 1);
         }
-        else if (menuMoveDir < 0)
+        else if (bandMenuMoveDir < 0)
         {
-            menuScrollOffset =
-                wrapMenuIndex(menuIdx);
+            bandScrollOffset =
+                selectedPos;
         }
+
+        while (bandScrollOffset < 0)
+            bandScrollOffset += validCount;
+
+        while (bandScrollOffset >= validCount)
+            bandScrollOffset -= validCount;
     }
 
-    previousMenuIdx = menuIdx;
+    // ------------------------------------------------------------
+    // Draw six visible rows
+    // ------------------------------------------------------------
 
-    // Draw visible rows
-    for (int row = 0; row < VISIBLE_ROWS; row++)
+    for (int row = 0; row < MAX_VISIBLE_ROWS; row++)
     {
-        int itemIndex =
-            wrapMenuIndex(menuScrollOffset + row);
+        int pos =
+            (bandScrollOffset + row) % validCount;
+
+        int idx = validBands[pos];
 
         int y =
             FIRST_Y + row * ROW_SPACING;
 
         drawNewMenuItem(
-            getNewMenuName(itemIndex),
+            bands[idx].bandName,
             y,
-            menuIdx == itemIndex,
-            menuActive
+            idx == bandIdx,
+            true
         );
     }
 }
