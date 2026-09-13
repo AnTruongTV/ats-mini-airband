@@ -49,15 +49,18 @@ static void drawNewBandScale()
     // ============================================================
 
     // Band-edge text anchor points
+    // Band-edge label centres
     constexpr int LEFT_FREQ_X  = 94;
     constexpr int RIGHT_FREQ_X = 294;
 
-    // Scale end circles
+    // Keep original vertical position
+    constexpr int FREQ_Y = 103;
+
+    // Scale
     constexpr int SCALE_LEFT_X  = 122;
     constexpr int SCALE_RIGHT_X = 268;
     constexpr int SCALE_Y       = 111;
 
-    // Dotted line between endpoint circles
     constexpr int DOT_START_X = 126;
     constexpr int DOT_END_X   = 264;
 
@@ -198,7 +201,11 @@ static void drawNewBandScale()
     // ============================================================
 
     spr.setTextColor(TFT_WHITE);
-    spr.setTextDatum(MC_DATUM);
+
+    // Top-centre:
+    // horizontally centred on our anchor,
+    // but keeps the original Y position.
+    spr.setTextDatum(TC_DATUM);
 
     spr.drawString(
         leftText,
@@ -213,7 +220,6 @@ static void drawNewBandScale()
         FREQ_Y,
         2
     );
-
 
     // ============================================================
     // Endpoint circles
