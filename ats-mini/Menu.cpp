@@ -424,6 +424,8 @@ static const Step amSteps[] =
 
 static const Step *steps[4] = { fmSteps, ssbSteps, ssbSteps, amSteps };
 static const uint8_t defaultStepIdx[4] = { 2, 5, 5, 1 };
+static int stepScrollOffset = 0;
+static int previousStepIdx = -1;
 
 static int getLastStep(int mode)
 {
@@ -1649,11 +1651,163 @@ static void drawNewBandMenu()
     }
 }
 
+static void drawNewStepMenu()
+{
+    spr.setTextColor(TFT_WHITE);
+    spr.setTextDatum(MC_DATUM);
+
+    // Header
+    spr.drawString("Step", 36, 80, 2);
+
+    constexpr int MAX_VISIBLE_ROWS = 6;
+    constexpr int FIRST_Y = 96;
+    constexpr int ROW_SPACING = 13;
+
+    // ============================================================
+    // AIR uses its own 25k / 8.33k spacing list
+    // ============================================================
+
+    if (bandIdx == 2)
+    {
+        constexpr int AIR_STEP_COUNT = 2;
+
+        for (int row = 0; row < AIR_STEP_COUNT; row++)
+        {
+            int y = FIRST_Y + row * ROW_SPACING;
+
+            drawNewMenuItem(
+                airStepDesc[row],
+                y,
+                row == currentAirSpacing,
+                true
+            );
+        }
+
+        return;
+    }
+
+    // ============================================================
+    // Normal FM / AM / SSB step list
+    // ============================================================
+
+    const int stepCount = getLastStep(currentMode) + 1;
+
+    int selectedIdx = bands[bandIdx].currentStepIdx;
+
+    // Safety: same idea already used by getCurrentStep()
+    if (selectedIdx >= stepCount)
+        selectedIdx = defaultStepIdx[currentMode];
+
+    // ============================================================
+    // 6 or fewer choices: simply draw them
+    // ============================================================
+
+    if (stepCount <= MAX_VISIBLE_ROWS)
+    {
+        stepScrollOffset = 0;
+
+        for (int row = 0; row < stepCount; row++)
+        {
+            int y = FIRST_Y + row * ROW_SPACING;
+
+            drawNewMenuItem(
+                steps[currentMode][row].desc,
+                y,
+                row == selectedIdx,
+                true
+            );
+        }
+
+        previousStepIdx = selectedIdx;
+        return;
+    }
+
+    // ============================================================
+    // More than 6 choices: same scrolling style as main menu
+    // ============================================================
+
+    int selectedRow = -1;
+
+    for (int row = 0; row < MAX_VISIBLE_ROWS; row++)
+    {
+        int pos =
+            (stepScrollOffset + row) % stepCount;
+
+        if (pos == selectedIdx)
+        {
+            selectedRow = row;
+            break;
+        }
+    }
+
+    int delta = 0;
+
+    if (previousStepIdx >= 0)
+    {
+        delta = selectedIdx - previousStepIdx;
+
+        // Circular wrap correction
+        if (delta > stepCount / 2)
+            delta -= stepCount;
+
+        if (delta < -(stepCount / 2))
+            delta += stepCount;
+    }
+
+    if (selectedRow == -1)
+    {
+        if (delta > 0)
+        {
+            // selected item appears on bottom row
+            stepScrollOffset =
+                selectedIdx - (MAX_VISIBLE_ROWS - 1);
+        }
+        else if (delta < 0)
+        {
+            // selected item appears on top row
+            stepScrollOffset =
+                selectedIdx;
+        }
+
+        while (stepScrollOffset < 0)
+            stepScrollOffset += stepCount;
+
+        while (stepScrollOffset >= stepCount)
+            stepScrollOffset -= stepCount;
+    }
+
+    previousStepIdx = selectedIdx;
+
+    // ============================================================
+    // Draw visible rows
+    // ============================================================
+
+    for (int row = 0; row < MAX_VISIBLE_ROWS; row++)
+    {
+        int pos =
+            (stepScrollOffset + row) % stepCount;
+
+        int y =
+            FIRST_Y + row * ROW_SPACING;
+
+        drawNewMenuItem(
+            steps[currentMode][pos].desc,
+            y,
+            pos == selectedIdx,
+            true
+        );
+    }
+}
+
 void drawNewMenuPanel()
 {
     if (currentCmd == CMD_BAND)
     {
         drawNewBandMenu();
+    }
+    else if (currentCmd == CMD_STEP)
+    {
+        drawNewStepMenu();
     }
     else
     {
