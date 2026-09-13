@@ -48,9 +48,12 @@ static void drawNewBandScale()
     // Scale geometry
     // ============================================================
 
-    // Band-edge text anchor points
+    // Band-edge label centres
     constexpr int LEFT_FREQ_X  = 96;
     constexpr int RIGHT_FREQ_X = 295;
+
+    // Keep original vertical position
+    constexpr int FREQ_Y = 103;
 
     // Scale end circles
     constexpr int SCALE_LEFT_X  = 122;
@@ -61,10 +64,6 @@ static void drawNewBandScale()
     constexpr int DOT_START_X = 126;
     constexpr int DOT_END_X   = 264;
 
-    // Keep the old vertical position
-    constexpr int FREQ_Y = 103;
-
-
     // ============================================================
     // Current band information
     // ============================================================
@@ -74,7 +73,6 @@ static void drawNewBandScale()
     uint32_t displayFreq = currentFrequency;
     uint32_t displayMin  = band->minimumFreq;
     uint32_t displayMax  = band->maximumFreq;
-
 
     // ============================================================
     // AIR / DCV
@@ -88,7 +86,6 @@ static void drawNewBandScale()
             dcvOffset = 100000;
         else if (currentDCVIdx == 2)
             dcvOffset = 110000;
-
 
         // --------------------------------------------------------
         // Frequency shown to the user
@@ -108,21 +105,15 @@ static void drawNewBandScale()
         }
         else
         {
-            displayFreq =
-                currentFrequency + dcvOffset;
+            displayFreq = currentFrequency + dcvOffset;
         }
-
 
         // --------------------------------------------------------
         // Visible band limits
         // --------------------------------------------------------
 
-        displayMin =
-            band->minimumFreq + dcvOffset;
-
-        displayMax =
-            band->maximumFreq + dcvOffset;
-
+        displayMin = band->minimumFreq + dcvOffset;
+        displayMax = band->maximumFreq + dcvOffset;
 
         // 110 MHz DCV hardware limit:
         // raw tuner max 27 MHz -> displayed 137 MHz
@@ -130,15 +121,12 @@ static void drawNewBandScale()
             displayMax = 137000;
     }
 
-
     // ============================================================
     // SSB BFO correction
     // ============================================================
 
     else if (isSSB())
     {
-        // Scale is in kHz, so keep the fractional BFO only
-        // for position calculation.
         int64_t correctedHz =
             (int64_t)currentFrequency * 1000 +
             currentBFO;
@@ -146,10 +134,8 @@ static void drawNewBandScale()
         if (correctedHz < 0)
             correctedHz = 0;
 
-        displayFreq =
-            correctedHz / 1000;
+        displayFreq = correctedHz / 1000;
     }
-
 
     // ============================================================
     // Safety
@@ -165,7 +151,6 @@ static void drawNewBandScale()
 
     if (markerFreq > displayMax)
         markerFreq = displayMax;
-
 
     // ============================================================
     // Format band-edge labels
@@ -186,20 +171,14 @@ static void drawNewBandScale()
         displayMax
     );
 
-
     // ============================================================
     // Band-edge labels
-    //
-    // Both numbers are centred around fixed anchor points.
-    // Therefore 520, 64.00, 118.00, etc. stay properly centred
-    // regardless of how many characters they contain.
     // ============================================================
 
     spr.setTextColor(TFT_WHITE);
 
-    // Top-centre:
-    // horizontally centred on our anchor,
-    // but keeps the original Y position.
+    // Horizontally center the text,
+    // but keep the old vertical position.
     spr.setTextDatum(TC_DATUM);
 
     spr.drawString(
@@ -234,7 +213,6 @@ static void drawNewBandScale()
         TFT_WHITE
     );
 
-
     // ============================================================
     // Dotted scale
     // ============================================================
@@ -249,7 +227,6 @@ static void drawNewBandScale()
             TFT_WHITE
         );
     }
-
 
     // ============================================================
     // Frequency -> scale position
@@ -267,7 +244,6 @@ static void drawNewBandScale()
          (SCALE_RIGHT_X - SCALE_LEFT_X)) /
         range;
 
-
     // ============================================================
     // Current-frequency marker
     // ============================================================
@@ -279,8 +255,7 @@ static void drawNewBandScale()
         TFT_RED
     );
 
-
-    // Restore common datum for other UI drawing
+    // Restore common datum
     spr.setTextDatum(TL_DATUM);
 }
 
