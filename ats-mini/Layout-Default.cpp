@@ -750,7 +750,7 @@ char snrText[16];
 int strength = getStrength(rssi);
 
 if (strength < 1 || strength > 17)
-  strength = 1;
+    strength = 1;
 
 snprintf(snrText, sizeof(snrText), "SNR: %udB", snr);
 
@@ -760,51 +760,59 @@ spr.setTextDatum(TL_DATUM);
 // SNR
 spr.drawString(snrText, 5, 41, 2);
 
+// ============================================================
 // Volume
+// ============================================================
+
 constexpr int VOL_X = 5;
 constexpr int VOL_Y = 55;
 
+// "Vol:" always stays visible
+spr.setTextColor(TFT_WHITE);
 spr.drawString("Vol:", VOL_X, VOL_Y, 2);
 
 char volValue[12];
 
 bool mainMuted = muteOn(MUTE_MAIN, 2);
 
-uint8_t volSqlRaw   = currentSquelch[currentMode];
+uint8_t volSqlRaw = currentSquelch[currentMode];
 uint8_t volSqlValue = volSqlRaw & 0x7F;
 
 bool sqlEnabled = (volSqlValue > 0);
-bool sqlMuted   = muteOn(MUTE_SQUELCH, 2);
+bool sqlMuted = muteOn(MUTE_SQUELCH, 2);
 
+// Value text
 if (mainMuted)
-  snprintf(volValue, sizeof(volValue), "Muted");
+    snprintf(volValue, sizeof(volValue), "Muted");
 else if (sqlEnabled)
-  snprintf(volValue, sizeof(volValue), "%u/sq", volume);
+    snprintf(volValue, sizeof(volValue), "%u/sq", volume);
 else
-  snprintf(volValue, sizeof(volValue), "%u", volume);
+    snprintf(volValue, sizeof(volValue), "%u", volume);
 
 int valueX = VOL_X + spr.textWidth("Vol:", 2) + 2;
-int w = spr.textWidth(volValue, 2);
+int valueW = spr.textWidth(volValue, 2);
 
-// Red background first
-if (mainMuted || sqlMuted)
+// Only the value flashes while Volume is being adjusted
+bool showVolValue = true;
+
+if (currentCmd == CMD_VOLUME)
+    showVolValue = ((millis() / 500) % 2) == 0;
+
+if (showVolValue)
 {
-  spr.fillRect(
-    valueX - 1,
-    VOL_Y + 1,
-    w + 2,
-    14,
-    TFT_RED
-  );
-}
+    // Red background:
+    // - main mute
+    // - squelch mute
+    if (mainMuted || sqlMuted)
+        spr.fillRect(valueX - 1, VOL_Y + 1, valueW + 2, 14, TFT_RED);
 
-// Text on top
-spr.setTextColor(TFT_WHITE);
-spr.drawString(volValue, valueX, VOL_Y, 2);
+    spr.setTextColor(TFT_WHITE);
+    spr.drawString(volValue, valueX, VOL_Y, 2);
+}
 
 // Signal bars
 drawSignalBars(strength);
-
+  
 char agcAttText[16];
 char avcText[16];
 char sqlText[16];
