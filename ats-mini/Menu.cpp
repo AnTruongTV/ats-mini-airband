@@ -96,6 +96,8 @@ static int8_t previousMenuIdx = MENU_MEMORY;
 static int bandScrollOffset = 0;
 static int previousBandIdx = -1;
 static int8_t menuMoveDir = 0;
+static int bwScrollOffset = 0;
+static int previousBwIdx = -1;
 
 static const char *menu[] =
 {
@@ -1910,7 +1912,7 @@ static void drawNewBandwidthMenu()
     constexpr int FIRST_Y = 96;
     constexpr int ROW_SPACING = 13;
 
-    // AIR and NDB are displayed as Auto
+    // AIR / NDB: display Auto only
     if (bandIdx == 2 || bandIdx == 3)
     {
         drawNewMenuItem("Auto", FIRST_Y, true, true);
@@ -1921,28 +1923,63 @@ static void drawNewBandwidthMenu()
     int bwCount = getLastBandwidth(currentMode) + 1;
     int selectedIdx = bands[bandIdx].bandwidthIdx;
 
-    if (selectedIdx > getLastBandwidth(currentMode))
+    if (selectedIdx < 0 || selectedIdx >= bwCount)
         selectedIdx = defaultBwIdx[currentMode];
 
+    // 6 or fewer entries: no scrolling needed
     if (bwCount <= MAX_VISIBLE_ROWS)
     {
+        bwScrollOffset = 0;
+
         for (int row = 0; row < bwCount; row++)
         {
             int y = FIRST_Y + row * ROW_SPACING;
             drawNewMenuItem(bwList[row].desc, y, row == selectedIdx, true);
         }
+
+        previousBwIdx = selectedIdx;
         return;
     }
 
-    int scrollOffset = selectedIdx - (MAX_VISIBLE_ROWS - 1);
+    // Work out movement direction, including wrap
+    int previousPos = (previousBwIdx >= 0) ? previousBwIdx : selectedIdx;
+    int delta = selectedIdx - previousPos;
 
-    if (scrollOffset < 0) scrollOffset = 0;
-    if (scrollOffset > bwCount - MAX_VISIBLE_ROWS)
-        scrollOffset = bwCount - MAX_VISIBLE_ROWS;
+    if (delta > bwCount / 2) delta -= bwCount;
+    if (delta < -(bwCount / 2)) delta += bwCount;
+
+    // Find selected item in current visible window
+    int selectedRow = -1;
 
     for (int row = 0; row < MAX_VISIBLE_ROWS; row++)
     {
-        int itemIndex = scrollOffset + row;
+        int pos = (bwScrollOffset + row) % bwCount;
+
+        if (pos == selectedIdx)
+        {
+            selectedRow = row;
+            break;
+        }
+    }
+
+    // If selection moved outside window, scroll circularly
+    if (selectedRow == -1)
+    {
+        if (delta > 0)
+            bwScrollOffset = selectedIdx - (MAX_VISIBLE_ROWS - 1);
+        else if (delta < 0)
+            bwScrollOffset = selectedIdx;
+
+        while (bwScrollOffset < 0) bwScrollOffset += bwCount;
+        while (bwScrollOffset >= bwCount) bwScrollOffset -= bwCount;
+    }
+
+    previousBwIdx = selectedIdx;
+
+    // Draw circular visible window
+    for (int row = 0; row < MAX_VISIBLE_ROWS; row++)
+    {
+        int itemIndex = (bwScrollOffset + row) % bwCount;
         int y = FIRST_Y + row * ROW_SPACING;
 
         drawNewMenuItem(
