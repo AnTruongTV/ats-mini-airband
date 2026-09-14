@@ -99,7 +99,6 @@ static int8_t menuMoveDir = 0;
 static int bwScrollOffset = 0;
 static int previousBwIdx = -1;
 static int settingsScrollOffset = 0;
-static int previousSettingsIdx = -1;
 static int8_t settingsMoveDir = 0;
 
 static const char *menu[] =
@@ -1722,7 +1721,7 @@ static void drawNewStepMenu()
 
     if (bandIdx == 2)
   {
-    const int airOrder[] = { AIR_833, AIR_25 };
+    const int airOrder[] = { AIR_833, AIR_25K };
 
     for (int row = 0; row < 2; row++)
     {
