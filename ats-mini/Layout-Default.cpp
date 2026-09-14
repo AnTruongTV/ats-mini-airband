@@ -767,11 +767,8 @@ spr.drawString(snrText, 5, 41, 2);
 constexpr int VOL_X = 5;
 constexpr int VOL_Y = 55;
 
-// "Vol:" always stays visible
 spr.setTextColor(TFT_WHITE);
 spr.drawString("Vol:", VOL_X, VOL_Y, 2);
-
-char volValue[12];
 
 bool mainMuted = muteOn(MUTE_MAIN, 2);
 
@@ -781,33 +778,83 @@ uint8_t volSqlValue = volSqlRaw & 0x7F;
 bool sqlEnabled = (volSqlValue > 0);
 bool sqlMuted = muteOn(MUTE_SQUELCH, 2);
 
-// Value text
-if (mainMuted)
-    snprintf(volValue, sizeof(volValue), "Muted");
-else if (sqlEnabled)
-    snprintf(volValue, sizeof(volValue), "%u/sq", volume);
-else
-    snprintf(volValue, sizeof(volValue), "%u", volume);
-
-int valueX = VOL_X + spr.textWidth("Vol:", 2) + 2;
-int valueW = spr.textWidth(volValue, 2);
-
-// Only the value flashes while Volume is being adjusted
+// Only the adjustable value flashes.
+// New volume changes reset volumeBlinkReset, so the new value appears immediately.
 bool showVolValue = true;
 
 if (currentCmd == CMD_VOLUME)
     showVolValue = (((millis() - volumeBlinkReset) / 500) % 2) == 0;
 
-if (showVolValue)
-{
-    // Red background:
-    // - main mute
-    // - squelch mute
-    if (mainMuted || sqlMuted)
-        spr.fillRect(valueX - 1, VOL_Y + 1, valueW + 2, 14, TFT_RED);
+int valueX = VOL_X + spr.textWidth("Vol:", 2) + 2;
 
+// ============================================================
+// MAIN MUTE
+// Red background always stays.
+// Only "Muted" flashes.
+// ============================================================
+
+if (mainMuted)
+{
+    const char *muteText = "Muted";
+    int w = spr.textWidth(muteText, 2);
+
+    spr.fillRect(valueX - 1, VOL_Y + 1, w + 2, 14, TFT_RED);
+
+    if (showVolValue)
+    {
+        spr.setTextColor(TFT_WHITE);
+        spr.drawString(muteText, valueX, VOL_Y, 2);
+    }
+}
+
+// ============================================================
+// SQL
+// Number flashes.
+// "/sq" and red background stay visible.
+// ============================================================
+
+else if (sqlEnabled)
+{
+    char numberText[6];
+    snprintf(numberText, sizeof(numberText), "%u", volume);
+
+    const char *sqlText = "/sq";
+
+    int numberW = spr.textWidth(numberText, 2);
+    int sqlW = spr.textWidth(sqlText, 2);
+    int sqlX = valueX + numberW;
+
+    // Keep red background visible while squelch is muting
+    if (sqlMuted)
+        spr.fillRect(valueX - 1, VOL_Y + 1, numberW + sqlW + 2, 14, TFT_RED);
+
+    // Flash ONLY the numeric volume
+    if (showVolValue)
+    {
+        spr.setTextColor(TFT_WHITE);
+        spr.drawString(numberText, valueX, VOL_Y, 2);
+    }
+
+    // /sq always stays visible
     spr.setTextColor(TFT_WHITE);
-    spr.drawString(volValue, valueX, VOL_Y, 2);
+    spr.drawString(sqlText, sqlX, VOL_Y, 2);
+}
+
+// ============================================================
+// NORMAL VOLUME
+// Only number flashes while adjusting.
+// ============================================================
+
+else
+{
+    char numberText[6];
+    snprintf(numberText, sizeof(numberText), "%u", volume);
+
+    if (showVolValue)
+    {
+        spr.setTextColor(TFT_WHITE);
+        spr.drawString(numberText, valueX, VOL_Y, 2);
+    }
 }
 
 // Signal bars
