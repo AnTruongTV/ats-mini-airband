@@ -1968,7 +1968,7 @@ void drawNewMenuPanel()
     {
         drawNewModeMenu();
     }
-    else if (currentCmd == CMD_BW)
+    else if (currentCmd == CMD_BANDWIDTH)
     {
         drawNewBandwidthMenu();
     }
