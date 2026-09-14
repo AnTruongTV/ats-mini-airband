@@ -82,6 +82,8 @@ int8_t scrollDirection = 1;             // Menu scroll direction
 // Background screen refresh
 uint32_t background_timer = millis();   // Background screen refresh timer.
 
+uint32_t volumeBlinkTimer = millis();
+
 //
 // Current parameters
 //
@@ -1256,6 +1258,16 @@ void loop()
     background_timer = currentTime;
   }
 
+  // Keep Volume value blinking while CMD_VOLUME is active
+  if(currentCmd == CMD_VOLUME && (currentTime - volumeBlinkTimer) >= 500)
+  {
+    volumeBlinkTimer = currentTime;
+    needRedraw = true;
+  }
+  else if(currentCmd != CMD_VOLUME)
+  {
+    volumeBlinkTimer = currentTime;
+  }
   // Redraw screen if necessary
   if(needRedraw) drawScreen();
 
