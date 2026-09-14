@@ -796,7 +796,7 @@ int valueW = spr.textWidth(volValue, 2);
 bool showVolValue = true;
 
 if (currentCmd == CMD_VOLUME)
-    showVolValue = ((millis() / 500) % 2) == 0;
+    showVolValue = (((millis() - volumeBlinkReset) / 500) % 2) == 0;
 
 if (showVolValue)
 {
