@@ -503,8 +503,37 @@ spr.setTextDatum(MC_DATUM);
 
 // ----- TIME -----
 spr.setTextColor(TFT_WHITE);
-const char *timeText = clockGet();
-spr.drawString(timeText ? timeText : "--:--", 22, 10, 2);
+
+char uptimeText[6];
+
+uint32_t uptimeSeconds = (millis() / 1000) % 6000; // 00:00 -> 99:59 -> 00:00
+uint8_t uptimeMinutes = uptimeSeconds / 60;
+uint8_t uptimeSecs = uptimeSeconds % 60;
+
+snprintf(
+    uptimeText,
+    sizeof(uptimeText),
+    "%02u:%02u",
+    uptimeMinutes,
+    uptimeSecs
+);
+
+if (!clockAvailable())
+{
+    // No valid real time: always show uptime
+    spr.drawString(uptimeText, 22, 10, 2);
+}
+else
+{
+    // Valid clock:
+    // Real time 3 s -> uptime 3 s -> repeat
+    bool showRealTime = ((millis() / 3000) % 2) == 0;
+
+    if (showRealTime)
+        spr.drawString(clockGet(), 22, 10, 2);
+    else
+        spr.drawString(uptimeText, 22, 10, 2);
+}
 
 // ----- DATE -----
 uint16_t year;
