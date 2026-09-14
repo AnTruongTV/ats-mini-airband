@@ -1389,6 +1389,7 @@ static const char *getNewSettingsName(int index)
 {
     switch (index)
     {
+        case 0:  return "Back Lt";   // Brightness
         case 1:  return "BFO";      // Calibration
         case 3:  return "UTC";      // UTC Offset
         case 4:  return "Date";     // Date/Time
