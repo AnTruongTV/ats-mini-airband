@@ -83,6 +83,7 @@ int8_t scrollDirection = 1;             // Menu scroll direction
 uint32_t background_timer = millis();   // Background screen refresh timer.
 
 uint32_t volumeBlinkTimer = millis();
+uint32_t clockDisplayTimer = millis();
 
 //
 // Current parameters
@@ -1246,30 +1247,42 @@ void loop()
   // Tick NETWORK time, connecting to WiFi if requested
   netTickTime();
 
-  // Update clock display
-  needRedraw |= clockUpdate();
+// Update clock display
+needRedraw |= clockUpdate();
 
-  // Periodically refresh the main screen
-  // This covers the case where there is nothing else triggering a refresh
-  if(needRedraw) background_timer = currentTime;
-  if((currentTime - background_timer) > BACKGROUND_REFRESH_TIME)
-  {
-    if(currentCmd == CMD_NONE) needRedraw = true;
+// Refresh uptime / real-time display
+if ((currentTime - clockDisplayTimer) >= 500)
+{
+    clockDisplayTimer = currentTime;
+    needRedraw = true;
+}
+
+// Periodically refresh the main screen
+if (needRedraw)
     background_timer = currentTime;
-  }
 
-  // Keep Volume value blinking while CMD_VOLUME is active
-  if(currentCmd == CMD_VOLUME && (currentTime - volumeBlinkTimer) >= 500)
-  {
+if ((currentTime - background_timer) > BACKGROUND_REFRESH_TIME)
+{
+    if (currentCmd == CMD_NONE)
+        needRedraw = true;
+
+    background_timer = currentTime;
+}
+
+// Keep Volume value blinking while CMD_VOLUME is active
+if (currentCmd == CMD_VOLUME && (currentTime - volumeBlinkTimer) >= 500)
+{
     volumeBlinkTimer = currentTime;
     needRedraw = true;
-  }
-  else if(currentCmd != CMD_VOLUME)
-  {
+}
+else if (currentCmd != CMD_VOLUME)
+{
     volumeBlinkTimer = currentTime;
-  }
-  // Redraw screen if necessary
-  if(needRedraw) drawScreen();
+}
+
+// Redraw screen if necessary
+if (needRedraw)
+    drawScreen();
 
   // Add a small default delay in the main loop
   delay(5);
