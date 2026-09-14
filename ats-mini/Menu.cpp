@@ -98,6 +98,9 @@ static int previousBandIdx = -1;
 static int8_t menuMoveDir = 0;
 static int bwScrollOffset = 0;
 static int previousBwIdx = -1;
+static int settingsScrollOffset = 0;
+static int previousSettingsIdx = -1;
+static int8_t settingsMoveDir = 0;
 
 static const char *menu[] =
 {
@@ -1199,7 +1202,11 @@ static void clickMenu(int cmd, bool shortPress)
 
 static void doSettings(int16_t enc)
 {
-  settingsIdx = wrap_range(settingsIdx, enc, 0, LAST_ITEM(settings));
+    if (enc > 0) settingsMoveDir = 1;
+    else if (enc < 0) settingsMoveDir = -1;
+    else return;
+
+    settingsIdx = wrap_range(settingsIdx, enc, 0, LAST_ITEM(settings));
 }
 
 static void clickSettings(int cmd, bool shortPress)
@@ -1991,27 +1998,59 @@ static void drawNewBandwidthMenu()
     }
 }
 
+static void drawNewSettingsMenu()
+{
+    spr.setTextColor(TFT_WHITE);
+    spr.setTextDatum(MC_DATUM);
+    spr.drawString("Settings", 36, 80, 2);
+
+    constexpr int VISIBLE_ROWS = 6;
+    constexpr int FIRST_Y = 96;
+    constexpr int ROW_SPACING = 13;
+    const int count = ITEM_COUNT(settings);
+
+    int selectedRow = -1;
+
+    for (int row = 0; row < VISIBLE_ROWS; row++)
+    {
+        int idx = (settingsScrollOffset + row) % count;
+
+        if (idx == settingsIdx)
+        {
+            selectedRow = row;
+            break;
+        }
+    }
+
+    if (selectedRow == -1)
+    {
+        if (settingsMoveDir > 0)
+            settingsScrollOffset = settingsIdx - (VISIBLE_ROWS - 1);
+        else if (settingsMoveDir < 0)
+            settingsScrollOffset = settingsIdx;
+
+        while (settingsScrollOffset < 0) settingsScrollOffset += count;
+        while (settingsScrollOffset >= count) settingsScrollOffset -= count;
+    }
+
+    for (int row = 0; row < VISIBLE_ROWS; row++)
+    {
+        int idx = (settingsScrollOffset + row) % count;
+        int y = FIRST_Y + row * ROW_SPACING;
+        drawNewMenuItem(settings[idx], y, idx == settingsIdx, true);
+    }
+}
+
 void drawNewMenuPanel()
 {
-    if (currentCmd == CMD_BAND)
+    switch (currentCmd)
     {
-        drawNewBandMenu();
-    }
-    else if (currentCmd == CMD_STEP)
-    {
-        drawNewStepMenu();
-    }
-    else if (currentCmd == CMD_MODE)
-    {
-        drawNewModeMenu();
-    }
-    else if (currentCmd == CMD_BANDWIDTH)
-    {
-        drawNewBandwidthMenu();
-    }
-    else
-    {
-        drawNewMenu();
+        case CMD_BAND:      drawNewBandMenu();      break;
+        case CMD_STEP:      drawNewStepMenu();      break;
+        case CMD_MODE:      drawNewModeMenu();      break;
+        case CMD_BANDWIDTH: drawNewBandwidthMenu(); break;
+        case CMD_SETTINGS:  drawNewSettingsMenu();  break;
+        default:            drawNewMenu();          break;
     }
 }
 
