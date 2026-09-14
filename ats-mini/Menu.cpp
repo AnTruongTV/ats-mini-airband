@@ -1386,6 +1386,27 @@ static const char *getNewMenuName(int index)
     }
 }
 
+static const char *getNewSettingsName(int index)
+{
+    switch (index)
+    {
+        case 1:  return "BFO";      // Calibration
+        case 3:  return "UTC";      // UTC Offset
+        case 4:  return "Date";     // Date/Time
+        case 5:  return "FM Reg";   // FM Region
+        case 7:  return "Layout";   // UI Layout
+        case 8:  return "Zoom";     // Zoom Menu
+        case 9:  return "Scroll";   // Scroll Dir.
+        case 11: return "Sl.Mode"; // Sleep Mode
+        case 13: return "L.EiBi";     // Load EiBi
+        case 14: return "USB";      // USB Port
+        case 15: return "BLE";       // Bluetooth
+
+        default:
+            return settings[index];
+    }
+}
+
 static void drawNewMenuItem(
     const char *text,
     int y,
@@ -1700,23 +1721,24 @@ static void drawNewStepMenu()
     // ============================================================
 
     if (bandIdx == 2)
+  {
+    const int airOrder[] = { AIR_833, AIR_25 };
+
+    for (int row = 0; row < 2; row++)
     {
-        constexpr int AIR_STEP_COUNT = 2;
+        int idx = airOrder[row];
+        int y = FIRST_Y + row * ROW_SPACING;
 
-        for (int row = 0; row < AIR_STEP_COUNT; row++)
-        {
-            int y = FIRST_Y + row * ROW_SPACING;
-
-            drawNewMenuItem(
-                airStepDesc[row],
-                y,
-                row == currentAirSpacing,
-                true
-            );
-        }
-
-        return;
+        drawNewMenuItem(
+            airStepDesc[idx],
+            y,
+            idx == currentAirSpacing,
+            true
+        );
     }
+
+    return;
+  }
 
     // ============================================================
     // Normal FM / AM / SSB step list
@@ -2037,7 +2059,7 @@ static void drawNewSettingsMenu()
     {
         int idx = (settingsScrollOffset + row) % count;
         int y = FIRST_Y + row * ROW_SPACING;
-        drawNewMenuItem(settings[idx], y, idx == settingsIdx, true);
+        drawNewMenuItem(getNewSettingsName(idx), y, idx == settingsIdx, true);
     }
 }
 
