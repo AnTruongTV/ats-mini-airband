@@ -100,6 +100,7 @@ static int bwScrollOffset = 0;
 static int previousBwIdx = -1;
 static int settingsScrollOffset = 0;
 static int8_t settingsMoveDir = 0;
+uint32_t volumeBlinkReset = 0;
 
 static const char *menu[] =
 {
@@ -725,8 +726,15 @@ void doSelectDigit(int16_t enc)
 
 void doVolume(int16_t enc)
 {
-  volume = clamp_range(volume, enc, 0, 63);
-  if(!muteOn(MUTE_MAIN)) rx.setVolume(volume);
+    uint8_t oldVolume = volume;
+
+    volume = clamp_range(volume, enc, 0, 63);
+
+    if (volume != oldVolume)
+        volumeBlinkReset = millis();
+
+    if (!muteOn(MUTE_MAIN))
+        rx.setVolume(volume);
 }
 
 static void clickVolume(bool shortPress)
