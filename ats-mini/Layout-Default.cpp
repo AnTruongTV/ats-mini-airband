@@ -939,11 +939,17 @@ if ((statusLine1 && statusLine1[0]) ||
 }
 else
 {
-  spr.drawString(agcAttText, 79, 125, 2);
-  spr.drawString(avcText,    79, 148, 2);
+  bool showAgcAtt = true;
 
-  spr.drawString(sqlText,   160, 125, 2);
-  spr.drawString(rssiText,  160, 148, 2);
+  if (currentCmd == CMD_AGC)
+    showAgcAtt = (((millis() - agcBlinkReset) / 500) % 2) == 0;
+
+  if (showAgcAtt)
+    spr.drawString(agcAttText, 79, 125, 2);
+
+  spr.drawString(avcText,   79, 148, 2);
+  spr.drawString(sqlText,  160, 125, 2);
+  spr.drawString(rssiText, 160, 148, 2);
 }
 
 // Saving icon
