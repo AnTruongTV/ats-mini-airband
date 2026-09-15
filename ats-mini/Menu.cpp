@@ -70,10 +70,7 @@ Band bands[] =
 int getTotalBands() { return(ITEM_COUNT(bands)); }
 Band *getCurrentBand() { return(&bands[bandIdx]); }
 
-//
 // Main Menu
-//
-
 #define MENU_BAND         0
 #define MENU_STEP         1
 #define MENU_MEMORY       2
@@ -81,12 +78,10 @@ Band *getCurrentBand() { return(&bands[bandIdx]); }
 #define MENU_SQUELCH      4
 #define MENU_MODE         5
 #define MENU_BW           6
-#define MENU_SEEK         7
-#define MENU_SCAN         8
-#define MENU_AGC_ATT      9
-#define MENU_AVC         10
-#define MENU_SOFTMUTE    11
-#define MENU_SETTINGS    12
+#define MENU_AGC_ATT      7
+#define MENU_AVC          8
+#define MENU_SOFTMUTE     9
+#define MENU_SETTINGS    10
 
 static int8_t menuIdx = MENU_MEMORY;
 // Main menu state
@@ -101,72 +96,58 @@ static int previousBwIdx = -1;
 static int settingsScrollOffset = 0;
 static int8_t settingsMoveDir = 0;
 uint32_t volumeBlinkReset = 0;
-uint32_t agcBlinkReset = 0;
-uint32_t avcBlinkReset = 0;
 
 static const char *menu[] =
 {
-  "Band",
-  "Step",
-  "Memory",
-  "Volume",
-  "Squelch",
-  "Mode",
-  "Bandwidth",
-  "Seek",
-  "Scan",
-  "AGC/ATTN",
-  "AVC",
-  "SoftMute",
-  "Settings",
+    "Band",
+    "Step",
+    "Memory",
+    "Volume",
+    "Squelch",
+    "Mode",
+    "Bandwidth",
+    "AGC/ATTN",
+    "AVC",
+    "SoftMute",
+    "Settings",
 };
 
-//
 // Settings Menu
-//
-
 #define MENU_BRIGHTNESS   0
 #define MENU_CALIBRATION  1
 #define MENU_RDS          2
 #define MENU_UTCOFFSET    3
 #define MENU_DATETIME     4
 #define MENU_FM_REGION    5
-#define MENU_THEME        6
-#define MENU_UI           7
-#define MENU_ZOOM         8
-#define MENU_SCROLL       9
-#define MENU_SLEEP        10
-#define MENU_SLEEPMODE    11
-#define MENU_DCV          12
-#define MENU_LOADEIBI     13
-#define MENU_USBMODE      14
-#define MENU_BLEMODE      15
-#define MENU_WIFIMODE     16
-#define MENU_ABOUT        17
-
+#define MENU_SCROLL       6
+#define MENU_SLEEP        7
+#define MENU_SLEEPMODE    8
+#define MENU_DCV          9
+#define MENU_LOADEIBI    10
+#define MENU_USBMODE     11
+#define MENU_BLEMODE     12
+#define MENU_WIFIMODE    13
+#define MENU_ABOUT       14
 
 int8_t settingsIdx = MENU_BRIGHTNESS;
 
 static const char *settings[] =
 {
-  "Brightness",
-  "Calibration",
-  "RDS",
-  "UTC Offset",
-  "Date/Time",
-  "FM Region",
-  "Theme",
-  "UI Layout",
-  "Zoom Menu",
-  "Scroll Dir.",
-  "Sleep",
-  "Sleep Mode",
-  "DCV",
-  "Load EiBi",
-  "USB Port",
-  "Bluetooth",
-  "Wi-Fi",
-  "About",
+    "Brightness",
+    "Calibration",
+    "RDS",
+    "UTC Offset",
+    "Date/Time",
+    "FM Region",
+    "Scroll Dir.",
+    "Sleep",
+    "Sleep Mode",
+    "DCV",
+    "Load EiBi",
+    "USB Port",
+    "Bluetooth",
+    "Wi-Fi",
+    "About",
 };
 
 //
@@ -1175,7 +1156,6 @@ static void clickMenu(int cmd, bool shortPress)
   switch(cmd)
   {
     case MENU_STEP:     currentCmd = CMD_STEP;      break;
-    case MENU_SEEK:     currentCmd = CMD_SEEK;      break;
     case MENU_MODE:     currentCmd = CMD_MODE;      break;
     case MENU_BW:       currentCmd = CMD_BANDWIDTH; break;
     case MENU_AGC_ATT:  currentCmd = CMD_AGC;       break;
@@ -1201,13 +1181,6 @@ static void clickMenu(int cmd, bool shortPress)
       // No AVC in FM mode
       if(currentMode!=FM) currentCmd = CMD_AVC;
       break;
-
-    case MENU_SCAN:
-      // Run a band scan around current frequency with the same
-      // step as scale resolution (10kHz for AM, 100kHz for FM)
-      currentCmd = CMD_SCAN;
-      clickScan(true);
-      break;
   }
 }
 
@@ -1231,14 +1204,11 @@ static void clickSettings(int cmd, bool shortPress)
     case MENU_CALIBRATION:
       if(isSSB()) currentCmd = CMD_CAL;
       break;
-    case MENU_THEME:      currentCmd = CMD_THEME;      break;
-    case MENU_UI:         currentCmd = CMD_UI;         break;
     case MENU_RDS:        currentCmd = CMD_RDS;        break;
     case MENU_DATETIME:
       dateTimeInit();
       currentCmd = CMD_DATETIME;
       break;
-    case MENU_ZOOM:       currentCmd = CMD_ZOOM;       break;
     case MENU_SCROLL:     currentCmd = CMD_SCROLL;     break;
     case MENU_SLEEP:      currentCmd = CMD_SLEEP;      break;
     case MENU_SLEEPMODE:  currentCmd = CMD_SLEEPMODE;  break;
@@ -1388,12 +1358,10 @@ static const char *getNewMenuName(int index)
 {
     switch (index)
     {
-        case 6:  return "BW";
-        case 9:  return "AGC/AT";
-        case 11: return "S.Mute";
-
-        default:
-            return menu[index];
+        case MENU_BW:       return "BW";
+        case MENU_AGC_ATT:  return "AGC/AT";
+        case MENU_SOFTMUTE: return "S.Mute";
+        default:            return menu[index];
     }
 }
 
@@ -1401,21 +1369,17 @@ static const char *getNewSettingsName(int index)
 {
     switch (index)
     {
-        case 0:  return "Back Lt";   // Brightness
-        case 1:  return "BFO";      // Calibration
-        case 3:  return "UTC";      // UTC Offset
-        case 4:  return "Date";     // Date/Time
-        case 5:  return "FM Reg";   // FM Region
-        case 7:  return "Layout";   // UI Layout
-        case 8:  return "Zoom";     // Zoom Menu
-        case 9:  return "Scroll";   // Scroll Dir.
-        case 11: return "Sl.Mode"; // Sleep Mode
-        case 13: return "L.EiBi";     // Load EiBi
-        case 14: return "USB";      // USB Port
-        case 15: return "BLE";       // Bluetooth
-
-        default:
-            return settings[index];
+        case MENU_BRIGHTNESS:  return "Back Lt";
+        case MENU_CALIBRATION: return "BFO";
+        case MENU_UTCOFFSET:   return "UTC";
+        case MENU_DATETIME:    return "Date";
+        case MENU_FM_REGION:   return "FM Reg";
+        case MENU_SCROLL:      return "Scroll";
+        case MENU_SLEEPMODE:   return "Sl.Mode";
+        case MENU_LOADEIBI:    return "L.EiBi";
+        case MENU_USBMODE:     return "USB";
+        case MENU_BLEMODE:     return "BLE";
+        default:               return settings[index];
     }
 }
 
