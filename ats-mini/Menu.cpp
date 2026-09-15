@@ -1429,6 +1429,8 @@ static void drawNewMenuItem(const char *text, int y, bool selected, bool active,
         spr.setTextDatum(MC_DATUM);
         spr.setTextColor(TFT_WHITE);
         spr.drawString(text, CENTER_X, y, FONT);
+
+        spr.setTextDatum(TL_DATUM);
         return;
     }
 
@@ -1447,6 +1449,9 @@ static void drawNewMenuItem(const char *text, int y, bool selected, bool active,
 
     spr.setTextColor(selectorColor);
     spr.drawString("<", startX + arrowW + GAP + textW + GAP, y, FONT);
+
+    // Restore normal drawing datum
+    spr.setTextDatum(TL_DATUM);
 }
 
 void drawNewMenu()
