@@ -2931,12 +2931,8 @@ void drawSideBar(uint16_t cmd, int x, int y, int sx)
     case CMD_SETTINGS:   drawSettings(x, y, sx);   break;
     case CMD_MODE:       drawMode(x, y, sx);       break;
     case CMD_STEP:       drawStep(x, y, sx);       break;
-    case CMD_SEEK:       drawSeek(x, y, sx);       break;
-    case CMD_SCAN:       drawScan(x, y, sx);       break;
     case CMD_BAND:       drawBand(x, y, sx);       break;
     case CMD_BANDWIDTH:  drawBandwidth(x, y, sx);  break;
-    case CMD_THEME:      drawTheme(x, y, sx);      break;
-    case CMD_UI:         drawUILayout(x, y, sx);   break;
     case CMD_VOLUME:     drawVolume(x, y, sx);     break;
     case CMD_AGC:        drawAgc(x, y, sx);        break;
     case CMD_SOFTMUTE:   drawSoftMuteMaxAtt(x, y, sx);break;
@@ -2951,7 +2947,6 @@ void drawSideBar(uint16_t cmd, int x, int y, int sx)
     case CMD_USBMODE:    drawUSBMode(x, y, sx);    break;
     case CMD_BLEMODE:    drawBleMode(x, y, sx);    break;
     case CMD_WIFIMODE:   drawWiFiMode(x, y, sx);   break;
-    case CMD_ZOOM:       drawZoom(x, y, sx);       break;
     case CMD_SCROLL:     drawScrollDir(x, y, sx);  break;
     case CMD_UTCOFFSET:  drawUTCOffset(x, y, sx);  break;
     case CMD_DATETIME:   drawDateTime(x, y, sx);   break;
