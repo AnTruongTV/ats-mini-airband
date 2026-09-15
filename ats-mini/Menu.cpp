@@ -1458,6 +1458,24 @@ static void drawNewMenuItem(const char *text, int y, bool selected, bool active,
     spr.setTextDatum(TL_DATUM);
 }
 
+static void drawNewSoftMuteMenu()
+{
+    spr.setTextColor(TFT_WHITE);
+    spr.setTextDatum(MC_DATUM);
+
+    // Header
+    spr.drawString("S.Mute", 36, 80, 2);
+
+    // Keep original SoftMute behavior/value
+    uint8_t softMuteValue = isSSB() ? SsbSoftMuteIdx : AmSoftMuteIdx;
+
+    // Large value
+    spr.drawNumber(softMuteValue, 36, 116, 4);
+
+    // Original unit / meaning
+    spr.drawString("dB", 36, 145, 2);
+}
+
 void drawNewMenu()
 {
     spr.setTextDatum(MC_DATUM);
@@ -2097,6 +2115,7 @@ void drawNewMenuPanel()
         case CMD_MODE:      drawNewModeMenu();      break;
         case CMD_BANDWIDTH: drawNewBandwidthMenu(); break;
         case CMD_SQUELCH:   drawNewSquelchMenu();   break;
+        case CMD_SOFTMUTE:  drawNewSoftMuteMenu();  break;
         case CMD_SETTINGS:  drawNewSettingsMenu();  break;
         default:            drawNewMenu();          break;
     }
