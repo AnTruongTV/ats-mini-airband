@@ -84,6 +84,7 @@ uint32_t background_timer = millis();   // Background screen refresh timer.
 
 uint32_t volumeBlinkTimer = millis();
 uint32_t clockDisplayTimer = millis();
+uint32_t agcBlinkTimer = millis();
 
 //
 // Current parameters
@@ -1278,6 +1279,17 @@ if (currentCmd == CMD_VOLUME && (currentTime - volumeBlinkTimer) >= 500)
 else if (currentCmd != CMD_VOLUME)
 {
     volumeBlinkTimer = currentTime;
+}
+
+// Keep AGC/ATTN field blinking while CMD_AGC is active
+if (currentCmd == CMD_AGC && (currentTime - agcBlinkTimer) >= 500)
+{
+    agcBlinkTimer = currentTime;
+    needRedraw = true;
+}
+else if (currentCmd != CMD_AGC)
+{
+    agcBlinkTimer = currentTime;
 }
 
 // Redraw screen if necessary
