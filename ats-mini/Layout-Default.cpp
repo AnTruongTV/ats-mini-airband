@@ -502,6 +502,7 @@ spr.drawRect(253, 2, 40, 16, TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
 
 // ----- TIME -----
+spr.setTextDatum(MC_DATUM);
 spr.setTextColor(TFT_WHITE);
 
 char uptimeText[6];
@@ -511,6 +512,24 @@ if (uptimeSeconds < 3600)
     snprintf(uptimeText, sizeof(uptimeText), "%02lu:%02lu", uptimeSeconds / 60, uptimeSeconds % 60);
 else
     snprintf(uptimeText, sizeof(uptimeText), "%02lu:%02lu", (uptimeSeconds / 3600) % 100, (uptimeSeconds / 60) % 60);
+
+// No valid real time -> uptime only
+if (!clockAvailable())
+{
+    spr.drawString(uptimeText, 22, 10, 2);
+}
+else
+{
+    // Real time 3 sec -> uptime 3 sec
+    bool showRealTime = ((millis() / 3000) % 2) == 0;
+
+    if (showRealTime)
+        spr.drawString(clockGet(), 22, 10, 2);
+    else
+        spr.drawString(uptimeText, 22, 10, 2);
+}
+
+spr.setTextDatum(TL_DATUM);
 
 // ----- DATE -----
 uint16_t year;
