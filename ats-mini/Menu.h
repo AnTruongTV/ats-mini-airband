@@ -91,6 +91,7 @@ extern const FMRegion fmRegions[];
 extern int bandIdx;
 extern uint8_t currentDCVIdx;
 extern uint32_t volumeBlinkReset;
+extern uint32_t agcBlinkReset;
 
 // These are menu commands
 static inline bool isMenuMode(uint16_t cmd)
