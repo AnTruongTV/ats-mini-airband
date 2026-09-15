@@ -101,6 +101,7 @@ static int previousBwIdx = -1;
 static int settingsScrollOffset = 0;
 static int8_t settingsMoveDir = 0;
 uint32_t volumeBlinkReset = 0;
+uint32_t agcBlinkReset = 0;
 
 static const char *menu[] =
 {
@@ -1018,24 +1019,22 @@ void doStep(int16_t enc)
 
 void doAgc(int16_t enc)
 {
-  if(currentMode==FM)
-    agcIdx = FmAgcIdx = wrap_range(FmAgcIdx, enc, 0, 27);
-  else if(isSSB())
-    agcIdx = SsbAgcIdx = wrap_range(SsbAgcIdx, enc, 0, 1);
-  else
-    agcIdx = AmAgcIdx = wrap_range(AmAgcIdx, enc, 0, 37);
+    int oldAgcIdx = agcIdx;
 
-  // Process agcIdx to generate disableAgc and agcIdx
-  // agcIdx     0 1 2 3 4 5 6  ..... n    (n:    FM = 27, AM = 37, SSB = 1)
-  // agcNdx     0 0 1 2 3 4 5  ..... n -1 (n -1: FM = 26, AM = 36, SSB = 0)
-  // disableAgc 0 1 1 1 1 1 1  ..... 1
+    if(currentMode==FM)
+        agcIdx = FmAgcIdx = wrap_range(FmAgcIdx, enc, 0, 27);
+    else if(isSSB())
+        agcIdx = SsbAgcIdx = wrap_range(SsbAgcIdx, enc, 0, 1);
+    else
+        agcIdx = AmAgcIdx = wrap_range(AmAgcIdx, enc, 0, 37);
 
-  // if true, disable AGC; else, AGC is enabled
-  disableAgc = agcIdx>0? 1 : 0;
-  agcNdx     = agcIdx>1? agcIdx - 1 : 0;
+    if (agcIdx != oldAgcIdx)
+        agcBlinkReset = millis();
 
-  // Configure SI4732/5 (if agcNdx = 0, no attenuation)
-  rx.setAutomaticGainControl(disableAgc, agcNdx);
+    disableAgc = agcIdx > 0 ? 1 : 0;
+    agcNdx = agcIdx > 1 ? agcIdx - 1 : 0;
+
+    rx.setAutomaticGainControl(disableAgc, agcNdx);
 }
 
 void doMode(int16_t enc)
@@ -1515,10 +1514,13 @@ void drawNewMenu()
 
     uint16_t selectorColor = TFT_BLUE;
 
-    if (itemIndex == MENU_VOLUME && currentCmd == CMD_VOLUME)
-    selectorColor = TFT_GREEN;
+    bool volumeActive = (itemIndex == MENU_VOLUME && currentCmd == CMD_VOLUME);
+    bool agcActive = (itemIndex == MENU_AGC_ATT && currentCmd == CMD_AGC);
 
-    bool itemActive = menuActive || (itemIndex == MENU_VOLUME && currentCmd == CMD_VOLUME);
+    if (volumeActive || agcActive)
+        selectorColor = TFT_GREEN;
+
+    bool itemActive = menuActive || volumeActive || agcActive;
 
     drawNewMenuItem(
       getNewMenuName(itemIndex),
