@@ -947,9 +947,16 @@ else
   if (showAgcAtt)
     spr.drawString(agcAttText, 79, 125, 2);
 
-  spr.drawString(avcText,   79, 148, 2);
-  spr.drawString(sqlText,  160, 125, 2);
-  spr.drawString(rssiText, 160, 148, 2);
+// AVC
+  bool showAvc = true;
+
+  if (currentCmd == CMD_AVC)
+    showAvc = (((millis() - avcBlinkReset) / 500) % 2) == 0;
+
+  if (showAvc)
+    spr.drawString(avcText, 79, 148, 2);
+    spr.drawString(sqlText, 160, 125, 2);
+    spr.drawString(rssiText, 160, 148, 2);
 }
 
 // Saving icon
