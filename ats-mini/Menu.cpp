@@ -1415,18 +1415,13 @@ static const char *getNewSettingsName(int index)
     }
 }
 
-static void drawNewMenuItem(
-    const char *text,
-    int y,
-    bool selected,
-    bool active
-)
+static void drawNewMenuItem(const char *text, int y, bool selected, bool active, uint16_t activeColor = TFT_BLUE)
 {
     constexpr int CENTER_X = 36;
     constexpr int GAP = 2;
     constexpr int FONT = 2;
 
-    int textW  = spr.textWidth(text, FONT);
+    int textW = spr.textWidth(text, FONT);
     int arrowW = spr.textWidth(">", FONT);
 
     if (!selected)
@@ -1437,42 +1432,21 @@ static void drawNewMenuItem(
         return;
     }
 
-    int totalW =
-        arrowW +
-        GAP +
-        textW +
-        GAP +
-        arrowW;
+    int totalW = arrowW + GAP + textW + GAP + arrowW;
+    int startX = CENTER_X - totalW / 2;
 
-    int startX =
-        CENTER_X - totalW / 2;
-
-    uint16_t selectorColor =
-        active ? TFT_BLUE : TFT_DARKGREY;
+    uint16_t selectorColor = active ? activeColor : TFT_DARKGREY;
 
     spr.setTextDatum(ML_DATUM);
 
-    // >
     spr.setTextColor(selectorColor);
     spr.drawString(">", startX, y, FONT);
 
-    // item
     spr.setTextColor(TFT_WHITE);
-    spr.drawString(
-        text,
-        startX + arrowW + GAP,
-        y,
-        FONT
-    );
+    spr.drawString(text, startX + arrowW + GAP, y, FONT);
 
-    // <
     spr.setTextColor(selectorColor);
-    spr.drawString(
-        "<",
-        startX + arrowW + GAP + textW + GAP,
-        y,
-        FONT
-    );
+    spr.drawString("<", startX + arrowW + GAP + textW + GAP, y, FONT);
 }
 
 void drawNewMenu()
