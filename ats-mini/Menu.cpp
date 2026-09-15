@@ -96,6 +96,8 @@ static int previousBwIdx = -1;
 static int settingsScrollOffset = 0;
 static int8_t settingsMoveDir = 0;
 uint32_t volumeBlinkReset = 0;
+uint32_t agcBlinkReset = 0;
+uint32_t avcBlinkReset = 0;
 
 static const char *menu[] =
 {
