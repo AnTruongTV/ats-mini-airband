@@ -1508,12 +1508,20 @@ void drawNewMenu()
         int y =
             FIRST_Y + row * ROW_SPACING;
 
-        drawNewMenuItem(
-            getNewMenuName(itemIndex),
-            y,
-            menuIdx == itemIndex,
-            menuActive
-        );
+    uint16_t selectorColor = TFT_BLUE;
+
+    if (itemIndex == MENU_VOLUME && currentCmd == CMD_VOLUME)
+    selectorColor = TFT_GREEN;
+
+    bool itemActive = menuActive || (itemIndex == MENU_VOLUME && currentCmd == CMD_VOLUME);
+
+    drawNewMenuItem(
+      getNewMenuName(itemIndex),
+      y,
+      menuIdx == itemIndex,
+      itemActive,
+      selectorColor
+      );
     }
 }
 
