@@ -529,8 +529,6 @@ else
         spr.drawString(uptimeText, 22, 10, 2);
 }
 
-spr.setTextDatum(TL_DATUM);
-
 // ----- DATE -----
 uint16_t year;
 uint8_t month, day, weekday;
