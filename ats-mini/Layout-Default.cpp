@@ -582,11 +582,11 @@ if (bandIdx == 2)
   if (currentAirSpacing == AIR_833)
     spr.drawString("8.33k", 273, 10, 2);
   else
-    spr.drawString("25k", 272, 10, 2);
+    spr.drawString("25k", 273, 10, 2);
 }
 else
 {
-  spr.drawString(getCurrentStep()->desc, 272, 10, 2);
+  spr.drawString(getCurrentStep()->desc, 273, 10, 2);
 }
 
 // ----- Draw BLT+Wifi -----
