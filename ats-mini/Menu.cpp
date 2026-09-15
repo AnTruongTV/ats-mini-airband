@@ -102,6 +102,7 @@ static int settingsScrollOffset = 0;
 static int8_t settingsMoveDir = 0;
 uint32_t volumeBlinkReset = 0;
 uint32_t agcBlinkReset = 0;
+uint32_t avcBlinkReset = 0;
 
 static const char *menu[] =
 {
@@ -789,20 +790,24 @@ static void doUILayout(int16_t enc)
 
 void doAvc(int16_t enc)
 {
-  // Only allow for AM and SSB modes
-  if(currentMode==FM) return;
+    // Only allow for AM and SSB modes
+    if (currentMode == FM) return;
 
-  // wrap_range expects to wrap a range of incremental numbers. avc instead is a range of all even numbers
-  int8_t newAvcIdx = wrap_range((isSSB() ? SsbAvcIdx : AmAvcIdx) / 2, enc, 12 / 2, 90 / 2) * 2;
-  if(isSSB())
-  {
-    SsbAvcIdx = newAvcIdx;
-  }
-  else
-  {
-    AmAvcIdx = newAvcIdx;
-  }
-  rx.setAvcAmMaxGain(newAvcIdx);
+    int8_t oldAvcIdx = isSSB() ? SsbAvcIdx : AmAvcIdx;
+
+    // AVC range is even numbers from 12 to 90
+    int8_t newAvcIdx = wrap_range(oldAvcIdx / 2, enc, 12 / 2, 90 / 2) * 2;
+
+    if (isSSB())
+        SsbAvcIdx = newAvcIdx;
+    else
+        AmAvcIdx = newAvcIdx;
+
+    // New value -> immediately show it and restart blink phase
+    if (newAvcIdx != oldAvcIdx)
+        avcBlinkReset = millis();
+
+    rx.setAvcAmMaxGain(newAvcIdx);
 }
 
 void doFmRegion(int16_t enc)
@@ -1516,11 +1521,12 @@ void drawNewMenu()
 
     bool volumeActive = (itemIndex == MENU_VOLUME && currentCmd == CMD_VOLUME);
     bool agcActive = (itemIndex == MENU_AGC_ATT && currentCmd == CMD_AGC);
+    bool avcActive = (itemIndex == MENU_AVC && currentCmd == CMD_AVC);
 
-    if (volumeActive || agcActive)
+    if (volumeActive || agcActive || avcActive)
         selectorColor = TFT_GREEN;
 
-    bool itemActive = menuActive || volumeActive || agcActive;
+    bool itemActive = menuActive || volumeActive || agcActive || avcActive;
 
     drawNewMenuItem(
       getNewMenuName(itemIndex),
