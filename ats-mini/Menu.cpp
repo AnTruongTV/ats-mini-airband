@@ -2254,41 +2254,41 @@ static void drawStep(int x, int y, int sx)
 }
 
 
-static void drawSeek(int x, int y, int sx)
-{
-  drawCommon(menu[MENU_SEEK], x, y, sx);
-  spr.drawSmoothArc(40+x+(sx/2), 66+y, 30, 27, 45, 180, TH.menu_param, TH.menu_bg);
-  spr.fillTriangle(40+x+(sx/2)-5, 66+y-32, 40+x+(sx/2)+5, 66+y-27, 40+x+(sx/2)-5, 66+y-22, TH.menu_param);
-  spr.drawSmoothArc(40+x+(sx/2), 66+y, 30, 27, 225, 360, TH.menu_param, TH.menu_bg);
-  spr.fillTriangle(40+x+(sx/2)+5, 66+y+32, 40+x+(sx/2)-5, 66+y+27, 40+x+(sx/2)+5, 66+y+22, TH.menu_param);
+// static void drawSeek(int x, int y, int sx)
+// {
+//   drawCommon(menu[MENU_SEEK], x, y, sx);
+//   spr.drawSmoothArc(40+x+(sx/2), 66+y, 30, 27, 45, 180, TH.menu_param, TH.menu_bg);
+//   spr.fillTriangle(40+x+(sx/2)-5, 66+y-32, 40+x+(sx/2)+5, 66+y-27, 40+x+(sx/2)-5, 66+y-22, TH.menu_param);
+//   spr.drawSmoothArc(40+x+(sx/2), 66+y, 30, 27, 225, 360, TH.menu_param, TH.menu_bg);
+//   spr.fillTriangle(40+x+(sx/2)+5, 66+y+32, 40+x+(sx/2)-5, 66+y+27, 40+x+(sx/2)+5, 66+y+22, TH.menu_param);
 
-  if(seekMode()==SEEK_SCHEDULE)
-  {
-    spr.drawCircle(40+x+(sx/2), 66+y, 10, TH.menu_param);
-    spr.drawLine(40+x+(sx/2), 66+y, 40+x+(sx/2), 66+y-7, TH.menu_param);
-    spr.drawLine(40+x+(sx/2), 66+y, 40+x+(sx/2)+4, 66+y+4, TH.menu_param);
-  }
-}
+//   if(seekMode()==SEEK_SCHEDULE)
+//   {
+//     spr.drawCircle(40+x+(sx/2), 66+y, 10, TH.menu_param);
+//     spr.drawLine(40+x+(sx/2), 66+y, 40+x+(sx/2), 66+y-7, TH.menu_param);
+//     spr.drawLine(40+x+(sx/2), 66+y, 40+x+(sx/2)+4, 66+y+4, TH.menu_param);
+//   }
+// }
 
-static void drawScan(int x, int y, int sx)
-{
-  drawCommon(menu[MENU_SCAN], x, y, sx);
-  spr.setTextDatum(MC_DATUM);
-  spr.setTextColor(TH.scan_rssi);
-  spr.drawString("S", 40+x+(sx/2)-30, 66+y+30, 2);
-  spr.setTextColor(TH.scan_snr);
-  spr.drawString("N", 40+x+(sx/2)+30, 66+y+30, 2);
+// static void drawScan(int x, int y, int sx)
+// {
+//   drawCommon(menu[MENU_SCAN], x, y, sx);
+//   spr.setTextDatum(MC_DATUM);
+//   spr.setTextColor(TH.scan_rssi);
+//   spr.drawString("S", 40+x+(sx/2)-30, 66+y+30, 2);
+//   spr.setTextColor(TH.scan_snr);
+//   spr.drawString("N", 40+x+(sx/2)+30, 66+y+30, 2);
 
-  spr.drawSmoothArc(40+x+(sx/2), 66+y, 30, 27, 45, 180, TH.menu_param, TH.menu_bg);
-  spr.fillTriangle(40+x+(sx/2)-5, 66+y-32, 40+x+(sx/2)+5, 66+y-27, 40+x+(sx/2)-5, 66+y-22, TH.menu_param);
-  spr.drawSmoothArc(40+x+(sx/2), 66+y, 30, 27, 225, 360, TH.menu_param, TH.menu_bg);
-  spr.fillTriangle(40+x+(sx/2)+5, 66+y+32, 40+x+(sx/2)-5, 66+y+27, 40+x+(sx/2)+5, 66+y+22, TH.menu_param);
+//   spr.drawSmoothArc(40+x+(sx/2), 66+y, 30, 27, 45, 180, TH.menu_param, TH.menu_bg);
+//   spr.fillTriangle(40+x+(sx/2)-5, 66+y-32, 40+x+(sx/2)+5, 66+y-27, 40+x+(sx/2)-5, 66+y-22, TH.menu_param);
+//   spr.drawSmoothArc(40+x+(sx/2), 66+y, 30, 27, 225, 360, TH.menu_param, TH.menu_bg);
+//   spr.fillTriangle(40+x+(sx/2)+5, 66+y+32, 40+x+(sx/2)-5, 66+y+27, 40+x+(sx/2)+5, 66+y+22, TH.menu_param);
 
-  spr.drawLine(40+x+(sx/2)-17, 66+y+5, 40+x+(sx/2)-4, 66+y+5, TH.menu_param);
-  spr.drawLine(40+x+(sx/2)-4, 66+y+5, 40+x+(sx/2), 66+y-16+5, TH.menu_param);
-  spr.drawLine(40+x+(sx/2), 66+y-16+5, 40+x+(sx/2)+4, 66+y+5, TH.menu_param);
-  spr.drawLine(40+x+(sx/2)+4, 66+y+5, 40+x+(sx/2)+17, 66+y+5, TH.menu_param);
-}
+//   spr.drawLine(40+x+(sx/2)-17, 66+y+5, 40+x+(sx/2)-4, 66+y+5, TH.menu_param);
+//   spr.drawLine(40+x+(sx/2)-4, 66+y+5, 40+x+(sx/2), 66+y-16+5, TH.menu_param);
+//   spr.drawLine(40+x+(sx/2), 66+y-16+5, 40+x+(sx/2)+4, 66+y+5, TH.menu_param);
+//   spr.drawLine(40+x+(sx/2)+4, 66+y+5, 40+x+(sx/2)+17, 66+y+5, TH.menu_param);
+// }
 
 static void drawDCV(int x, int y, int sx)
 {
@@ -2486,48 +2486,48 @@ static void drawWiFiMode(int x, int y, int sx)
   }
 }
 
-static void drawTheme(int x, int y, int sx)
-{
-  drawCommon(settings[MENU_THEME], x, y, sx, true);
+// static void drawTheme(int x, int y, int sx)
+// {
+//   drawCommon(settings[MENU_THEME], x, y, sx, true);
 
-  int count = getTotalThemes();
-  for(int i=-2 ; i<3 ; i++)
-  {
-    if(i==0) {
-      drawZoomedMenu(theme[abs((themeIdx+count+i)%count)].name);
-      spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
-    } else {
-      spr.setTextColor(TH.menu_item);
-    }
+//   int count = getTotalThemes();
+//   for(int i=-2 ; i<3 ; i++)
+//   {
+//     if(i==0) {
+//       drawZoomedMenu(theme[abs((themeIdx+count+i)%count)].name);
+//       spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
+//     } else {
+//       spr.setTextColor(TH.menu_item);
+//     }
 
-    spr.setTextDatum(MC_DATUM);
-    spr.drawString(theme[abs((themeIdx+count+i)%count)].name, 40+x+(sx/2), 64+y+(i*16), 2);
-  }
-}
+//     spr.setTextDatum(MC_DATUM);
+//     spr.drawString(theme[abs((themeIdx+count+i)%count)].name, 40+x+(sx/2), 64+y+(i*16), 2);
+//   }
+// }
 
-static void drawUILayout(int x, int y, int sx)
-{
-  drawCommon(settings[MENU_UI], x, y, sx, true);
+// static void drawUILayout(int x, int y, int sx)
+// {
+//   drawCommon(settings[MENU_UI], x, y, sx, true);
 
-  int count = ITEM_COUNT(uiLayoutDesc);
-  for(int i=-2 ; i<3 ; i++)
-  {
-    if(i==0) {
-      drawZoomedMenu(uiLayoutDesc[abs((uiLayoutIdx+count+i)%count)]);
-      spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
-    } else {
-      spr.setTextColor(TH.menu_item);
-    }
+//   int count = ITEM_COUNT(uiLayoutDesc);
+//   for(int i=-2 ; i<3 ; i++)
+//   {
+//     if(i==0) {
+//       drawZoomedMenu(uiLayoutDesc[abs((uiLayoutIdx+count+i)%count)]);
+//       spr.setTextColor(TH.menu_hl_text, TH.menu_hl_bg);
+//     } else {
+//       spr.setTextColor(TH.menu_item);
+//     }
 
-    // Prevent repeats for short menus
-    if (count < 5 && ((uiLayoutIdx+i) < 0 || (uiLayoutIdx+i) >= count)) {
-      continue;
-    }
+//     // Prevent repeats for short menus
+//     if (count < 5 && ((uiLayoutIdx+i) < 0 || (uiLayoutIdx+i) >= count)) {
+//       continue;
+//     }
 
-    spr.setTextDatum(MC_DATUM);
-    spr.drawString(uiLayoutDesc[abs((uiLayoutIdx+count+i)%count)], 40+x+(sx/2), 64+y+(i*16), 2);
-  }
-}
+//     spr.setTextDatum(MC_DATUM);
+//     spr.drawString(uiLayoutDesc[abs((uiLayoutIdx+count+i)%count)], 40+x+(sx/2), 64+y+(i*16), 2);
+//   }
+// }
 
 static void drawRDSMode(int x, int y, int sx)
 {
@@ -2809,15 +2809,15 @@ static void drawSleep(int x, int y, int sx)
   spr.drawNumber(currentSleep, 40+x+(sx/2), 60+y, 4);
 }
 
-static void drawZoom(int x, int y, int sx)
-{
-  drawCommon(settings[MENU_ZOOM], x, y, sx);
-  drawZoomedMenu(settings[MENU_ZOOM]);
-  spr.setTextDatum(MC_DATUM);
+// static void drawZoom(int x, int y, int sx)
+// {
+//   drawCommon(settings[MENU_ZOOM], x, y, sx);
+//   drawZoomedMenu(settings[MENU_ZOOM]);
+//   spr.setTextDatum(MC_DATUM);
 
-  spr.setTextColor(TH.menu_param);
-  spr.drawString(zoomMenu ? "On" : "Off", 40+x+(sx/2), 60+y, 4);
-}
+//   spr.setTextColor(TH.menu_param);
+//   spr.drawString(zoomMenu ? "On" : "Off", 40+x+(sx/2), 60+y, 4);
+// }
 
 static void drawScrollDir(int x, int y, int sx)
 {
