@@ -492,11 +492,11 @@ spr.drawRect(43,  2, 44, 16, TFT_WHITE);
 // BFO
 spr.drawRect(88,  2, 29, 16, TFT_WHITE);
 // Mode
-spr.drawRect(118, 2, 29, 16, TFT_WHITE);
+spr.drawRect(118, 2, 29, 16, TFT_BLUE);
 // Bandwidth
-spr.drawRect(148, 2, 54, 16, TFT_WHITE);
+spr.drawRect(148, 2, 58, 16, TFT_WHITE);
 // Band
-spr.drawRect(203, 2, 49, 16, TFT_WHITE);
+spr.drawRect(207, 2, 45, 16, TFT_PINK);
 // Step
 spr.drawRect(253, 2, 40, 16, TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
@@ -551,7 +551,7 @@ spr.setTextColor(c);
 spr.drawString("BFO", 103, 10, 2);
 
 // ----- MODE -----
-spr.setTextColor(TFT_WHITE);
+spr.setTextColor(TFT_BLUE);
 spr.setTextDatum(MC_DATUM);
 spr.drawString(bandModeDesc[currentMode], 133, 10, 2);
 
@@ -567,12 +567,12 @@ else
 
 spr.setTextColor(TFT_WHITE);
 spr.setTextDatum(MC_DATUM);
-spr.drawString(bwText, 175, 10, 2);
+spr.drawString(bwText, 177, 10, 2);
 
 // ----- Band name -----
-spr.setTextColor(TFT_WHITE);
+spr.setTextColor(TFT_PINK);
 spr.setTextDatum(MC_DATUM);
-spr.drawString(getCurrentBand()->bandName, 228, 10, 2);
+spr.drawString(getCurrentBand()->bandName, 229, 10, 2);
 
 // ----- Step -----
 spr.setTextColor(TFT_WHITE);
