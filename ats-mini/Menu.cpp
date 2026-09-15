@@ -2071,6 +2071,28 @@ static void drawNewSettingsMenu()
     }
 }
 
+static void drawNewSquelchMenu()
+{
+    spr.setTextColor(TFT_WHITE);
+    spr.setTextDatum(MC_DATUM);
+
+    // Header
+    spr.drawString("SQL", 36, 80, 2);
+
+    uint8_t squelchValue = currentSquelch[currentMode] & 0x7F;
+    bool squelchParam = currentSquelch[currentMode] & 0x80;
+
+    // Large value
+    if (squelchValue)
+        spr.drawNumber(squelchValue, 36, 116, 4);
+    else
+        spr.drawString("OFF", 36, 116, 4);
+
+    // Parameter mode under the value
+    spr.setTextColor(TFT_WHITE);
+    spr.drawString(squelchParam ? "SNR" : "RSSI", 36, 145, 2);
+}
+
 void drawNewMenuPanel()
 {
     switch (currentCmd)
@@ -2079,6 +2101,7 @@ void drawNewMenuPanel()
         case CMD_STEP:      drawNewStepMenu();      break;
         case CMD_MODE:      drawNewModeMenu();      break;
         case CMD_BANDWIDTH: drawNewBandwidthMenu(); break;
+        case CMD_SQUELCH:   drawNewSquelchMenu();   break;
         case CMD_SETTINGS:  drawNewSettingsMenu();  break;
         default:            drawNewMenu();          break;
     }
