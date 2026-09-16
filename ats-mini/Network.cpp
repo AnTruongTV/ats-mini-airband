@@ -275,7 +275,7 @@ static bool wifiInitAP()
 
   drawScreen(
     ("Use Access Point " + String(apSSID)).c_str(),
-    ("IP : " + WiFi.softAPIP().toString() + " or atsmini.local").c_str()
+    ("IP : " + WiFi.softAPIP().toString() + " / atsmini.local").c_str()
   );
 
   ajaxInterval = 2500;
