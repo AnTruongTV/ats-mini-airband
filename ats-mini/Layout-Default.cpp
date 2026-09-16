@@ -472,17 +472,17 @@ void drawLayoutDefault(const char *statusLine1, const char *statusLine2)
 spr.fillSprite(TFT_BLACK);
 
 // Main divider lines
-spr.drawRect(0, 0, 320, 170, TFT_WHITE);
-spr.drawFastHLine(0, 19, 320, TFT_WHITE);
-spr.drawFastVLine(72, 19, 151, TFT_WHITE);
-spr.drawFastHLine(0, 72, 320, TFT_WHITE);
-spr.drawFastHLine(72, 102, 248, TFT_WHITE);
-spr.drawFastHLine(72, 119, 248, TFT_WHITE);
-spr.drawFastVLine(254, 119, 51, TFT_WHITE);
-spr.drawFastVLine(270, 119, 18, TFT_WHITE);
-spr.drawFastHLine(254, 136, 66, TFT_WHITE);
-spr.drawFastHLine(0, 87, 73, TFT_WHITE);
-spr.drawFastHLine(0, 38, 72, TFT_WHITE);
+spr.drawRect(0, 0, 320, 170, spr.color565(90, 190, 220));
+spr.drawFastHLine(0, 19, 320, spr.color565(90, 190, 220));
+spr.drawFastVLine(72, 19, 151, spr.color565(90, 190, 220));
+spr.drawFastHLine(0, 72, 320, spr.color565(90, 190, 220));
+spr.drawFastHLine(72, 102, 248, spr.color565(90, 190, 220));
+spr.drawFastHLine(72, 119, 248, spr.color565(90, 190, 220));
+spr.drawFastVLine(254, 119, 51, spr.color565(90, 190, 220));
+spr.drawFastVLine(270, 119, 18, spr.color565(90, 190, 220));
+spr.drawFastHLine(254, 136, 66, spr.color565(90, 190, 220));
+spr.drawFastHLine(0, 87, 73, spr.color565(90, 190, 220));
+spr.drawFastHLine(0, 38, 72, spr.color565(90, 190, 220));
   
 // 7 boxes - adjusted to your new mockup
 // Time
@@ -612,9 +612,10 @@ if (wifiStatus)
 // =====================
 if (currentMode == FM)
 {
+  spr.setTextColor(spr.color565(255, 170, 40));
   spr.setTextDatum(MR_DATUM);
   spr.drawFloat(currentFrequency / 100.0, 2, 262, 46, 7);
-
+  spr.setTextColor(TFT_WHITE);
   spr.setTextDatum(MC_DATUM);
   spr.drawString("MHz", 289, 61, 4);
 }
@@ -652,7 +653,7 @@ else if (bandIdx == 2)
     // Font 2
     spr.drawString(
         dcvText,
-        293,
+        294,
         34,
         2
     );
@@ -684,10 +685,10 @@ else if (bandIdx == 2)
     displayFreq / 1000,
     displayFreq % 1000
   );
-
+  spr.setTextColor(spr.color565(255, 170, 40));
   spr.setTextDatum(MR_DATUM);
   spr.drawString(freqText, 262, 46, 7);
-
+  spr.setTextColor(TFT_WHITE);
   spr.setTextDatum(MC_DATUM);
   spr.drawString("MHz", 289, 61, 4);
 }
@@ -697,29 +698,33 @@ else if (bandIdx == 2)
 // =====================
 else
 {
-  uint32_t freqHz;
+    uint32_t freqHz;
 
-  if (isSSB())
-    freqHz = currentFrequency * 1000 + currentBFO;
-  else
-    freqHz = currentFrequency * 1000;
+    if (isSSB())
+        freqHz = currentFrequency * 1000 + currentBFO;
+    else
+        freqHz = currentFrequency * 1000;
 
-  // Large kHz part
-  spr.setTextDatum(MR_DATUM);
-  spr.drawNumber(freqHz / 1000, 262, 46, 7);
+    // Main frequency color - amber
+    spr.setTextColor(spr.color565(255, 170, 40));
 
-  // Small .xxx part
-  char fracText[8];
-  sprintf(fracText, ".%03lu", freqHz % 1000);
+    // Large kHz part
+    spr.setTextDatum(MR_DATUM);
+    spr.drawNumber(freqHz / 1000, 262, 46, 7);
 
-  spr.setTextDatum(ML_DATUM);
-  spr.drawString(fracText, 267, 61, 4);
+    // Small .xxx part
+    char fracText[8];
+    sprintf(fracText, ".%03lu", freqHz % 1000);
 
-  // kHz opposite .xxx
-  spr.setTextDatum(MC_DATUM);
-  spr.drawString("kHz", 292, 39, 4);
+    spr.setTextDatum(ML_DATUM);
+    spr.drawString(fracText, 267, 61, 4);
+
+    // kHz stays white
+    spr.setTextColor(TFT_WHITE);
+    spr.setTextDatum(MC_DATUM);
+    spr.drawString("kHz", 292, 39, 4);
 }
-
+  
 // =====================
 // STATION / CHANNEL NAME
 // =====================
